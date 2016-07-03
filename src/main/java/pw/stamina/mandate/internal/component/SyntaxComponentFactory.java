@@ -21,6 +21,7 @@ package pw.stamina.mandate.internal.component;
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
+import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.internal.execution.MethodExecutable;
@@ -47,12 +48,12 @@ public final class SyntaxComponentFactory {
 
         if ((tree = treeifySubSyntax(backingMethod.getDeclaredAnnotation(Executes.class).tree())).length > 0) {
             addSubSyntax((parents = Arrays.stream(syntax.syntax())
-                    .map(SyntaxComponent::new)
+                    .map(BaseSyntaxComponent::new)
                     .collect(Collectors.toCollection(LinkedHashSet::new))), tree, 0, new MethodExecutable(backingMethod, container, commandManager));
         } else {
             CommandExecutable executable = new MethodExecutable(backingMethod, container, commandManager);
             return Arrays.stream(syntax.syntax())
-                    .map(s -> new SyntaxComponent(s, executable))
+                    .map(s -> new BaseSyntaxComponent(s, executable))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         }
 
@@ -63,12 +64,12 @@ public final class SyntaxComponentFactory {
         for (SyntaxComponent component : syntaxComponents) {
             if (index < syntaxTree.length - 1) {
                 Arrays.stream(syntaxTree[index])
-                        .map(SyntaxComponent::new)
+                        .map(BaseSyntaxComponent::new)
                         .forEach(component::addChild);
                 addSubSyntax(component.getChildren(), syntaxTree, index+1, terminalOp);
             } else {
                 Arrays.stream(syntaxTree[index])
-                        .map(s -> new SyntaxComponent(s, terminalOp))
+                        .map(s -> new BaseSyntaxComponent(s, terminalOp))
                         .forEach(component::addChild);
             }
         }

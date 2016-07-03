@@ -26,7 +26,7 @@ import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.CommandResult;
 import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
-import pw.stamina.mandate.internal.component.SyntaxComponent;
+import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
 import pw.stamina.mandate.internal.execution.argument.handlers.NumberArgumentHandler;
 import pw.stamina.mandate.internal.execution.argument.handlers.StringArgumentHandler;

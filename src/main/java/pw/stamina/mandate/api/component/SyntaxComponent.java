@@ -16,27 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.api;
+package pw.stamina.mandate.api.component;
 
-import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.api.execution.result.CommandResult;
-import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
-import pw.stamina.mandate.api.component.SyntaxComponent;
+import pw.stamina.mandate.api.execution.CommandExecutable;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Foundry
  */
-public interface CommandManager {
-    boolean register(Object container);
+public interface SyntaxComponent {
+    String getSyntax();
 
-    Optional<CommandResult> execute(String input);
+    SyntaxComponent getChild(String syntax);
 
-    <T> Optional<ArgumentHandler<T>> findArgumentHandler(Class<T> type);
+    void addChild(SyntaxComponent component);
 
-    <T> Optional<ExecutableResultHandler<T>> findOutputParser(Class<T> type);
+    Collection<SyntaxComponent> getChildren();
 
-    Collection<SyntaxComponent> getCommands();
+    void addExecutable(CommandExecutable executable);
+
+    Optional<Set<CommandExecutable>> findExecutables();
 }

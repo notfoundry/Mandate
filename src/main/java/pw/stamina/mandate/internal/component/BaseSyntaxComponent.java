@@ -18,6 +18,7 @@
 
 package pw.stamina.mandate.internal.component;
 
+import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 
 import java.util.*;
@@ -25,47 +26,53 @@ import java.util.*;
 /**
  * @author Foundry
  */
-public class SyntaxComponent {
+public class BaseSyntaxComponent implements SyntaxComponent {
     private final Map<String, SyntaxComponent> childMap;
     private final String syntax;
     private Set<CommandExecutable> executables;
 
-    public SyntaxComponent(String syntax) {
+    public BaseSyntaxComponent(String syntax) {
         this(syntax, new CommandExecutable[0]);
     }
 
-    public SyntaxComponent(String syntax, CommandExecutable... executables) {
+    public BaseSyntaxComponent(String syntax, CommandExecutable... executables) {
         this.syntax = syntax;
         this.executables = new HashSet<>(Arrays.asList(executables));
         this.childMap = new LinkedHashMap<>();
     }
 
+    @Override
     public String getSyntax() {
         return syntax;
     }
 
+    @Override
     public SyntaxComponent getChild(String syntax) {
         return childMap.get(syntax);
     }
 
+    @Override
     public void addChild(SyntaxComponent component) {
         childMap.put(component.getSyntax(), component);
     }
 
+    @Override
     public Collection<SyntaxComponent> getChildren() {
         return Collections.unmodifiableCollection(childMap.values());
     }
 
+    @Override
     public void addExecutable(CommandExecutable executable) {
         executables.add(executable);
     }
 
+    @Override
     public Optional<Set<CommandExecutable>> findExecutables() {
         return Optional.ofNullable(executables);
     }
 
     @Override
     public String toString() {
-        return String.format("SyntaxComponent{syntax=%s, children=%s, executables=%s}", syntax, childMap.values(), executables);
+        return String.format("BaseSyntaxComponent{syntax=%s, children=%s, executables=%s}", syntax, childMap.values(), executables);
     }
 }
