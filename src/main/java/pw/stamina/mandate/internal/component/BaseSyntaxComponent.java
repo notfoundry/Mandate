@@ -27,7 +27,7 @@ import java.util.*;
  * @author Foundry
  */
 public class BaseSyntaxComponent implements SyntaxComponent {
-    private final Map<String, SyntaxComponent> childMap;
+    private  Map<String, SyntaxComponent> childMap;
     private final String syntax;
     private Set<CommandExecutable> executables;
 
@@ -37,8 +37,9 @@ public class BaseSyntaxComponent implements SyntaxComponent {
 
     public BaseSyntaxComponent(String syntax, CommandExecutable... executables) {
         this.syntax = syntax;
-        this.executables = new HashSet<>(Arrays.asList(executables));
-        this.childMap = new LinkedHashMap<>();
+        if (executables.length > 0) {
+            this.executables = new HashSet<>(Arrays.asList(executables));
+        }
     }
 
     @Override
@@ -48,21 +49,23 @@ public class BaseSyntaxComponent implements SyntaxComponent {
 
     @Override
     public SyntaxComponent getChild(String syntax) {
-        return childMap.get(syntax);
+        return childMap != null ? childMap.get(syntax) : null;
     }
 
     @Override
     public void addChild(SyntaxComponent component) {
+        if (childMap == null) childMap = new LinkedHashMap<>();
         childMap.put(component.getSyntax(), component);
     }
 
     @Override
-    public Collection<SyntaxComponent> getChildren() {
-        return Collections.unmodifiableCollection(childMap.values());
+    public Optional<Collection<SyntaxComponent>> findChildren() {
+        return Optional.ofNullable(childMap).map(Map::values).map(Collections::unmodifiableCollection);
     }
 
     @Override
     public void addExecutable(CommandExecutable executable) {
+        if (executables == null) executables = new HashSet<>();
         executables.add(executable);
     }
 

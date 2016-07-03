@@ -34,7 +34,7 @@ public interface SyntaxComponent {
 
     void addChild(SyntaxComponent component);
 
-    Collection<SyntaxComponent> getChildren();
+    Optional<Collection<SyntaxComponent>> findChildren();
 
     void addExecutable(CommandExecutable executable);
 

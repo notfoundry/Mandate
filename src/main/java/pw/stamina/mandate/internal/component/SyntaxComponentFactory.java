@@ -66,7 +66,7 @@ public final class SyntaxComponentFactory {
                 Arrays.stream(syntaxTree[index])
                         .map(BaseSyntaxComponent::new)
                         .forEach(component::addChild);
-                addSubSyntax(component.getChildren(), syntaxTree, index+1, terminalOp);
+                addSubSyntax(component.findChildren().get(), syntaxTree, index+1, terminalOp);
             } else {
                 Arrays.stream(syntaxTree[index])
                         .map(s -> new BaseSyntaxComponent(s, terminalOp))

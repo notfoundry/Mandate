@@ -173,11 +173,13 @@ public class AnnotatedCommandManager implements CommandManager {
     private static void mergeSyntaxComponent(SyntaxComponent newComponent, SyntaxComponent oldComponent) {
         SyntaxComponent lookup;
         newComponent.findExecutables().ifPresent(set -> set.forEach(oldComponent::addExecutable));
-        for (SyntaxComponent component : newComponent.getChildren()) {
-            if ((lookup = oldComponent.getChild(component.getSyntax())) != null) {
-                mergeSyntaxComponent(component, lookup);
-            } else {
-                oldComponent.addChild(component);
+        if (newComponent.findChildren().isPresent()) {
+            for (SyntaxComponent component : newComponent.findChildren().get()) {
+                if ((lookup = oldComponent.getChild(component.getSyntax())) != null) {
+                    mergeSyntaxComponent(component, lookup);
+                } else {
+                    oldComponent.addChild(component);
+                }
             }
         }
     }
