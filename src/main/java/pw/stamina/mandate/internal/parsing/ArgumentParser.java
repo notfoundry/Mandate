@@ -20,12 +20,11 @@ package pw.stamina.mandate.internal.parsing;
 
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
+import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.parameter.CommandParameter;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,17 +37,17 @@ public enum ArgumentParser {
         return INSTANCE;
     }
 
-    public Object[] parseArguments(Deque<CommandArgument> arguments, List<CommandParameter> parameters, CommandManager commandManager) throws ArgumentParsingException {
-        final Object[] parsedArgs = new Object[parameters.size()];
+    public Object[] parseArguments(Deque<CommandArgument> arguments, CommandExecutable executable, CommandManager commandManager) throws ArgumentParsingException {
+        final Object[] parsedArgs = new Object[executable.getParameters().size()];
         final boolean[] presentArgs = new boolean[parsedArgs.length];
         for (int i = 0; i < parsedArgs.length; i++) {
-            if (!parameters.get(i).isOptional()) {
-                Optional<ArgumentHandler<Object>> argumentHandler = commandManager.findArgumentHandler((Class<Object>) parameters.get(i).getType());
+            if (!executable.getParameters().get(i).isOptional()) {
+                Optional<ArgumentHandler<Object>> argumentHandler = commandManager.findArgumentHandler((Class<Object>) executable.getParameters().get(i).getType());
                 if (argumentHandler.isPresent()) {
-                    parsedArgs[i] = argumentHandler.get().parse(arguments.poll(), parameters.get(i), commandManager);
+                    parsedArgs[i] = argumentHandler.get().parse(arguments.poll(), executable.getParameters().get(i), commandManager);
                     presentArgs[i] = true;
                 } else {
-                    throw new ArgumentParsingException(String.format("No argument handler exists for argument parameter type '%s'", parameters.get(i).getType().getCanonicalName()));
+                    throw new ArgumentParsingException(String.format("No argument handler exists for argument parameter type '%s'", executable.getParameters().get(i).getType().getCanonicalName()));
                 }
             } else {
                 parsedArgs[i] = Optional.empty();

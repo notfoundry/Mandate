@@ -91,7 +91,7 @@ public class AnnotatedCommandManager implements CommandManager {
                     for (CommandExecutable executable : component.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
                             try {
-                                Object[] executionArgs = ArgumentParser.getInstance().parseArguments(arguments, executable.getParameters(), this);
+                                Object[] executionArgs = ArgumentParser.getInstance().parseArguments(arguments, executable, this);
                                 return executable.execute(executionArgs);
                             } catch (ArgumentParsingException e) {
                                 lastException = e;

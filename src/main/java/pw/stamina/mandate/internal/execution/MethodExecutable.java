@@ -78,8 +78,7 @@ public class MethodExecutable implements CommandExecutable {
             return Optional.ofNullable(output).flatMap(o -> commandManager.findOutputParser((Class<Object>) o.getClass())).map(parser -> Optional.of(parser.generateResult(output)))
                     .orElse(Optional.of(ResultFactory.immediate("Unable to parse output of backing method " + backingMethod.getName(), CommandResult.Status.FAILED)));
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.of(ResultFactory.immediate("Exception encountered while executing backing method " + backingMethod.getName(), CommandResult.Status.TERMINATED));
+            return Optional.of(ResultFactory.immediate(String.format("Exception while executing method '%s': %s", backingMethod.getName(), e.getCause()), CommandResult.Status.TERMINATED));
         }
     }
 
