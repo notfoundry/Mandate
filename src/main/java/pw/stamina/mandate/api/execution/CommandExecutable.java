@@ -31,4 +31,8 @@ public interface CommandExecutable {
     Optional<CommandResult> execute(Object[] arguments);
 
     List<CommandParameter> getParameters();
+
+    int minimumArguments();
+
+    int maximumArguments();
 }

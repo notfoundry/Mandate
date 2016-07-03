@@ -53,7 +53,7 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
         } else {
             final IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
             if (intClamp != null) {
-                Long min, max, typeMinimum, typeMaximum;
+                Long min, max;
                 if (resultNumber.longValue() < (min = Math.min(intClamp.min(), intClamp.max()))) {
                     resultNumber = parseNumber(numberClass, min.toString());
                 } else if (resultNumber.longValue() > (max = (Math.max(intClamp.min(), intClamp.max())))) {

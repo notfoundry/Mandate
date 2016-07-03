@@ -89,9 +89,9 @@ public class AnnotatedCommandManager implements CommandManager {
                 if (component.findExecutables().isPresent()) {
                     int lowestConsumed = Integer.MAX_VALUE; ArgumentParsingException lastException = null;
                     for (CommandExecutable executable : component.findExecutables().get()) {
-                        if (executable.getParameters().size() == arguments.size()) {
+                        if (arguments.size() <= executable.maximumArguments()  && arguments.size() >= executable.minimumArguments()) {
                             try {
-                                Object[] executionArgs = ArgumentParser.getInstance().parseArguments(arguments, executable.getParameters());
+                                Object[] executionArgs = ArgumentParser.getInstance().parseArguments(arguments, executable.getParameters(), this);
                                 return executable.execute(executionArgs);
                             } catch (ArgumentParsingException e) {
                                 lastException = e;
@@ -100,7 +100,7 @@ public class AnnotatedCommandManager implements CommandManager {
                             lowestConsumed = lowestConsumed > executable.getParameters().size() ? executable.getParameters().size() : lowestConsumed;
                         }
                     }
-                    if (lastException != null) lastException.printStackTrace();
+                    if (lastException != null) return Optional.of(ResultFactory.immediate(lastException.getLocalizedMessage(), CommandResult.Status.FAILED));
                     if (lowestConsumed != Integer.MAX_VALUE) depth += lowestConsumed;
                 }
                 if (!arguments.isEmpty() && component.getChild(arguments.getFirst().getArgument()) != null) {

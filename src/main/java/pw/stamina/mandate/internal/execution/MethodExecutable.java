@@ -72,7 +72,7 @@ public class MethodExecutable implements CommandExecutable {
     }
 
     @Override
-    public Optional<CommandResult> execute(Object[] arguments) {
+    public Optional<CommandResult> execute(Object... arguments) {
         try {
             final Object output = backingMethod.invoke(methodParent, arguments);
             return Optional.ofNullable(output).flatMap(o -> commandManager.findOutputParser((Class<Object>) o.getClass())).map(parser -> Optional.of(parser.generateResult(output)))
@@ -86,6 +86,16 @@ public class MethodExecutable implements CommandExecutable {
     @Override
     public List<CommandParameter> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public int minimumArguments() {
+        return (int) parameters.stream().filter(param -> !param.isOptional()).count();
+    }
+
+    @Override
+    public int maximumArguments() {
+        return parameters.size();
     }
 
     @Override

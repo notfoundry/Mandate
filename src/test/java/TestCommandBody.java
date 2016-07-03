@@ -19,26 +19,17 @@
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
 
+import java.util.Optional;
+
 /**
  * @author Foundry
  */
 @Syntax(syntax = {"execute", "exec", "do"})
 class TestCommandBody {
 
-    @Executes(tree = {"return|ret", "string|str"})
-    public String doSomething(String something) {
-        return "Someone said: " + something;
-    }
-
-    @Executes(tree = {"return|ret", "string|str"})
-    public String doSomething(String sender, String something) {
-        return sender + " said: " + something;
-    }
-
-    @Executes
-    @Syntax(syntax = {"sum", "add"})
-    private int sum(int first, int second) {
-        return first + second;
+    @Executes(tree = "greet|gr")
+    public String greetSomeone(Optional<String> greeter, String greeting, Optional<String> greeted) {
+        return greeter.orElse("Someone") + " greeted " + greeted.orElse("someone else") + " with " + greeting;
     }
 
 }

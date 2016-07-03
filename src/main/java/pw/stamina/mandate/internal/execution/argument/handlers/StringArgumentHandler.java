@@ -48,10 +48,12 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
         }
         Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
-            double min = Math.min(length.min(), length.max());
-            double max = Math.max(length.min(), length.max());
-            if (min < (double)input.getArgument().length() || max > (double)input.getArgument().length()) {
-                throw new ArgumentParsingException(String.format("'%s' is either too long or too short. (%s-%s)", input, min, max));
+            int min = Math.min(length.min(), length.max());
+            int max = Math.max(length.min(), length.max());
+            if (input.getArgument().length() < min) {
+                throw new ArgumentParsingException(String.format("'%s' is too short: length can be between %s-%s characters", input, min, max));
+            } else if (input.getArgument().length() > max) {
+                throw new ArgumentParsingException(String.format("'%s' is too long: length can be between %s-%s characters", input, min, max));
             }
         }
         return input.getArgument();
