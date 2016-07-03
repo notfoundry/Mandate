@@ -1,0 +1,1 @@
+Mandate - A flexible annotation-based command parsing and execution system
