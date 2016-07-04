@@ -21,10 +21,11 @@ package pw.stamina.mandate.internal.execution.argument.handlers;
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.internal.annotations.strings.Equals;
 import pw.stamina.mandate.internal.annotations.strings.Length;
-import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.parameter.CommandParameter;
+import pw.stamina.mandate.api.execution.CommandParameter;
+import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.exceptions.ParseFailException;
 
 import java.util.regex.Pattern;
 
@@ -34,7 +35,7 @@ import java.util.regex.Pattern;
 public class StringArgumentHandler implements ArgumentHandler<String> {
 
     @Override
-    public String parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ArgumentParsingException {
+    public String parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
         if (input.getArgument().length() == 0) {
             return null;
         }
@@ -44,16 +45,16 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
                 if (!(equals.regex() ? Pattern.compile(string).matcher(input.getArgument()).matches() : string.equalsIgnoreCase(input.getArgument()))) continue;
                 return input.getArgument();
             }
-            throw new ArgumentParsingException(String.format("'%s' doesn't match %s (regex=%s)", input, String.format("['%s']", String.join("'/'", equals.value())), equals.regex()));
+            throw new ParseFailException(input.getArgument(), this.getClass(), String.format("'%s' doesn't match %s (regex=%s)", input.getArgument(), String.format("['%s']", String.join("'/'", equals.value())), equals.regex()));
         }
         Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
             int min = Math.min(length.min(), length.max());
             int max = Math.max(length.min(), length.max());
             if (input.getArgument().length() < min) {
-                throw new ArgumentParsingException(String.format("'%s' is too short: length can be between %s-%s characters", input, min, max));
+                throw new ParseFailException(input.getArgument(), this.getClass(), String.format("'%s' is too short: length can be between %s-%s characters", input.getArgument(), min, max));
             } else if (input.getArgument().length() > max) {
-                throw new ArgumentParsingException(String.format("'%s' is too long: length can be between %s-%s characters", input, min, max));
+                throw new ParseFailException(input.getArgument(), this.getClass(), String.format("'%s' is too long: length can be between %s-%s characters", input.getArgument(), min, max));
             }
         }
         return input.getArgument();

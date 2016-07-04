@@ -19,14 +19,14 @@
 package pw.stamina.mandate.api.execution.argument;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
-import pw.stamina.mandate.api.execution.parameter.CommandParameter;
+import pw.stamina.mandate.api.execution.CommandParameter;
+import pw.stamina.parsor.exceptions.ParseException;
 
 /**
  * @author Foundry
  */
 public interface ArgumentHandler<T> {
-    T parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ArgumentParsingException;
+    T parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException;
 
     String getSyntax(CommandParameter parameter);
 

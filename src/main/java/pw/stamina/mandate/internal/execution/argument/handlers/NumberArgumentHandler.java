@@ -21,11 +21,12 @@ package pw.stamina.mandate.internal.execution.argument.handlers;
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
 import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
-import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.parameter.CommandParameter;
+import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.internal.utils.Primitives;
+import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.exceptions.ParseFailException;
 
 import java.util.regex.Pattern;
 
@@ -36,7 +37,7 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
     private static final Pattern hexValidator = Pattern.compile("^(-|\\+)?(0x|0X|#)[a-fA-F0-9]+$"); //require hex prefix
 
     @Override
-    public final Number parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ArgumentParsingException {
+    public final Number parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
         Class<? extends Number> numberClass; Number resultNumber = parseNumber((numberClass = Primitives.wrap(parameter.getType())), input.getArgument());
 
         if (numberClass == Float.class || numberClass == Double.class) {
@@ -92,7 +93,7 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
         return new Class[] {Number.class};
     }
 
-    private Number parseNumber(Class numberClass, String input) throws ArgumentParsingException {
+    private Number parseNumber(Class numberClass, String input) throws ParseException {
         Number resultNumber;
         try {
             if (numberClass == Byte.class) resultNumber = Byte.decode(input);
@@ -102,7 +103,7 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
             else if (numberClass == Float.class) resultNumber = hexValidator.matcher(input).matches() ? Integer.decode(input).floatValue() : Float.valueOf(input);
             else resultNumber = hexValidator.matcher(input).matches() ? Long.decode(input).doubleValue() : Double.valueOf(input);
         } catch (NumberFormatException e) {
-            throw new ArgumentParsingException(String.format("'%s' cannot be parsed to a %s: %s", input, numberClass.getSimpleName(), e.getMessage()));
+            throw new ParseFailException(input, this.getClass(), String.format("'%s' cannot be parsed to a %s", input, numberClass.getSimpleName()), e);
         }
         return resultNumber;
     }

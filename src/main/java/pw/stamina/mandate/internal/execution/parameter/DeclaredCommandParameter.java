@@ -18,7 +18,7 @@
 
 package pw.stamina.mandate.internal.execution.parameter;
 
-import pw.stamina.mandate.api.execution.parameter.CommandParameter;
+import pw.stamina.mandate.api.execution.CommandParameter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;

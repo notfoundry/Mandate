@@ -19,22 +19,22 @@
 package pw.stamina.mandate.internal;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.internal.annotations.Executes;
 import pw.stamina.mandate.api.component.SyntaxComponent;
-import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.CommandResult;
 import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
+import pw.stamina.mandate.internal.annotations.Executes;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
 import pw.stamina.mandate.internal.execution.argument.handlers.NumberArgumentHandler;
 import pw.stamina.mandate.internal.execution.argument.handlers.StringArgumentHandler;
 import pw.stamina.mandate.internal.execution.result.ResultFactory;
 import pw.stamina.mandate.internal.execution.result.handlers.NumberResultHandler;
 import pw.stamina.mandate.internal.execution.result.handlers.StringResultHandler;
-import pw.stamina.mandate.internal.parsing.InputTokenizer;
+import pw.stamina.mandate.internal.parsing.InputToArgumentParser;
 import pw.stamina.mandate.internal.utils.Primitives;
+import pw.stamina.parsor.exceptions.ParseException;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -82,16 +82,16 @@ public class AnnotatedCommandManager implements CommandManager {
         List<CommandArgument> consumedArgs = new ArrayList<>();
 
         Deque<CommandArgument> arguments; SyntaxComponent component; CommandArgument currentArgument; int depth = 0;
-        if ((component = registeredCommands.get((currentArgument = (arguments = InputTokenizer.getInstance().tokenize(input)).getFirst()).getArgument())) != null) {
+        if ((component = registeredCommands.get((currentArgument = (arguments = InputToArgumentParser.getInstance().parse(input)).getFirst()).getArgument())) != null) {
             while ((currentArgument = arguments.poll()) != null) {
                 consumedArgs.add(currentArgument);
                 if (component.findExecutables().isPresent()) {
-                    int lowestConsumed = Integer.MAX_VALUE; ArgumentParsingException lastException = null;
+                    int lowestConsumed = Integer.MAX_VALUE; ParseException lastException = null;
                     for (CommandExecutable executable : component.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
                             try {
                                 return executable.execute(arguments);
-                            } catch (ArgumentParsingException e) {
+                            } catch (ParseException e) {
                                 lastException = e;
                             }
                         } else {
