@@ -19,7 +19,7 @@
 package pw.stamina.mandate.internal;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.internal.annotations.Executes;
 import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.execution.CommandExecutable;

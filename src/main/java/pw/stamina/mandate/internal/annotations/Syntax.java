@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.api.annotations.numeric;
+package pw.stamina.mandate.internal.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,11 +26,8 @@ import java.lang.annotation.Target;
 /**
  * @author Foundry
  */
-@Target(value=ElementType.PARAMETER)
+@Target(value={ElementType.METHOD, ElementType.TYPE})
 @Retention(value=RetentionPolicy.RUNTIME)
-public @interface IntClamp {
-    long min() default Long.MIN_VALUE;
-
-    long max() default Long.MAX_VALUE;
+public @interface Syntax {
+    String[] syntax() default {};
 }
-

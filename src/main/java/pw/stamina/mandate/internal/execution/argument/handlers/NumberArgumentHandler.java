@@ -19,8 +19,8 @@
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.annotations.numeric.IntClamp;
-import pw.stamina.mandate.api.annotations.numeric.RealClamp;
+import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
+import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
 import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
