@@ -18,9 +18,12 @@
 
 package pw.stamina.mandate.api.execution;
 
+import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
+import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.parameter.CommandParameter;
 import pw.stamina.mandate.api.execution.result.CommandResult;
 
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +31,7 @@ import java.util.Optional;
  * @author Foundry
  */
 public interface CommandExecutable {
-    Optional<CommandResult> execute(Object[] arguments);
+    Optional<CommandResult> execute(Deque<CommandArgument> arguments) throws ArgumentParsingException;
 
     List<CommandParameter> getParameters();
 

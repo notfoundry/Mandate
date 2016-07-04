@@ -20,20 +20,19 @@ package pw.stamina.mandate.internal;
 
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.CommandResult;
 import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
-import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
 import pw.stamina.mandate.internal.execution.argument.handlers.NumberArgumentHandler;
 import pw.stamina.mandate.internal.execution.argument.handlers.StringArgumentHandler;
 import pw.stamina.mandate.internal.execution.result.ResultFactory;
 import pw.stamina.mandate.internal.execution.result.handlers.NumberResultHandler;
 import pw.stamina.mandate.internal.execution.result.handlers.StringResultHandler;
-import pw.stamina.mandate.internal.parsing.ArgumentParser;
 import pw.stamina.mandate.internal.parsing.InputTokenizer;
 import pw.stamina.mandate.internal.utils.Primitives;
 
@@ -91,8 +90,7 @@ public class AnnotatedCommandManager implements CommandManager {
                     for (CommandExecutable executable : component.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
                             try {
-                                Object[] executionArgs = ArgumentParser.getInstance().parseArguments(arguments, executable, this);
-                                return executable.execute(executionArgs);
+                                return executable.execute(arguments);
                             } catch (ArgumentParsingException e) {
                                 lastException = e;
                             }

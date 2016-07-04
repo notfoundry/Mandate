@@ -32,4 +32,15 @@ class TestCommandBody {
         return greeter.orElse("Someone") + " greeted " + greeted.orElse("someone else") + " with " + greeting;
     }
 
+    @Executes(tree = "thing|th")
+    public String doThing(
+            Optional<String> arg1,
+            String arg2,
+            Optional<String> arg3,
+            Optional<String> arg4,
+            String arg5
+    ) {
+        return String.format("1='%s', 2='%s', 3='%s', 4='%s', 5='%s'", arg1.orElse("Default"), arg2, arg3.orElse("Default"), arg4.orElse("Default"), arg5);
+    }
+
 }

@@ -19,18 +19,22 @@
 package pw.stamina.mandate.internal.execution;
 
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.exceptions.ArgumentParsingException;
 import pw.stamina.mandate.api.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
+import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.parameter.CommandParameter;
 import pw.stamina.mandate.api.execution.result.CommandResult;
 import pw.stamina.mandate.internal.execution.parameter.DeclaredCommandParameter;
 import pw.stamina.mandate.internal.execution.result.ResultFactory;
+import pw.stamina.mandate.internal.parsing.ArgumentParser;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -72,9 +76,10 @@ public class MethodExecutable implements CommandExecutable {
     }
 
     @Override
-    public Optional<CommandResult> execute(Object... arguments) {
+    public Optional<CommandResult> execute(Deque<CommandArgument> arguments) throws ArgumentParsingException {
+        final Object[] parsedArgs = ArgumentParser.getInstance().parseArguments(arguments, this, commandManager);
         try {
-            final Object output = backingMethod.invoke(methodParent, arguments);
+            final Object output = backingMethod.invoke(methodParent, parsedArgs);
             return Optional.ofNullable(output).flatMap(o -> commandManager.findOutputParser((Class<Object>) o.getClass())).map(parser -> Optional.of(parser.generateResult(output)))
                     .orElse(Optional.of(ResultFactory.immediate("Unable to parse output of backing method " + backingMethod.getName(), CommandResult.Status.FAILED)));
         } catch (Exception e) {
