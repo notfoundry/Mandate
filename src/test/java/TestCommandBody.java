@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import pw.stamina.mandate.api.annotations.Executes;
-import pw.stamina.mandate.api.annotations.Syntax;
+import pw.stamina.mandate.internal.annotations.Executes;
+import pw.stamina.mandate.internal.annotations.Syntax;
 
 import java.util.Optional;
 

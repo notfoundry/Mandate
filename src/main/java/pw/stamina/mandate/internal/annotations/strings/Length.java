@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.api.annotations.numeric;
+package pw.stamina.mandate.internal.annotations.strings;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  */
 @Target(value=ElementType.PARAMETER)
 @Retention(value=RetentionPolicy.RUNTIME)
-public @interface RealClamp {
-    double min() default Double.NaN;
+public @interface Length {
+    int min() default 0;
 
-    double max() default Double.NaN;
+    int max() default Integer.MAX_VALUE;
 }
 
