@@ -29,7 +29,8 @@ public class OptionalCommandArgumentTest {
 
         Assert.assertTrue(result.isPresent());
 
-        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='Default', 4='Default', 5='secondRequired', 6='Default'", result.get().getResult());
+        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='Default', 4='Default', 5='secondRequired', 6='Default'",
+                result.get().getResult());
     }
 
     @Test
@@ -38,7 +39,8 @@ public class OptionalCommandArgumentTest {
 
         Assert.assertTrue(result.isPresent());
 
-        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='secondOptional', 4='Default', 5='secondRequired', 6='Default'", result.get().getResult());
+        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='secondOptional', 4='Default', 5='secondRequired', 6='Default'",
+                result.get().getResult());
     }
 
     @Test
@@ -47,19 +49,17 @@ public class OptionalCommandArgumentTest {
 
         Assert.assertTrue(result.isPresent());
 
-        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='secondOptional', 4='thirdOptional', 5='secondRequired', 6='fourthOptional'", result.get().getResult());
+        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='secondOptional', 4='thirdOptional', 5='secondRequired', 6='fourthOptional'",
+                result.get().getResult());
     }
 
     @Executes
     @Syntax(syntax = "execute")
-    public String doThing(
-            Optional<String> arg1,
-            String arg2,
-            Optional<String> arg3,
-            Optional<String> arg4,
-            String arg5,
-            Optional<String> arg6
-    ) {
-        return String.format("1='%s', 2='%s', 3='%s', 4='%s', 5='%s', 6='%s", arg1.orElse("Default"), arg2, arg3.orElse("Default"), arg4.orElse("Default"), arg5, arg6.orElse("Default"));
+    public String doThing(Optional<String> arg1, String arg2, Optional<String> arg3, Optional<String> arg4, String arg5, Optional<String> arg6) {
+        return String.format("1='%s', 2='%s', 3='%s', 4='%s', 5='%s', 6='%s",
+                arg1.orElse("Default"),
+                arg2, arg3.orElse("Default"),
+                arg4.orElse("Default"),
+                arg5, arg6.orElse("Default"));
     }
 }
