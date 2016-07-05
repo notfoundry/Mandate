@@ -47,6 +47,7 @@ public class MethodExecutable implements CommandExecutable {
     private final Object methodParent;
     private final CommandManager commandManager;
     private final List<CommandParameter> parameters;
+    private ArgumentToObjectParser argumentParser;
 
     public MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
         if (!(this.commandManager = commandManager).findOutputParser(backingMethod.getReturnType()).isPresent()) {
@@ -77,7 +78,7 @@ public class MethodExecutable implements CommandExecutable {
 
     @Override
     public Optional<CommandResult> execute(Deque<CommandArgument> arguments) throws ParseException {
-        final Object[] parsedArgs = new ArgumentToObjectParser(this, commandManager).parse(arguments);
+        final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
         try {
             final Object output = backingMethod.invoke(methodParent, parsedArgs);
             return Optional.ofNullable(output).flatMap(o -> commandManager.findOutputParser((Class<Object>) o.getClass())).map(parser -> Optional.of(parser.generateResult(output)))

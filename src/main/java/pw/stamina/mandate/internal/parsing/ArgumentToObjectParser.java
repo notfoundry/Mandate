@@ -33,7 +33,6 @@ import java.util.Optional;
  * @author Foundry
  */
 public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArgument>> {
-
     private final CommandExecutable executable;
 
     private final CommandManager commandManager;

@@ -43,4 +43,10 @@ class TestCommandBody {
         return String.format("1='%s', 2='%s', 3='%s', 4='%s', 5='%s'", arg1.orElse("Default"), arg2, arg3.orElse("Default"), arg4.orElse("Default"), arg5);
     }
 
+    @Executes
+    @Syntax(syntax = {"sum", "add"})
+    private int sum(int first, int second) {
+        return first + second;
+    }
+
 }

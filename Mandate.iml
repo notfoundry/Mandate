@@ -10,7 +10,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Parsor" />
     <orderEntry type="module" module-name="Commons" />
+    <orderEntry type="module" module-name="Parsor" />
   </component>
 </module>

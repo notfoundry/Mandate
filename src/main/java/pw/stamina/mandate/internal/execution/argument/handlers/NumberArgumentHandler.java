@@ -19,14 +19,14 @@
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
-import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
+import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.CommandParameter;
+import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
+import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
 import pw.stamina.mandate.internal.utils.Primitives;
 import pw.stamina.parsor.exceptions.ParseException;
-import pw.stamina.parsor.exceptions.ParseFailException;
+import pw.stamina.parsor.impl.parsers.standards.NumberParser;
 
 import java.util.regex.Pattern;
 
@@ -38,7 +38,7 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
 
     @Override
     public final Number parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        Class<? extends Number> numberClass; Number resultNumber = parseNumber((numberClass = Primitives.wrap(parameter.getType())), input.getArgument());
+        Class<? extends Number> numberClass; NumberParser parser; Number resultNumber = (parser = new NumberParser((numberClass = Primitives.wrap(parameter.getType())))).parse(input.getArgument());
 
         if (numberClass == Float.class || numberClass == Double.class) {
             final RealClamp realClamp = parameter.getAnnotation(RealClamp.class);
@@ -56,9 +56,9 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
             if (intClamp != null) {
                 Long min, max;
                 if (resultNumber.longValue() < (min = Math.min(intClamp.min(), intClamp.max()))) {
-                    resultNumber = parseNumber(numberClass, min.toString());
+                    resultNumber = parser.parse(min.toString());
                 } else if (resultNumber.longValue() > (max = (Math.max(intClamp.min(), intClamp.max())))) {
-                    resultNumber = parseNumber(numberClass, max.toString());
+                    resultNumber = parser.parse(max.toString());
                 }
             }
         }
@@ -91,20 +91,5 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
     @Override
     public Class[] getHandledTypes() {
         return new Class[] {Number.class};
-    }
-
-    private Number parseNumber(Class numberClass, String input) throws ParseException {
-        Number resultNumber;
-        try {
-            if (numberClass == Byte.class) resultNumber = Byte.decode(input);
-            else if (numberClass == Short.class) resultNumber = Short.decode(input);
-            else if (numberClass == Integer.class) resultNumber = Integer.decode(input);
-            else if (numberClass == Long.class) resultNumber = Long.decode(input);
-            else if (numberClass == Float.class) resultNumber = hexValidator.matcher(input).matches() ? Integer.decode(input).floatValue() : Float.valueOf(input);
-            else resultNumber = hexValidator.matcher(input).matches() ? Long.decode(input).doubleValue() : Double.valueOf(input);
-        } catch (NumberFormatException e) {
-            throw new ParseFailException(input, this.getClass(), String.format("'%s' cannot be parsed to a %s", input, numberClass.getSimpleName()), e);
-        }
-        return resultNumber;
     }
 }
