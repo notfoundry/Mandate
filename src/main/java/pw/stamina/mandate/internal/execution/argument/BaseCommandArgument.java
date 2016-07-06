@@ -31,7 +31,7 @@ public class BaseCommandArgument implements CommandArgument {
     }
 
     @Override
-    public String getArgument() {
+    public String getRaw() {
         return argument;
     }
 

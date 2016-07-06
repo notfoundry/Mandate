@@ -22,21 +22,18 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
-import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.CommandParameter;
-import pw.stamina.mandate.api.execution.result.CommandResult;
+import pw.stamina.mandate.api.io.IODescriptor;
+import pw.stamina.mandate.api.execution.argument.CommandArgument;
+import pw.stamina.mandate.api.execution.result.ResultCode;
 import pw.stamina.mandate.internal.execution.parameter.DeclaredCommandParameter;
-import pw.stamina.mandate.internal.execution.result.ResultFactory;
 import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
 import pw.stamina.parsor.exceptions.ParseException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -50,41 +47,25 @@ public class MethodExecutable implements CommandExecutable {
     private ArgumentToObjectParser argumentParser;
 
     public MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
-        if (!(this.commandManager = commandManager).findOutputParser(backingMethod.getReturnType()).isPresent()) {
-            throw new MalformedCommandException("Unsupported method return type " + backingMethod.getReturnType().getCanonicalName());
+        if (backingMethod.getReturnType() != ResultCode.class) {
+            throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does have a return type of " + ResultCode.class.getCanonicalName());
+        } else if (backingMethod.getParameterCount() == 0 || backingMethod.getParameterTypes()[0] != IODescriptor.class) {
+            throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does not have a first parameter of type " + IODescriptor.class.getCanonicalName());
         }
 
-        int[] index = new int[1];
-        this.parameters = Arrays.stream((this.backingMethod = backingMethod).getParameters()).map(parameter -> {
-            Class<?> type = parameter.getType();
-            if (type == Optional.class) {
-                Type generic = backingMethod.getGenericParameterTypes()[index[0]];
-                if (generic instanceof ParameterizedType) {
-                    type = (Class<?>) ((ParameterizedType) generic).getActualTypeArguments()[0];
-                } else {
-                    throw new UnsupportedParameterException("failed to resolve argument type for parameter " + parameter.getName());
-                }
-            }
-            if (!commandManager.findArgumentHandler(type).isPresent()) {
-                throw new UnsupportedParameterException(String.format("%s is not a supported parameter type.", type.getCanonicalName()));
-            }
-            index[0]++;
-            return new DeclaredCommandParameter(parameter, type);
-        }).collect(Collectors.toList());
-
+        this.parameters = generateCommandParameters((this.backingMethod = backingMethod), (this.commandManager = commandManager));
         this.methodParent = methodParent;
         this.backingMethod.setAccessible(true);
     }
 
     @Override
-    public Optional<CommandResult> execute(Deque<CommandArgument> arguments) throws ParseException {
+    public ResultCode execute(Deque<CommandArgument> arguments, IODescriptor descriptor) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
         try {
-            final Object output = backingMethod.invoke(methodParent, parsedArgs);
-            return Optional.ofNullable(output).flatMap(o -> commandManager.findOutputParser((Class<Object>) o.getClass())).map(parser -> Optional.of(parser.generateResult(output)))
-                    .orElse(Optional.of(ResultFactory.immediate("Unable to parse output of backing method " + backingMethod.getName(), CommandResult.Status.FAILED)));
+            return (ResultCode) backingMethod.invoke(methodParent, arrayConcat(new Object[] {descriptor}, parsedArgs));
         } catch (Exception e) {
-            return Optional.of(ResultFactory.immediate(String.format("Exception while executing method '%s': %s", backingMethod.getName(), e.getCause()), CommandResult.Status.TERMINATED));
+            descriptor.err().write(String.format("Exception while executing method '%s': %s", backingMethod.getName(), e));
+            return ResultCode.TERMINATED;
         }
     }
 
@@ -106,5 +87,35 @@ public class MethodExecutable implements CommandExecutable {
     @Override
     public String toString() {
         return String.format("MethodExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
+    }
+
+    private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) {
+        if (backingMethod.getParameterCount() > 1) {
+            int[] index = {1};
+            return Arrays.stream(backingMethod.getParameters(), 1, backingMethod.getParameterCount()).map(parameter -> {
+                Class<?> type = parameter.getType();
+                if (type == Optional.class) {
+                    Type generic = backingMethod.getGenericParameterTypes()[index[0]];
+                    if (generic instanceof ParameterizedType) {
+                        type = (Class<?>) ((ParameterizedType) generic).getActualTypeArguments()[0];
+                    } else {
+                        throw new UnsupportedParameterException("failed to resolve argument type for optional parameter " + parameter.getName());
+                    }
+                }
+                if (!commandManager.findArgumentHandler(type).isPresent()) {
+                    throw new UnsupportedParameterException(String.format("%s is not a supported parameter type.", type.getCanonicalName()));
+                }
+                index[0]++;
+                return new DeclaredCommandParameter(parameter, type);
+            }).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private static Object[] arrayConcat(Object[] first, Object[] second) {
+        Object[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
     }
 }

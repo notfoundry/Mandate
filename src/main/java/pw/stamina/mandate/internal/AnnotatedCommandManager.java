@@ -21,17 +21,21 @@ package pw.stamina.mandate.internal;
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.execution.CommandExecutable;
+import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.result.CommandResult;
-import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
+import pw.stamina.mandate.api.execution.result.ResultCode;
+import pw.stamina.mandate.api.io.CommandInput;
+import pw.stamina.mandate.api.io.CommandOutput;
 import pw.stamina.mandate.internal.annotations.Executes;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
+import pw.stamina.mandate.internal.execution.argument.handlers.BooleanArgumentHandler;
+import pw.stamina.mandate.internal.execution.argument.handlers.EnumArgumentHandler;
 import pw.stamina.mandate.internal.execution.argument.handlers.NumberArgumentHandler;
 import pw.stamina.mandate.internal.execution.argument.handlers.StringArgumentHandler;
-import pw.stamina.mandate.internal.execution.result.ResultFactory;
-import pw.stamina.mandate.internal.execution.result.handlers.NumberResultHandler;
-import pw.stamina.mandate.internal.execution.result.handlers.StringResultHandler;
+import pw.stamina.mandate.internal.io.StandardErrorStream;
+import pw.stamina.mandate.internal.io.StandardInputStream;
+import pw.stamina.mandate.internal.io.StandardOutputStream;
 import pw.stamina.mandate.internal.parsing.InputToArgumentParser;
 import pw.stamina.mandate.internal.utils.Primitives;
 import pw.stamina.parsor.exceptions.ParseException;
@@ -45,19 +49,28 @@ import java.util.*;
 public class AnnotatedCommandManager implements CommandManager {
     private final Map<String, SyntaxComponent> registeredCommands = new LinkedHashMap<>();
 
-    private final Set<ExecutableResultHandler> executableResultHandlers = new HashSet<>();
-
     private final Set<ArgumentHandler> argumentHandlers = new HashSet<>();
 
+    private final CommandInput stdin;
+
+    private final CommandOutput stdout;
+
+    private final CommandOutput stderr;
+
     public AnnotatedCommandManager() {
-        Arrays.asList(
-                new StringResultHandler(),
-                new NumberResultHandler()
-        ).forEach(executableResultHandlers::add);
+        this(StandardInputStream.get(), StandardOutputStream.get(), StandardErrorStream.get());
+    }
+
+    public AnnotatedCommandManager(CommandInput stdin, CommandOutput stdout,  CommandOutput stderr) {
+        this.stdin = stdin;
+        this.stderr = stderr;
+        this.stdout = stdout;
 
         Arrays.asList(
                 new StringArgumentHandler(),
-                new NumberArgumentHandler()
+                new NumberArgumentHandler(),
+                new BooleanArgumentHandler(),
+                new EnumArgumentHandler()
         ).forEach(argumentHandlers::add);
     }
 
@@ -72,17 +85,19 @@ public class AnnotatedCommandManager implements CommandManager {
         return registered;
     }
 
-    public Optional<CommandResult> execute(String input) {
+    public ResultCode execute(String input) {
         if (input == null) {
-            return Optional.of(ResultFactory.immediate("Invalid input: input cannot be null", CommandResult.Status.FAILED));
+            stderr.write("Invalid input: input cannot be empty");
+            return ResultCode.INVALID;
         } else if (input.length() == 0) {
-            return Optional.of(ResultFactory.immediate("Invalid input: input cannot be empty", CommandResult.Status.FAILED));
+            stderr.write("Invalid input: input cannot be empty");
+            return ResultCode.INVALID;
         }
 
         List<CommandArgument> consumedArgs = new ArrayList<>();
 
         Deque<CommandArgument> arguments; SyntaxComponent component; CommandArgument currentArgument; int depth = 0;
-        if ((component = registeredCommands.get((currentArgument = (arguments = InputToArgumentParser.getInstance().parse(input)).getFirst()).getArgument())) != null) {
+        if ((component = registeredCommands.get((currentArgument = (arguments = InputToArgumentParser.getInstance().parse(input)).getFirst()).getRaw())) != null) {
             while ((currentArgument = arguments.poll()) != null) {
                 consumedArgs.add(currentArgument);
                 if (component.findExecutables().isPresent()) {
@@ -90,7 +105,7 @@ public class AnnotatedCommandManager implements CommandManager {
                     for (CommandExecutable executable : component.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
                             try {
-                                return executable.execute(arguments);
+                                return executable.execute(arguments, IODescriptor.from(stdin, stdout, stderr));
                             } catch (ParseException e) {
                                 lastException = e;
                             }
@@ -98,24 +113,30 @@ public class AnnotatedCommandManager implements CommandManager {
                             lowestConsumed = lowestConsumed > executable.minimumArguments() ? executable.minimumArguments() : lowestConsumed;
                         }
                     }
-                    if (lastException != null) return Optional.of(ResultFactory.immediate(lastException.getLocalizedMessage(), CommandResult.Status.FAILED));
-                    if (lowestConsumed != Integer.MAX_VALUE) depth += lowestConsumed;
+                    if (lastException != null) {
+                        stderr.write(lastException.getLocalizedMessage());
+                        return ResultCode.INVALID;
+                    } else if (lowestConsumed != Integer.MAX_VALUE) {
+                        depth += lowestConsumed;
+                    }
                 }
-                if (!arguments.isEmpty() && component.getChild(arguments.getFirst().getArgument()) != null) {
+                if (!arguments.isEmpty() && component.getChild(arguments.getFirst().getRaw()) != null) {
                     depth++;
-                    component = component.getChild(arguments.getFirst().getArgument());
+                    component = component.getChild(arguments.getFirst().getRaw());
                 } else {
                     consumedArgs.addAll(arguments);
                     if (++depth <= consumedArgs.size()) {
-                        return Optional.of(ResultFactory.immediate(String.format("Invalid argument(s) '%s' passed to command '%s'", consumedArgs.subList(depth, consumedArgs.size()), consumedArgs.subList(0, depth)), CommandResult.Status.FAILED));
+                        stderr.write(String.format("Invalid argument(s) '%s' passed to command '%s'", consumedArgs.subList(depth, consumedArgs.size()), consumedArgs.subList(0, depth)));
                     } else {
-                        return Optional.of(ResultFactory.immediate(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs), CommandResult.Status.FAILED));
+                        stderr.write(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs));
                     }
+                    return ResultCode.INVALID;
                 }
             }
-            return Optional.empty();
+            return ResultCode.INVALID;
         } else {
-            return Optional.of(ResultFactory.immediate(String.format("'%s' is not a valid command", currentArgument), CommandResult.Status.FAILED));
+            stderr.write(String.format("'%s' is not a valid command", currentArgument));
+            return ResultCode.INVALID;
         }
     }
 
@@ -129,22 +150,6 @@ public class AnnotatedCommandManager implements CommandManager {
             for (Class handledType : argumentHandler.getHandledTypes()) {
                 if (handledType.isAssignableFrom(type)) {
                     return Optional.of(argumentHandler);
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> Optional<ExecutableResultHandler<T>> findOutputParser(Class<T> type) {
-        if (type.isPrimitive()) {
-            type = Primitives.wrap(type);
-        }
-        for (ExecutableResultHandler resultHandler : executableResultHandlers) {
-            for (Class handledType : resultHandler.getHandledTypes()) {
-                if (handledType.isAssignableFrom(type)) {
-                    return Optional.of(resultHandler);
                 }
             }
         }

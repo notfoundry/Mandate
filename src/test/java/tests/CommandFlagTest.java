@@ -1,6 +1,9 @@
 package tests;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
@@ -8,6 +11,7 @@ import pw.stamina.mandate.api.execution.result.ResultCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
 import pw.stamina.mandate.internal.annotations.Executes;
+import pw.stamina.mandate.internal.annotations.Flag;
 import pw.stamina.mandate.internal.annotations.Syntax;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
@@ -17,8 +21,7 @@ import java.util.Queue;
 /**
  * @author Foundry
  */
-@Syntax(syntax = {"execute", "exec", "do"})
-public class ClassSyntaxInheritanceTest {
+public class CommandFlagTest {
     private Queue<Object> commandErrors = new ArrayDeque<>();
 
     private Queue<Object> commandOutput = new ArrayDeque<>();
@@ -34,31 +37,32 @@ public class ClassSyntaxInheritanceTest {
     };
 
     @Before
-    public void setup() {
+    public void setupTests() {
         commandManager.register(this);
     }
 
     @Test
-    public void testSyntaxInheritance() {
-        ResultCode result = commandManager.execute("execute sum 500 250");
+    public void testFlagSet() {
+        ResultCode result = commandManager.execute("greet foo -caps");
 
         Assert.assertTrue(result == ResultCode.COMPLETED);
 
-        Assert.assertEquals(750, commandOutput.poll());
+        Assert.assertEquals("FOO", commandOutput.poll());
     }
 
     @Test
-    public void testAliasUsage() {
-        ResultCode result = commandManager.execute("do add 1000 500");
+    public void testFlagUnset() {
+        ResultCode result = commandManager.execute("greet foo");
 
         Assert.assertTrue(result == ResultCode.COMPLETED);
 
-        Assert.assertEquals(1500, commandOutput.poll());
+        Assert.assertEquals("foo", commandOutput.poll());
     }
 
-    @Executes(tree = "sum|add")
-    public ResultCode sum(IODescriptor io, int augend, int addend) {
-        io.out().write(augend + addend);
+    @Executes
+    @Syntax(syntax = "greet")
+    public ResultCode doGreeting(IODescriptor io, String greeting, @Flag(value = {"caps"}, def = "false") boolean useCaps) {
+        io.out().write(useCaps ? greeting.toUpperCase() : greeting);
         return ResultCode.COMPLETED;
     }
 }
