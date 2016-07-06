@@ -38,7 +38,7 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
 
     @Override
     public final Number parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        Class<? extends Number> numberClass; NumberParser parser; Number resultNumber = (parser = new NumberParser((numberClass = Primitives.wrap(parameter.getType())))).parse(input.getArgument());
+        Class<? extends Number> numberClass; NumberParser parser; Number resultNumber = (parser = new NumberParser((numberClass = Primitives.wrap(parameter.getType())))).parse(input.getRaw());
 
         if (numberClass == Float.class || numberClass == Double.class) {
             final RealClamp realClamp = parameter.getAnnotation(RealClamp.class);

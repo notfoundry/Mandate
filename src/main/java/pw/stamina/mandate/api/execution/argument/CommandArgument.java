@@ -22,5 +22,5 @@ package pw.stamina.mandate.api.execution.argument;
  * @author Foundry
  */
 public interface CommandArgument {
-    String getArgument();
+    String getRaw();
 }

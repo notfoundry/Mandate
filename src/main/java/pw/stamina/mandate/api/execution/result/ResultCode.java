@@ -16,24 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.execution.result.handlers;
-
-import pw.stamina.mandate.api.execution.result.CommandResult;
-import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
-import pw.stamina.mandate.internal.execution.result.ResultFactory;
+package pw.stamina.mandate.api.execution.result;
 
 /**
  * @author Foundry
  */
-public class StringResultHandler implements ExecutableResultHandler<String> {
-
-    @Override
-    public CommandResult generateResult(String output) {
-        return ResultFactory.immediate(output, CommandResult.Status.COMPLETED);
-    }
-
-    @Override
-    public Class[] getHandledTypes() {
-        return new Class[] {String.class};
-    }
+public enum ResultCode {
+    COMPLETED, FAILED, TERMINATED, INVALID;
 }

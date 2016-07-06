@@ -19,8 +19,7 @@
 package pw.stamina.mandate.api;
 
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.api.execution.result.CommandResult;
-import pw.stamina.mandate.api.execution.result.ExecutableResultHandler;
+import pw.stamina.mandate.api.execution.result.ResultCode;
 import pw.stamina.mandate.api.component.SyntaxComponent;
 
 import java.util.Collection;
@@ -32,11 +31,9 @@ import java.util.Optional;
 public interface CommandManager {
     boolean register(Object container);
 
-    Optional<CommandResult> execute(String input);
+    ResultCode execute(String input);
 
     <T> Optional<ArgumentHandler<T>> findArgumentHandler(Class<T> type);
-
-    <T> Optional<ExecutableResultHandler<T>> findOutputParser(Class<T> type);
 
     Collection<SyntaxComponent> getCommands();
 }

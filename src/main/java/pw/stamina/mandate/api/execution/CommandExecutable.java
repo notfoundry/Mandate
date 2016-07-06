@@ -19,18 +19,18 @@
 package pw.stamina.mandate.api.execution;
 
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.result.CommandResult;
+import pw.stamina.mandate.api.execution.result.ResultCode;
+import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.parsor.exceptions.ParseException;
 
 import java.util.Deque;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Foundry
  */
 public interface CommandExecutable {
-    Optional<CommandResult> execute(Deque<CommandArgument> arguments) throws ParseException;
+    ResultCode execute(Deque<CommandArgument> arguments, IODescriptor descriptor) throws ParseException;
 
     List<CommandParameter> getParameters();
 

@@ -36,28 +36,28 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
 
     @Override
     public String parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        if (input.getArgument().length() == 0) {
+        if (input.getRaw().length() == 0) {
             return null;
         }
         Equals equals = parameter.getAnnotation(Equals.class);
         if (equals != null) {
             for (String string : equals.value()) {
-                if (!(equals.regex() ? Pattern.compile(string).matcher(input.getArgument()).matches() : string.equalsIgnoreCase(input.getArgument()))) continue;
-                return input.getArgument();
+                if (!(equals.regex() ? Pattern.compile(string).matcher(input.getRaw()).matches() : string.equalsIgnoreCase(input.getRaw()))) continue;
+                return input.getRaw();
             }
-            throw new ParseFailException(input.getArgument(), this.getClass(), String.format("'%s' doesn't match %s (regex=%s)", input.getArgument(), String.format("['%s']", String.join("'/'", equals.value())), equals.regex()));
+            throw new ParseFailException(input.getRaw(), this.getClass(), String.format("'%s' doesn't match %s (regex=%s)", input.getRaw(), String.format("['%s']", String.join("'/'", equals.value())), equals.regex()));
         }
         Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
             int min = Math.min(length.min(), length.max());
             int max = Math.max(length.min(), length.max());
-            if (input.getArgument().length() < min) {
-                throw new ParseFailException(input.getArgument(), this.getClass(), String.format("'%s' is too short: length can be between %s-%s characters", input.getArgument(), min, max));
-            } else if (input.getArgument().length() > max) {
-                throw new ParseFailException(input.getArgument(), this.getClass(), String.format("'%s' is too long: length can be between %s-%s characters", input.getArgument(), min, max));
+            if (input.getRaw().length() < min) {
+                throw new ParseFailException(input.getRaw(), this.getClass(), String.format("'%s' is too short: length can be between %s-%s characters", input.getRaw(), min, max));
+            } else if (input.getRaw().length() > max) {
+                throw new ParseFailException(input.getRaw(), this.getClass(), String.format("'%s' is too long: length can be between %s-%s characters", input.getRaw(), min, max));
             }
         }
-        return input.getArgument();
+        return input.getRaw();
     }
 
     @Override
