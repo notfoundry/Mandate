@@ -22,8 +22,8 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
-import pw.stamina.mandate.internal.annotations.Executes;
-import pw.stamina.mandate.internal.annotations.Syntax;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.internal.execution.MethodExecutable;
 
 import java.lang.reflect.Method;

@@ -25,7 +25,7 @@ import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.result.ResultCode;
+import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.internal.execution.parameter.DeclaredCommandParameter;
 import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
 import pw.stamina.parsor.exceptions.ParseException;
@@ -47,8 +47,8 @@ public class MethodExecutable implements CommandExecutable {
     private ArgumentToObjectParser argumentParser;
 
     public MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
-        if (backingMethod.getReturnType() != ResultCode.class) {
-            throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does have a return type of " + ResultCode.class.getCanonicalName());
+        if (backingMethod.getReturnType() != ExitCode.class) {
+            throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does have a return type of " + ExitCode.class.getCanonicalName());
         } else if (backingMethod.getParameterCount() == 0 || backingMethod.getParameterTypes()[0] != IODescriptor.class) {
             throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does not have a first parameter of type " + IODescriptor.class.getCanonicalName());
         }
@@ -59,13 +59,13 @@ public class MethodExecutable implements CommandExecutable {
     }
 
     @Override
-    public ResultCode execute(Deque<CommandArgument> arguments, IODescriptor descriptor) throws ParseException {
+    public ExitCode execute(Deque<CommandArgument> arguments, IODescriptor descriptor) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
         try {
-            return (ResultCode) backingMethod.invoke(methodParent, arrayConcat(new Object[] {descriptor}, parsedArgs));
+            return (ExitCode) backingMethod.invoke(methodParent, arrayConcat(new Object[] {descriptor}, parsedArgs));
         } catch (Exception e) {
             descriptor.err().write(String.format("Exception while executing method '%s': %s", backingMethod.getName(), e));
-            return ResultCode.TERMINATED;
+            return ExitCode.TERMINATED;
         }
     }
 
@@ -82,6 +82,22 @@ public class MethodExecutable implements CommandExecutable {
     @Override
     public int maximumArguments() {
         return parameters.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodExecutable that = (MethodExecutable) o;
+        return this.minimumArguments() == that.minimumArguments() && this.maximumArguments() == that.maximumArguments();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + minimumArguments();
+        result = 31 * result + maximumArguments();
+        return result;
     }
 
     @Override

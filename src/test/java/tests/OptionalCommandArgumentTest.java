@@ -7,11 +7,11 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.result.ResultCode;
+import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
-import pw.stamina.mandate.internal.annotations.Executes;
-import pw.stamina.mandate.internal.annotations.Syntax;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
 import java.util.ArrayDeque;
@@ -37,48 +37,48 @@ public class OptionalCommandArgumentTest {
     };
 
     @Before
-    public void setupTests() {
+    public void setup() {
         commandManager.register(this);
     }
 
     @Test
     public void testPrecedingOptionalArguments() {
-        ResultCode result = commandManager.execute("execute firstOptional firstRequired secondRequired");
+        ExitCode result = commandManager.execute("execute firstOptional firstRequired secondRequired");
 
-        Assert.assertTrue(result == ResultCode.COMPLETED);
+        Assert.assertTrue(result == ExitCode.SUCCESS);
 
-        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='Default', 4='Default', 5='secondRequired', 6='Default'",
+        Assert.assertEquals("firstOptional, firstRequired, DEFAULT, DEFAULT, secondRequired, DEFAULT",
                 commandOutput.poll());
     }
 
     @Test
     public void testIntermediaryOptionalArguments() {
-        ResultCode result = commandManager.execute("execute firstOptional firstRequired secondOptional secondRequired");
+        ExitCode result = commandManager.execute("execute firstOptional firstRequired secondOptional secondRequired");
 
-        Assert.assertTrue(result == ResultCode.COMPLETED);
+        Assert.assertTrue(result == ExitCode.SUCCESS);
 
-        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='secondOptional', 4='Default', 5='secondRequired', 6='Default'",
+        Assert.assertEquals("firstOptional, firstRequired, secondOptional, DEFAULT, secondRequired, DEFAULT",
                 commandOutput.poll());
     }
 
     @Test
     public void testTrailingOptionalArguments() {
-        ResultCode result = commandManager.execute("execute firstOptional firstRequired secondOptional thirdOptional secondRequired fourthOptional");
+        ExitCode result = commandManager.execute("execute firstOptional firstRequired secondOptional thirdOptional secondRequired fourthOptional");
 
-        Assert.assertTrue(result == ResultCode.COMPLETED);
+        Assert.assertTrue(result == ExitCode.SUCCESS);
 
-        Assert.assertEquals("1='firstOptional', 2='firstRequired', 3='secondOptional', 4='thirdOptional', 5='secondRequired', 6='fourthOptional'",
+        Assert.assertEquals("firstOptional, firstRequired, secondOptional, thirdOptional, secondRequired, fourthOptional",
                 commandOutput.poll());
     }
 
     @Executes
     @Syntax(syntax = "execute")
-    public ResultCode doThing(IODescriptor io, Optional<String> arg1, String arg2, Optional<String> arg3, Optional<String> arg4, String arg5, Optional<String> arg6) {
-        io.out().write(String.format("1='%s', 2='%s', 3='%s', 4='%s', 5='%s', 6='%s",
-                arg1.orElse("Default"),
-                arg2, arg3.orElse("Default"),
-                arg4.orElse("Default"),
-                arg5, arg6.orElse("Default")));
-        return ResultCode.COMPLETED;
+    public ExitCode doThing(IODescriptor io, Optional<String> arg1, String arg2, Optional<String> arg3, Optional<String> arg4, String arg5, Optional<String> arg6) {
+        io.out().write(String.format("%s, %s, %s, %s, %s, %s",
+                arg1.orElse("DEFAULT"),
+                arg2, arg3.orElse("DEFAULT"),
+                arg4.orElse("DEFAULT"),
+                arg5, arg6.orElse("DEFAULT")));
+        return ExitCode.SUCCESS;
     }
 }

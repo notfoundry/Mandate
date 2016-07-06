@@ -16,11 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.api.execution.result;
+package pw.stamina.mandate.api.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Foundry
  */
-public enum ResultCode {
-    COMPLETED, FAILED, TERMINATED, INVALID;
+@Target(value=ElementType.METHOD)
+@Retention(value=RetentionPolicy.RUNTIME)
+public @interface Executes {
+    String[] tree() default {};
 }

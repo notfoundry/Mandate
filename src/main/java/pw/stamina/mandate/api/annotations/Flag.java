@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.annotations;
+package pw.stamina.mandate.api.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,8 +26,11 @@ import java.lang.annotation.Target;
 /**
  * @author Foundry
  */
-@Target(value=ElementType.METHOD)
+@Target(value=ElementType.PARAMETER)
 @Retention(value=RetentionPolicy.RUNTIME)
-public @interface Executes {
-    String[] tree() default {};
+public @interface Flag {
+    String[] value();
+
+    String def() default "";
 }
+

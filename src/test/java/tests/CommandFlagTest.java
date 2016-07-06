@@ -7,12 +7,12 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.result.ResultCode;
+import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
-import pw.stamina.mandate.internal.annotations.Executes;
-import pw.stamina.mandate.internal.annotations.Flag;
-import pw.stamina.mandate.internal.annotations.Syntax;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Flag;
+import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
 import java.util.ArrayDeque;
@@ -37,32 +37,32 @@ public class CommandFlagTest {
     };
 
     @Before
-    public void setupTests() {
+    public void setup() {
         commandManager.register(this);
     }
 
     @Test
     public void testFlagSet() {
-        ResultCode result = commandManager.execute("greet foo -caps");
+        ExitCode result = commandManager.execute("greet foo -caps");
 
-        Assert.assertTrue(result == ResultCode.COMPLETED);
+        Assert.assertTrue(result == ExitCode.SUCCESS);
 
         Assert.assertEquals("FOO", commandOutput.poll());
     }
 
     @Test
     public void testFlagUnset() {
-        ResultCode result = commandManager.execute("greet foo");
+        ExitCode result = commandManager.execute("greet foo");
 
-        Assert.assertTrue(result == ResultCode.COMPLETED);
+        Assert.assertTrue(result == ExitCode.SUCCESS);
 
         Assert.assertEquals("foo", commandOutput.poll());
     }
 
     @Executes
     @Syntax(syntax = "greet")
-    public ResultCode doGreeting(IODescriptor io, String greeting, @Flag(value = {"caps"}, def = "false") boolean useCaps) {
+    public ExitCode doGreeting(IODescriptor io, String greeting, @Flag(value = {"caps"}, def = "false") boolean useCaps) {
         io.out().write(useCaps ? greeting.toUpperCase() : greeting);
-        return ResultCode.COMPLETED;
+        return ExitCode.SUCCESS;
     }
 }
