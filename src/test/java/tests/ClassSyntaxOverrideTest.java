@@ -7,11 +7,11 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.result.ResultCode;
+import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
-import pw.stamina.mandate.internal.annotations.Executes;
-import pw.stamina.mandate.internal.annotations.Syntax;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
 import java.util.ArrayDeque;
@@ -37,32 +37,32 @@ public class ClassSyntaxOverrideTest {
     };
 
     @Before
-    public void setupTests() {
+    public void setup() {
         commandManager.register(this);
     }
 
     @Test
     public void testSyntaxOverride() {
-        ResultCode result = commandManager.execute("sum 125 125");
+        ExitCode result = commandManager.execute("sum 125 125");
 
         commandErrors.forEach(System.out::println);
 
-        Assert.assertTrue(result == ResultCode.COMPLETED);
+        Assert.assertTrue(result == ExitCode.SUCCESS);
 
         Assert.assertEquals(250, commandOutput.poll());
     }
 
     @Test
     public void testFailedClassSyntaxUse() {
-        ResultCode result = commandManager.execute("foo 200 175");
+        ExitCode result = commandManager.execute("foo 200 175");
 
-        Assert.assertTrue(result == ResultCode.INVALID);
+        Assert.assertTrue(result == ExitCode.INVALID);
     }
 
     @Executes
     @Syntax(syntax = {"sum", "add"})
-    public ResultCode sum(IODescriptor io, int augend, int addend) {
+    public ExitCode sum(IODescriptor io, int augend, int addend) {
         io.out().write(augend + addend);
-        return ResultCode.COMPLETED;
+        return ExitCode.SUCCESS;
     }
 }

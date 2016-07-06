@@ -16,18 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package pw.stamina.mandate.api.execution.result;
 
 /**
  * @author Foundry
  */
-@Target(value={ElementType.METHOD, ElementType.TYPE})
-@Retention(value=RetentionPolicy.RUNTIME)
-public @interface Syntax {
-    String[] syntax() default {};
+public enum ExitCode {
+    SUCCESS, FAILURE, TERMINATED, INVALID;
 }
