@@ -39,4 +39,10 @@ public class InteractiveCommandLine {
         io.out().write(augend + addend);
         return ExitCode.SUCCESS;
     }
+
+    @Executes
+    @Syntax(syntax = {"execute", "exec"})
+    public ExitCode execute(IODescriptor io) {
+        return ExitCode.SUCCESS;
+    }
 }

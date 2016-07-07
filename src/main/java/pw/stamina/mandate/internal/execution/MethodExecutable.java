@@ -118,12 +118,14 @@ public class MethodExecutable implements CommandExecutable {
 
     private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) throws UnsupportedParameterException {
         if (backingMethod.getParameterCount() > 1) {
+            Set<String> usedFlags = new HashSet<>();
             boolean[] reachedOptionals = {false}, reachedRequired = {false};
             return Arrays.stream(backingMethod.getParameters(), 1, backingMethod.getParameterCount()).map(parameter -> {
                 Class<?> type = parameter.getType();
+                AutoFlag autoFlag; UserFlag userFlag;
 
-                if (parameter.getDeclaredAnnotation(AutoFlag.class) != null || parameter.getDeclaredAnnotation(UserFlag.class) != null) {
-                    if (parameter.getDeclaredAnnotation(AutoFlag.class) != null && parameter.getDeclaredAnnotation(UserFlag.class) != null) {
+                if ((autoFlag = parameter.getDeclaredAnnotation(AutoFlag.class)) != null | (userFlag = parameter.getDeclaredAnnotation(UserFlag.class)) != null) {
+                    if (autoFlag != null && userFlag != null) {
                         throw new UnsupportedParameterException("Parameter " + parameter.getName()
                                 + " in method " + backingMethod.getName()
                                 + " is annotated as both an automatic and operand-based flag");
@@ -131,7 +133,17 @@ public class MethodExecutable implements CommandExecutable {
                         throw new UnsupportedParameterException("Parameter " + parameter.getName()
                                 + " in method " + backingMethod.getName()
                                 + " is annotated as flag, but exists after non-flag parameters");
-                    } else if (type == Optional.class) {
+                    }
+
+                    for (String flag : (autoFlag != null ? autoFlag.flag() : userFlag.flag())) {
+                        if (!usedFlags.add(flag)) {
+                            throw new UnsupportedParameterException("Parameter " + parameter.getName()
+                                    + " in method " + backingMethod.getName()
+                                    + " uses previously declared flag name '" + flag + "'");
+                        }
+                    }
+
+                    if (type == Optional.class) {
                         type = resolveGenericType(parameter);
                     }
 

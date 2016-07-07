@@ -18,7 +18,6 @@ import pw.stamina.mandate.internal.UnixCommandManager;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
 import java.util.ArrayDeque;
-import java.util.Optional;
 import java.util.Queue;
 
 /**
@@ -75,10 +74,10 @@ public class CommandFlagTest {
     @Syntax(syntax = "greet")
     public ExitCode doGreeting(IODescriptor io,
                                @AutoFlag(flag = {"-caps"}) boolean useCaps,
-                               @UserFlag(flag = {"-recipient"}, elsedef = "someone") Optional<String> recipient,
+                               @UserFlag(flag = {"-recipient"}, elsedef = "someone") String recipient,
                                String greeting) {
 
-        io.out().write("to " + recipient.get() + ": " + (useCaps ? greeting.toUpperCase() : greeting));
+        io.out().write("to " + recipient + ": " + (useCaps ? greeting.toUpperCase() : greeting));
         return ExitCode.SUCCESS;
     }
 }
