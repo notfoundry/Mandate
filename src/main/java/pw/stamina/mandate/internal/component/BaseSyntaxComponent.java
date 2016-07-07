@@ -75,6 +75,19 @@ public class BaseSyntaxComponent implements SyntaxComponent {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseSyntaxComponent that = (BaseSyntaxComponent) o;
+        return Objects.equals(syntax, that.syntax);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(syntax);
+    }
+
+    @Override
     public String toString() {
         return String.format("BaseSyntaxComponent{syntax=%s, children=%s, executables=%s}", syntax, childMap.values(), executables);
     }

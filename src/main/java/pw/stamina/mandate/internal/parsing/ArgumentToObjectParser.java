@@ -30,9 +30,7 @@ import pw.stamina.parsor.api.parsing.Parser;
 import pw.stamina.parsor.exceptions.ParseException;
 import pw.stamina.parsor.exceptions.ParseFailException;
 
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Foundry
@@ -50,17 +48,24 @@ public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArg
     public Object[] parse(Deque<CommandArgument> arguments) throws ParseException {
         final Object[] parsedArgs = new Object[executable.getParameters().size()];
         final CommandParameter[] parameters = executable.getParameters().toArray(new CommandParameter[executable.getParameters().size()]);
+        final Set<String> excludedFlags = new HashSet<>();
 
         for (int i = 0; i < parsedArgs.length; i++) {
             Optional<ArgumentHandler<Object>> argumentHandler = commandManager.findArgumentHandler((Class<Object>) parameters[i].getType());
             if (!argumentHandler.isPresent()) {
-                throw new ParseFailException(parameters[i].getLabel(), this.getClass(), String.format("No argument handler exists for argument parameter type '%s'", parameters[i].getType().getCanonicalName()));
+                throw new ParseFailException(parameters[i].getLabel(), CommandArgument.class, String.format("No argument handler exists for argument parameter type '%s'", parameters[i].getType().getCanonicalName()));
             }
 
             AutoFlag autoFlag; UserFlag userFlag;
             if ((autoFlag = parameters[i].getAnnotation(AutoFlag.class)) != null) {
-                boolean present = popFlagIfPresent(arguments, autoFlag.flag());
-                String def = (parameters[i].getType() == Boolean.class || parameters[i].getType() == Boolean.TYPE) ? present ? "true" : "false" : present ? autoFlag.ifdef() : autoFlag.elsedef();
+                CommandArgument present = popFlagIfPresent(arguments, autoFlag.flag());
+
+                Optional<String> conflictingFlagLookup;
+                if (present != null && (conflictingFlagLookup = findConflictingFlag(autoFlag.flag(), autoFlag.xor(), excludedFlags)).isPresent()) {
+                    throw new ParseFailException(Arrays.toString(autoFlag.flag()), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
+                }
+
+                String def = (parameters[i].getType() == Boolean.class || parameters[i].getType() == Boolean.TYPE) ? present != null ? "true" : "false" : present != null ? autoFlag.ifdef() : autoFlag.elsedef();
                 if (!parameters[i].isOptional()) {
                     parsedArgs[i] = (!def.isEmpty()) ? argumentHandler.get().parse(new BaseCommandArgument(def), parameters[i], commandManager) : null;
                 } else {
@@ -69,6 +74,12 @@ public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArg
 
             } else if ((userFlag = parameters[i].getAnnotation(UserFlag.class)) != null) {
                 CommandArgument present = popFlagAndOperandIfPresent(arguments, userFlag.flag());
+
+                Optional<String> conflictingFlagLookup;
+                if (present != null && (conflictingFlagLookup = findConflictingFlag(userFlag.flag(), userFlag.or(), excludedFlags)).isPresent()) {
+                    throw new ParseFailException(Arrays.toString(userFlag.flag()), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
+                }
+
                 String def = (present != null) ? present.getRaw() : userFlag.elsedef();
                 if (!parameters[i].isOptional()) {
                     parsedArgs[i] = (!def.isEmpty()) ? argumentHandler.get().parse(new BaseCommandArgument(def), parameters[i], commandManager) : null;
@@ -84,20 +95,25 @@ public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArg
                 }
             }
         }
-        return parsedArgs;
+
+        if (!arguments.isEmpty()) {
+            throw new ParseFailException(arguments.toString(), CommandArgument.class, String.format("Passed %d invalid or previously present argument(s): %s", arguments.size(), arguments.toString()));
+        } else {
+            return parsedArgs;
+        }
     }
 
-    private static boolean popFlagIfPresent(Deque<CommandArgument> arguments, String[] possibilities) {
+    private static CommandArgument popFlagIfPresent(Deque<CommandArgument> arguments, String[] possibilities) {
         for (Iterator<CommandArgument> it = arguments.iterator(); it.hasNext();) {
             CommandArgument arg = it.next();
             for (String option : possibilities) {
                 if (arg.getRaw().equals("-" + option)) {
                     it.remove();
-                    return true;
+                    return arg;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private static CommandArgument popFlagAndOperandIfPresent(Deque<CommandArgument> arguments, String[] possibilities) {
@@ -113,5 +129,21 @@ public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArg
             }
         }
         return null;
+    }
+
+    private static Optional<String> findConflictingFlag(String[] flags, String[] exclusives, Set<String> excluded) {
+        Optional<String> result = Optional.empty();
+        for (String s : exclusives) {
+            if (excluded.contains(s)) {
+                result = Optional.of(s);
+                break;
+            }
+        }
+
+        excluded.addAll(Arrays.asList(flags));
+        if (exclusives.length > 0) {
+            excluded.addAll(Arrays.asList(exclusives));
+        }
+        return result;
     }
 }

@@ -35,6 +35,6 @@ public @interface AutoFlag {
 
     String elsedef() default "";
 
-    String[] or() default {};
+    String[] xor() default {};
 }
 
