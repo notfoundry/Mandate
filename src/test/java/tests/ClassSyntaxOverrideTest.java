@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
@@ -43,20 +44,20 @@ public class ClassSyntaxOverrideTest {
 
     @Test
     public void testSyntaxOverride() {
-        ExitCode result = commandManager.execute("sum 125 125");
+        Execution result = commandManager.execute("sum 125 125");
 
         commandErrors.forEach(System.out::println);
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals(250, commandOutput.poll());
     }
 
     @Test
     public void testFailedClassSyntaxUse() {
-        ExitCode result = commandManager.execute("foo 200 175");
+        Execution result = commandManager.execute("foo 200 175");
 
-        Assert.assertTrue(result == ExitCode.INVALID);
+        Assert.assertTrue(result.result() == ExitCode.INVALID);
     }
 
     @Executes

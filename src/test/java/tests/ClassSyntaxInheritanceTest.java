@@ -4,6 +4,7 @@ import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
@@ -40,18 +41,18 @@ public class ClassSyntaxInheritanceTest {
 
     @Test
     public void testSyntaxInheritance() {
-        ExitCode result = commandManager.execute("execute sum 500 250");
+        Execution result = commandManager.execute("execute sum 500 250");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals(750, commandOutput.poll());
     }
 
     @Test
     public void testAliasUsage() {
-        ExitCode result = commandManager.execute("do add 1000 500");
+        Execution result = commandManager.execute("do add 1000 500");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals(1500, commandOutput.poll());
     }

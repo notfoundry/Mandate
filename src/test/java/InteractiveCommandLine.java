@@ -1,9 +1,10 @@
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Syntax;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
-import pw.stamina.mandate.api.annotations.Executes;
-import pw.stamina.mandate.api.annotations.Syntax;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -18,8 +19,8 @@ public class InteractiveCommandLine {
         Scanner scanner = new Scanner(System.in);
 
         while (scanner.hasNext()) {
-            ExitCode exitCode = commandManager.execute(scanner.nextLine());
-            System.out.println("Result code: " + exitCode);
+            Execution execution = commandManager.execute(scanner.nextLine());
+            System.out.println("Result code: " + execution.result());
         }
     }
 
