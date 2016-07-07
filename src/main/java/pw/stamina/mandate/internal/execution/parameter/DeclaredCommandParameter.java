@@ -18,6 +18,7 @@
 
 package pw.stamina.mandate.internal.execution.parameter;
 
+import pw.stamina.mandate.api.annotations.meta.Usage;
 import pw.stamina.mandate.api.execution.CommandParameter;
 
 import java.lang.annotation.Annotation;
@@ -58,8 +59,15 @@ public class DeclaredCommandParameter implements CommandParameter {
     }
 
     @Override
+    public String getDescription() {
+        Usage usage = getAnnotation(Usage.class);
+        return usage != null ? usage.usage() : "";
+    }
+
+    @Override
     public String getLabel() {
-        return parameter.getName();
+        Usage usage = getAnnotation(Usage.class);
+        return usage != null ? usage.name() : parameter.getName();
     }
 
     @Override

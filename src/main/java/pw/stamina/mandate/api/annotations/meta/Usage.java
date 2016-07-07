@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.api.annotations;
+package pw.stamina.mandate.api.annotations.meta;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  */
 @Target(value=ElementType.PARAMETER)
 @Retention(value=RetentionPolicy.RUNTIME)
-public @interface Flag {
-    String[] value();
+public @interface Usage {
+    String name();
 
-    String def() default "";
+    String usage() default "";
 }
 

@@ -2,7 +2,7 @@ package pw.stamina.mandate.internal.io;
 
 import pw.stamina.mandate.api.io.CommandInput;
 
-import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -14,7 +14,7 @@ public enum StandardInputStream implements CommandInput {
     private final Scanner scanner = new Scanner(System.in);
 
     @Override
-    public String read() throws IOException {
+    public String read() throws NoSuchElementException {
         return scanner.nextLine();
     }
 

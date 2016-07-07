@@ -34,6 +34,8 @@ public interface CommandExecutable {
 
     List<CommandParameter> getParameters();
 
+    String getDescription();
+
     int minimumArguments();
 
     int maximumArguments();

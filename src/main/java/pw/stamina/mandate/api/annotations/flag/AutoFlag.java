@@ -16,23 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.api.execution;
+package pw.stamina.mandate.api.annotations.flag;
 
-import pw.stamina.commons.interfaces.Labeled;
-
-import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Foundry
  */
-public interface CommandParameter extends Labeled {
-    <A extends Annotation> A getAnnotation(Class<A> annotationClass);
+@Target(value=ElementType.PARAMETER)
+@Retention(value=RetentionPolicy.RUNTIME)
+public @interface AutoFlag {
+    String[] flag();
 
-    Annotation[] getAnnotations();
+    String ifdef() default "";
 
-    Class<?> getType();
+    String elsedef() default "";
 
-    boolean isOptional();
-
-    String getDescription();
+    String[] or() default {};
 }
+

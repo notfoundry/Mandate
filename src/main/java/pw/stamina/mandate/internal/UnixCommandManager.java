@@ -47,7 +47,7 @@ import java.util.*;
 /**
  * @author Foundry
  */
-public class AnnotatedCommandManager implements CommandManager {
+public class UnixCommandManager implements CommandManager {
     private final Map<String, SyntaxComponent> registeredCommands = new LinkedHashMap<>();
 
     private final Set<ArgumentHandler> argumentHandlers = new HashSet<>();
@@ -58,11 +58,11 @@ public class AnnotatedCommandManager implements CommandManager {
 
     private final CommandOutput stderr;
 
-    public AnnotatedCommandManager() {
+    public UnixCommandManager() {
         this(StandardInputStream.get(), StandardOutputStream.get(), StandardErrorStream.get());
     }
 
-    public AnnotatedCommandManager(CommandInput stdin, CommandOutput stdout,  CommandOutput stderr) {
+    public UnixCommandManager(CommandInput stdin, CommandOutput stdout, CommandOutput stderr) {
         this.stdin = stdin;
         this.stderr = stderr;
         this.stdout = stdout;
