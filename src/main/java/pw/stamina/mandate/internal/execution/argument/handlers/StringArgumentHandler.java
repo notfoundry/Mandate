@@ -52,9 +52,9 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
             int min = Math.min(length.min(), length.max());
             int max = Math.max(length.min(), length.max());
             if (input.getRaw().length() < min) {
-                throw new ParseFailException(input.getRaw(), this.getClass(), String.format("'%s' is too short: length can be between %s-%s characters", input.getRaw(), min, max));
+                throw new ParseFailException(input.getRaw(), String.class, String.format("'%s' is too short: length can be between %s-%s characters", input.getRaw(), min, max));
             } else if (input.getRaw().length() > max) {
-                throw new ParseFailException(input.getRaw(), this.getClass(), String.format("'%s' is too long: length can be between %s-%s characters", input.getRaw(), min, max));
+                throw new ParseFailException(input.getRaw(), String.class, String.format("'%s' is too long: length can be between %s-%s characters", input.getRaw(), min, max));
             }
         }
         return input.getRaw();

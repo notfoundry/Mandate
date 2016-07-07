@@ -62,7 +62,7 @@ public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArg
 
                 Optional<String> conflictingFlagLookup;
                 if (present != null && (conflictingFlagLookup = findConflictingFlag(autoFlag.flag(), autoFlag.xor(), excludedFlags)).isPresent()) {
-                    throw new ParseFailException(Arrays.toString(autoFlag.flag()), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
+                    throw new ParseFailException(present.getRaw(), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
                 }
 
                 String def = (parameters[i].getType() == Boolean.class || parameters[i].getType() == Boolean.TYPE) ? present != null ? "true" : "false" : present != null ? autoFlag.ifdef() : autoFlag.elsedef();
@@ -77,7 +77,7 @@ public class ArgumentToObjectParser implements Parser<Object[], Deque<CommandArg
 
                 Optional<String> conflictingFlagLookup;
                 if (present != null && (conflictingFlagLookup = findConflictingFlag(userFlag.flag(), userFlag.or(), excludedFlags)).isPresent()) {
-                    throw new ParseFailException(Arrays.toString(userFlag.flag()), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
+                    throw new ParseFailException(present.getRaw(), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
                 }
 
                 String def = (present != null) ? present.getRaw() : userFlag.elsedef();
