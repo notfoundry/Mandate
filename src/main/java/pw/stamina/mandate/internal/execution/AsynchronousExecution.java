@@ -39,6 +39,8 @@ class AsynchronousExecution implements Execution {
     public ExitCode result(long timeout, TimeUnit unit) throws TimeoutException {
         try {
             return pendingComputation.get(timeout, unit);
+        } catch (TimeoutException e) {
+            throw e;
         } catch (Exception e) {
             io.err().write(String.format("Exception while executing method '%s': %s", executable.getName(), e));
             return ExitCode.TERMINATED;
