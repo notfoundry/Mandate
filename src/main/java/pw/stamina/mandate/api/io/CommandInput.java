@@ -1,11 +1,11 @@
 package pw.stamina.mandate.api.io;
 
-import java.io.IOException;
+import java.util.NoSuchElementException;
 
 /**
  * @author Foundry
  */
 @FunctionalInterface
 public interface CommandInput {
-    String read() throws IOException;
+    String read() throws NoSuchElementException;
 }

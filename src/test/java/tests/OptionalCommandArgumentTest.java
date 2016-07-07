@@ -7,12 +7,12 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.AnnotatedCommandManager;
-import pw.stamina.mandate.api.annotations.Executes;
-import pw.stamina.mandate.api.annotations.Syntax;
+import pw.stamina.mandate.internal.UnixCommandManager;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
 import java.util.ArrayDeque;
@@ -27,7 +27,7 @@ public class OptionalCommandArgumentTest {
 
     private Queue<Object> commandOutput = new ArrayDeque<>();
 
-    private CommandManager commandManager = new AnnotatedCommandManager(StandardInputStream.get(), commandOutput::add, commandErrors::add);
+    private CommandManager commandManager = new UnixCommandManager(StandardInputStream.get(), commandOutput::add, commandErrors::add);
 
     @Rule
     public TestWatcher watcher = new TestWatcher() {
@@ -43,46 +43,39 @@ public class OptionalCommandArgumentTest {
     }
 
     @Test
-    public void testPrecedingOptionalArguments() {
-        Execution result = commandManager.execute("execute firstOptional firstRequired secondRequired");
-        result = commandManager.execute("execute firstOptional firstRequired secondRequired");
+    public void testUsingFullCommandSignature() {
+        Execution result = commandManager.execute("execute first second 100");
 
         Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("firstOptional, firstRequired, DEFAULT, DEFAULT, secondRequired, DEFAULT",
+        Assert.assertEquals("first second 100",
                 commandOutput.poll());
     }
 
     @Test
-    public void testIntermediaryOptionalArguments() {
-        Execution result = commandManager.execute("execute firstOptional firstRequired secondRequired");
-        result = commandManager.execute("execute firstOptional firstRequired secondOptional secondRequired");
+    public void testUsingPartialCommandSignature() {
+        Execution result = commandManager.execute("execute first second");
 
         Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("firstOptional, firstRequired, secondOptional, DEFAULT, secondRequired, DEFAULT",
+        Assert.assertEquals("first second 0",
                 commandOutput.poll());
     }
 
     @Test
-    public void testTrailingOptionalArguments() {
-        Execution result = commandManager.execute("execute firstOptional firstRequired secondRequired");
-        result = commandManager.execute("execute firstOptional firstRequired secondOptional thirdOptional secondRequired fourthOptional");
+    public void testUsingOnlyMandatoryArguments() {
+        Execution result = commandManager.execute("execute first");
 
         Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("firstOptional, firstRequired, secondOptional, thirdOptional, secondRequired, fourthOptional",
+        Assert.assertEquals("first DEFAULT 0",
                 commandOutput.poll());
     }
 
     @Executes
     @Syntax(syntax = "execute")
-    public ExitCode doThing(IODescriptor io, Optional<String> arg1, String arg2, Optional<String> arg3, Optional<String> arg4, String arg5, Optional<String> arg6) {
-        io.out().write(String.format("%s, %s, %s, %s, %s, %s",
-                arg1.orElse("DEFAULT"),
-                arg2, arg3.orElse("DEFAULT"),
-                arg4.orElse("DEFAULT"),
-                arg5, arg6.orElse("DEFAULT")));
+    public ExitCode doThing(IODescriptor io, String arg1, Optional<String> arg2, Optional<Integer> arg3) {
+        io.out().write(String.format("%s %s %d", arg1, arg2.orElse("DEFAULT"), arg3.orElse(0)));
         return ExitCode.SUCCESS;
     }
 }

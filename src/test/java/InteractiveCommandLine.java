@@ -4,9 +4,9 @@ import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.AnnotatedCommandManager;
+import pw.stamina.mandate.internal.UnixCommandManager;
 
-import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 public class InteractiveCommandLine {
     public static void main(String[] args) {
-        final CommandManager commandManager = new AnnotatedCommandManager();
+        final CommandManager commandManager = new UnixCommandManager();
         commandManager.register(new InteractiveCommandLine());
         Scanner scanner = new Scanner(System.in);
 
@@ -26,10 +26,17 @@ public class InteractiveCommandLine {
 
     @Executes
     @Syntax(syntax = "accept")
-    public ExitCode acceptUserInput(IODescriptor io) throws IOException {
+    public ExitCode acceptUserInput(IODescriptor io) throws NoSuchElementException {
         io.out().write("Please enter something:");
         String input = io.in().read();
         io.out().write(input);
+        return ExitCode.SUCCESS;
+    }
+
+    @Executes
+    @Syntax(syntax = {"sum", "add"})
+    public ExitCode sum(IODescriptor io, int augend, int addend) {
+        io.out().write(augend + addend);
         return ExitCode.SUCCESS;
     }
 }

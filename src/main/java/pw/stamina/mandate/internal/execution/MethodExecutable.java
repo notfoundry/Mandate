@@ -19,6 +19,9 @@
 package pw.stamina.mandate.internal.execution;
 
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.annotations.flag.AutoFlag;
+import pw.stamina.mandate.api.annotations.flag.UserFlag;
+import pw.stamina.mandate.api.annotations.meta.Description;
 import pw.stamina.mandate.api.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
@@ -32,6 +35,7 @@ import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
 import pw.stamina.parsor.exceptions.ParseException;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -71,13 +75,24 @@ public class MethodExecutable implements CommandExecutable {
     }
 
     @Override
+    public String getDescription() {
+        Description description = backingMethod.getDeclaredAnnotation(Description.class);
+        return (description != null) ? String.join(System.lineSeparator(), description.value()) : "";
+    }
+
+    @Override
     public int minimumArguments() {
-        return (int) parameters.stream().filter(param -> !param.isOptional()).count();
+        return (int) parameters.stream()
+                .filter(param -> param.getAnnotation(AutoFlag.class) == null && param.getAnnotation(UserFlag.class) == null)
+                .filter(param -> !param.isOptional())
+                .count();
     }
 
     @Override
     public int maximumArguments() {
-        return parameters.size();
+        return parameters.size() + (int) parameters.stream()
+                .filter(param -> param.getAnnotation(UserFlag.class) != null)
+                .count();
     }
 
     @Override
@@ -101,23 +116,43 @@ public class MethodExecutable implements CommandExecutable {
         return String.format("MethodExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
     }
 
-    private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) {
+    private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) throws UnsupportedParameterException {
         if (backingMethod.getParameterCount() > 1) {
-            int[] index = {1};
+            boolean[] reachedOptionals = {false}, reachedRequired = {false};
             return Arrays.stream(backingMethod.getParameters(), 1, backingMethod.getParameterCount()).map(parameter -> {
                 Class<?> type = parameter.getType();
-                if (type == Optional.class) {
-                    Type generic = backingMethod.getGenericParameterTypes()[index[0]];
-                    if (generic instanceof ParameterizedType) {
-                        type = (Class<?>) ((ParameterizedType) generic).getActualTypeArguments()[0];
-                    } else {
-                        throw new UnsupportedParameterException("failed to resolve argument type for optional parameter " + parameter.getName());
+
+                if (parameter.getDeclaredAnnotation(AutoFlag.class) != null || parameter.getDeclaredAnnotation(UserFlag.class) != null) {
+                    if (parameter.getDeclaredAnnotation(AutoFlag.class) != null && parameter.getDeclaredAnnotation(UserFlag.class) != null) {
+                        throw new UnsupportedParameterException("Parameter " + parameter.getName()
+                                + " in method " + backingMethod.getName()
+                                + " is annotated as both an automatic and operand-based flag");
+                    } else if ((reachedRequired[0] || reachedOptionals[0])) {
+                        throw new UnsupportedParameterException("Parameter " + parameter.getName()
+                                + " in method " + backingMethod.getName()
+                                + " is annotated as flag, but exists after non-flag parameters");
+                    } else if (type == Optional.class) {
+                        type = resolveGenericType(parameter);
                     }
+
+                } else if (type == Optional.class) {
+                    reachedOptionals[0] = true;
+                    type = resolveGenericType(parameter);
+
+                } else {
+                    if (reachedOptionals[0]) {
+                        throw new UnsupportedParameterException("Parameter " + parameter.getName()
+                                + " in method " + backingMethod.getName()
+                                + " is mandatory, but exists after optional parameters");
+                    }
+                    reachedRequired[0] = true;
+
                 }
+
                 if (!commandManager.findArgumentHandler(type).isPresent()) {
-                    throw new UnsupportedParameterException(String.format("%s is not a supported parameter type.", type.getCanonicalName()));
+                    throw new UnsupportedParameterException(String.format("%s is not a supported parameter type", type.getCanonicalName()));
                 }
-                index[0]++;
+
                 return new DeclaredCommandParameter(parameter, type);
             }).collect(Collectors.toList());
         } else {
@@ -129,5 +164,14 @@ public class MethodExecutable implements CommandExecutable {
         Object[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);
         return result;
+    }
+
+    private static Class<?> resolveGenericType(Parameter parameter) {
+        final Type generic = parameter.getParameterizedType();
+        if (generic instanceof ParameterizedType) {
+            return (Class<?>) ((ParameterizedType) generic).getActualTypeArguments()[0];
+        } else {
+            throw new UnsupportedParameterException("failed to resolve argument type for optional parameter " + parameter.getName());
+        }
     }
 }
