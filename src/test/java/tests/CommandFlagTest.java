@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
@@ -43,18 +44,18 @@ public class CommandFlagTest {
 
     @Test
     public void testFlagSet() {
-        ExitCode result = commandManager.execute("greet foo -caps");
+        Execution result = commandManager.execute("greet foo -caps");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals("FOO", commandOutput.poll());
     }
 
     @Test
     public void testFlagUnset() {
-        ExitCode result = commandManager.execute("greet foo");
+        Execution result = commandManager.execute("greet foo");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals("foo", commandOutput.poll());
     }

@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.AnnotatedCommandManager;
@@ -43,9 +44,10 @@ public class OptionalCommandArgumentTest {
 
     @Test
     public void testPrecedingOptionalArguments() {
-        ExitCode result = commandManager.execute("execute firstOptional firstRequired secondRequired");
+        Execution result = commandManager.execute("execute firstOptional firstRequired secondRequired");
+        result = commandManager.execute("execute firstOptional firstRequired secondRequired");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals("firstOptional, firstRequired, DEFAULT, DEFAULT, secondRequired, DEFAULT",
                 commandOutput.poll());
@@ -53,9 +55,10 @@ public class OptionalCommandArgumentTest {
 
     @Test
     public void testIntermediaryOptionalArguments() {
-        ExitCode result = commandManager.execute("execute firstOptional firstRequired secondOptional secondRequired");
+        Execution result = commandManager.execute("execute firstOptional firstRequired secondRequired");
+        result = commandManager.execute("execute firstOptional firstRequired secondOptional secondRequired");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals("firstOptional, firstRequired, secondOptional, DEFAULT, secondRequired, DEFAULT",
                 commandOutput.poll());
@@ -63,9 +66,10 @@ public class OptionalCommandArgumentTest {
 
     @Test
     public void testTrailingOptionalArguments() {
-        ExitCode result = commandManager.execute("execute firstOptional firstRequired secondOptional thirdOptional secondRequired fourthOptional");
+        Execution result = commandManager.execute("execute firstOptional firstRequired secondRequired");
+        result = commandManager.execute("execute firstOptional firstRequired secondOptional thirdOptional secondRequired fourthOptional");
 
-        Assert.assertTrue(result == ExitCode.SUCCESS);
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
         Assert.assertEquals("firstOptional, firstRequired, secondOptional, thirdOptional, secondRequired, fourthOptional",
                 commandOutput.poll());

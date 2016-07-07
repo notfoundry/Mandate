@@ -19,15 +19,16 @@
 package pw.stamina.mandate.internal;
 
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.execution.CommandExecutable;
-import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.CommandInput;
 import pw.stamina.mandate.api.io.CommandOutput;
-import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
 import pw.stamina.mandate.internal.execution.argument.handlers.BooleanArgumentHandler;
 import pw.stamina.mandate.internal.execution.argument.handlers.EnumArgumentHandler;
@@ -85,13 +86,14 @@ public class AnnotatedCommandManager implements CommandManager {
         return registered;
     }
 
-    public ExitCode execute(String input) {
+    @Override
+    public Execution execute(String input) {
         if (input == null) {
             stderr.write("Invalid input: input cannot be empty");
-            return ExitCode.INVALID;
+            return Execution.complete(ExitCode.INVALID);
         } else if (input.length() == 0) {
             stderr.write("Invalid input: input cannot be empty");
-            return ExitCode.INVALID;
+            return Execution.complete(ExitCode.INVALID);
         }
 
         List<CommandArgument> consumedArgs = new ArrayList<>();
@@ -115,7 +117,7 @@ public class AnnotatedCommandManager implements CommandManager {
                     }
                     if (lastException != null) {
                         stderr.write(lastException.getLocalizedMessage());
-                        return ExitCode.INVALID;
+                        return Execution.complete(ExitCode.INVALID);
                     } else if (lowestConsumed != Integer.MAX_VALUE) {
                         depth += lowestConsumed;
                     }
@@ -130,13 +132,13 @@ public class AnnotatedCommandManager implements CommandManager {
                     } else {
                         stderr.write(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs));
                     }
-                    return ExitCode.INVALID;
+                    return Execution.complete(ExitCode.INVALID);
                 }
             }
-            return ExitCode.INVALID;
+            return Execution.complete(ExitCode.INVALID);
         } else {
             stderr.write(String.format("'%s' is not a valid command", currentArgument));
-            return ExitCode.INVALID;
+            return Execution.complete(ExitCode.INVALID);
         }
     }
 

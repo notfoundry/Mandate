@@ -19,7 +19,7 @@
 package pw.stamina.mandate.api.execution;
 
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.result.ExitCode;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.parsor.exceptions.ParseException;
 
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Foundry
  */
 public interface CommandExecutable {
-    ExitCode execute(Deque<CommandArgument> arguments, IODescriptor descriptor) throws ParseException;
+    Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException;
 
     List<CommandParameter> getParameters();
 

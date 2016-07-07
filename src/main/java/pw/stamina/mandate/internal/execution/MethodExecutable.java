@@ -23,6 +23,7 @@ import pw.stamina.mandate.api.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.CommandParameter;
+import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.ExitCode;
@@ -59,14 +60,9 @@ public class MethodExecutable implements CommandExecutable {
     }
 
     @Override
-    public ExitCode execute(Deque<CommandArgument> arguments, IODescriptor descriptor) throws ParseException {
+    public Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
-        try {
-            return (ExitCode) backingMethod.invoke(methodParent, arrayConcat(new Object[] {descriptor}, parsedArgs));
-        } catch (Exception e) {
-            descriptor.err().write(String.format("Exception while executing method '%s': %s", backingMethod.getName(), e));
-            return ExitCode.TERMINATED;
-        }
+        return new AsynchronousExecution(io, backingMethod, methodParent, arrayConcat(new Object[] {io}, parsedArgs));
     }
 
     @Override
