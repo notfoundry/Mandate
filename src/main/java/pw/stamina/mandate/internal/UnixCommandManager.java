@@ -41,6 +41,7 @@ import pw.stamina.parsor.exceptions.ParseException;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * @author Foundry
@@ -50,20 +51,20 @@ public class UnixCommandManager implements CommandManager {
 
     private final Set<ArgumentHandler> argumentHandlers = new HashSet<>();
 
-    private final CommandInput stdin;
+    private final Supplier<CommandInput> stdin;
 
-    private final CommandOutput stdout;
+    private final Supplier<CommandOutput> stdout;
 
-    private final CommandOutput stderr;
+    private final Supplier<CommandOutput> stderr;
 
     public UnixCommandManager() {
-        this(StandardInputStream.get(), StandardOutputStream.get(), StandardErrorStream.get());
+        this (StandardInputStream::get, StandardOutputStream::get, StandardErrorStream::get);
     }
 
-    public UnixCommandManager(CommandInput stdin, CommandOutput stdout, CommandOutput stderr) {
+    public UnixCommandManager(Supplier<CommandInput> stdin, Supplier<CommandOutput> stdout, Supplier<CommandOutput> stderr) {
         this.stdin = stdin;
-        this.stderr = stderr;
         this.stdout = stdout;
+        this.stderr = stderr;
 
         Arrays.asList(
                 new StringArgumentHandler(),
@@ -88,22 +89,22 @@ public class UnixCommandManager implements CommandManager {
     @Override
     public Execution execute(String input) {
         if (input == null) {
-            stderr.write("Invalid input: input cannot be empty");
+            stderr.get().write("Invalid input: input cannot be empty");
             return Execution.complete(ExitCode.INVALID);
         } else if (input.length() == 0) {
-            stderr.write("Invalid input: input cannot be empty");
+            stderr.get().write("Invalid input: input cannot be empty");
             return Execution.complete(ExitCode.INVALID);
         }
-
-        List<CommandArgument> consumedArgs = new ArrayList<>();
 
         Deque<CommandArgument> arguments;
         try {
             arguments = InputToArgumentParser.getInstance().parse(input);
         } catch (ParseException e) {
-            stderr.write("Exception tokenizing input: " + e.getLocalizedMessage());
+            stderr.get().write("Exception tokenizing input: " + e.getLocalizedMessage());
             return Execution.complete(ExitCode.INVALID);
         }
+
+        List<CommandArgument> consumedArgs = new ArrayList<>();
         SyntaxComponent component; CommandArgument currentArgument; int depth = 0;
         if ((component = registeredCommands.get((currentArgument = arguments.getFirst()).getRaw())) != null) {
             while ((currentArgument = arguments.poll()) != null) {
@@ -113,7 +114,7 @@ public class UnixCommandManager implements CommandManager {
                     for (CommandExecutable executable : component.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
                             try {
-                                return executable.execute(arguments, IODescriptor.from(stdin, stdout, stderr));
+                                return executable.execute(arguments, IODescriptor.from(stdin.get(), stdout.get(), stderr.get()));
                             } catch (ParseException e) {
                                 lastException = e;
                             }
@@ -122,7 +123,7 @@ public class UnixCommandManager implements CommandManager {
                         }
                     }
                     if (lastException != null) {
-                        stderr.write(lastException.getLocalizedMessage());
+                        stderr.get().write(lastException.getLocalizedMessage());
                         return Execution.complete(ExitCode.INVALID);
                     } else if (lowestConsumed != Integer.MAX_VALUE) {
                         depth += lowestConsumed;
@@ -134,16 +135,16 @@ public class UnixCommandManager implements CommandManager {
                 } else {
                     consumedArgs.addAll(arguments);
                     if (++depth <= consumedArgs.size()) {
-                        stderr.write(String.format("Invalid argument(s) '%s' passed to command '%s'", consumedArgs.subList(depth, consumedArgs.size()), consumedArgs.subList(0, depth)));
+                        stderr.get().write(String.format("Invalid argument(s) '%s' passed to command '%s'", consumedArgs.subList(depth, consumedArgs.size()), consumedArgs.subList(0, depth)));
                     } else {
-                        stderr.write(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs));
+                        stderr.get().write(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs));
                     }
                     return Execution.complete(ExitCode.INVALID);
                 }
             }
             return Execution.complete(ExitCode.INVALID);
         } else {
-            stderr.write(String.format("'%s' is not a valid command", currentArgument));
+            stderr.get().write(String.format("'%s' is not a valid command", currentArgument));
             return Execution.complete(ExitCode.INVALID);
         }
     }
