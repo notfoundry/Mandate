@@ -24,7 +24,7 @@ public class ClassSyntaxInheritanceTest {
 
     private Queue<Object> commandOutput = new ArrayDeque<>();
 
-    private CommandManager commandManager = new UnixCommandManager(StandardInputStream.get(), commandOutput::add, commandErrors::add);
+    private CommandManager commandManager = new UnixCommandManager(StandardInputStream::get, () -> commandOutput::add, () -> commandErrors::add);
 
     @Rule
     public TestWatcher watcher = new TestWatcher() {
