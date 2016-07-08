@@ -5,13 +5,15 @@ import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.internal.annotations.Length;
-import pw.stamina.mandate.internal.exceptions.ArgumentParseException;
+import pw.stamina.mandate.internal.execution.argument.ArgumentParseException;
 import pw.stamina.mandate.internal.execution.argument.BaseCommandArgument;
+import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.parsor.exceptions.ParseException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +31,7 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
         List<String> rawComponents = new ArrayList<>();
         StringBuilder rawComponent = new StringBuilder();
 
-        char[] inputChars; boolean escaped = false, quoted = false;
+        char[] inputChars; boolean escaped = false, quoted = false; int depth = 0;
         for (int idx = 1; idx < (inputChars = input.getRaw().toCharArray()).length - 1; idx++) {
             if (escaped) {
                 rawComponent.append(inputChars[idx]);
@@ -44,8 +46,20 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
                         quoted = !quoted;
                         break;
                     }
-                    case ',': {
+                    case ']':
                         if (!quoted) {
+                            depth--;
+                        }
+                        rawComponent.append(inputChars[idx]);
+                        break;
+                    case '[':
+                        if (!quoted) {
+                            depth++;
+                        }
+                        rawComponent.append(inputChars[idx]);
+                        break;
+                    case ',': {
+                        if (!quoted && depth == 0) {
                             while (inputChars[idx+1] == ' ') {
                                 idx++;
                             }
@@ -57,7 +71,7 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
                         }
                     }
                     case ' ': {
-                        if (!quoted) {
+                        if (!quoted && depth == 0) {
                             if (inputChars[idx - 1] != ' ' && inputChars[idx - 1] != ',') {
                                 throw new ArgumentParseException("", parameter.getType().getComponentType(), "Array element at position " + idx + " is separated by space, but not comma delimited");
                             } else {
@@ -84,9 +98,9 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
             int min = Math.min(length.min(), length.max());
             int max = Math.max(length.min(), length.max());
             if (rawComponents.size() < min) {
-                throw new ArgumentParseException(input.getRaw(), parameter.getType(), String.format("'%s' is too short: length can be between %s-%s elements", input.getRaw(), min, max));
+                throw new ArgumentParseException(input.getRaw(), parameter.getType(), String.format("'%s' is too short: length can be between %d-%d elements", input.getRaw(), min, max));
             } else if (rawComponents.size() > max) {
-                throw new ArgumentParseException(input.getRaw(), parameter.getType(), String.format("'%s' is too long: length can be between %s-%s elements", input.getRaw(), min, max));
+                throw new ArgumentParseException(input.getRaw(), parameter.getType(), String.format("'%s' is too long: length can be between %d-%d elements", input.getRaw(), min, max));
             }
         }
 
@@ -99,7 +113,11 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
 
     @Override
     public String getSyntax(CommandParameter parameter) {
-        return parameter.getLabel() + " - " + " array of " + parameter.getType().getSimpleName();
+        Length length = parameter.getAnnotation(Length.class);
+        if (length != null) {
+            return parameter.getLabel() + " - " + String.format("Array(%s%s)[length=%d-%d]", parameter.getType().getSimpleName(), String.join("", Collections.nCopies(PrimitiveArrays.getDimensions(parameter.getType()).length, "[]")), Math.min(length.min(), length.max()), Math.max(length.min(), length.max()));
+        }
+        return parameter.getLabel() + " - " + String.format("Array(%s%s)", parameter.getType().getSimpleName(), String.join("", Collections.nCopies(PrimitiveArrays.getDimensions(parameter.getType()).length, "[]")));
     }
 
     @Override

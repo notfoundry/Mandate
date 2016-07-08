@@ -27,7 +27,7 @@ import java.util.*;
  * @author Foundry
  */
 public class BaseSyntaxComponent implements SyntaxComponent {
-    private  Map<String, SyntaxComponent> childMap;
+    private Map<String, SyntaxComponent> childMap;
     private final String syntax;
     private Set<CommandExecutable> executables;
 

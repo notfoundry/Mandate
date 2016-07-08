@@ -1,4 +1,4 @@
-package pw.stamina.mandate.internal.exceptions;
+package pw.stamina.mandate.internal.execution.argument;
 
 import pw.stamina.parsor.exceptions.ParseException;
 

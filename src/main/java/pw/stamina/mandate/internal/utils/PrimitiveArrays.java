@@ -28,14 +28,14 @@ public final class PrimitiveArrays {
         return arrayClass;
     }
 
-    private static Class getBaseComponentType(Class arrayClass) {
+    public static Class getBaseComponentType(Class arrayClass) {
         while (arrayClass.isArray()) {
             arrayClass = arrayClass.getComponentType();
         }
         return arrayClass;
     }
 
-    private static int[] getDimensions(Class arrayClass) {
+    public static int[] getDimensions(Class arrayClass) {
         int dim = 0;
         while (arrayClass.isArray()) {
             arrayClass = arrayClass.getComponentType();

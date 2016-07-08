@@ -23,7 +23,8 @@ public final class EnumArgumentHandler implements ArgumentHandler<Enum> {
 
     @Override
     public String getSyntax(CommandParameter parameter) {
-        return parameter.getLabel() + " - " + "one of " + Arrays.toString(parameter.getType().getEnumConstants());
+        String constantsString = Arrays.toString(parameter.getType().getEnumConstants());
+        return parameter.getLabel() + " - " + "one of " + constantsString.substring(1, constantsString.length() - 1);
     }
 
     @Override

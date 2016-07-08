@@ -54,6 +54,15 @@ public class ArrayArgumentTest {
     }
 
     @Test
+    public void testPassingTo2DStringArray() {
+        Execution result = commandManager.execute("run 2dstrings [[foo, bar], [baz, quz, \"tricky, ]]]\"]]");
+
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+
+        Assert.assertEquals("[[foo, bar], [baz, quz, tricky, ]]]]]", commandOutput.poll());
+    }
+
+    @Test
     public void testPassingZeroLengthArrayAsArgument() {
         Execution result = commandManager.execute("run strings []");
 
@@ -105,6 +114,13 @@ public class ArrayArgumentTest {
     @Syntax(syntax = "run")
     public ExitCode runClampedInts(IODescriptor io, @Length(min = 5, max = 5) int[] ints) {
         io.out().write(Arrays.toString(ints));
+        return ExitCode.SUCCESS;
+    }
+
+    @Executes(tree = "2dstrings")
+    @Syntax(syntax = "run")
+    public ExitCode run2DStrings(IODescriptor io, String[][] strings) {
+        io.out().write(Arrays.deepToString(strings));
         return ExitCode.SUCCESS;
     }
 }
