@@ -59,7 +59,7 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
                     case ' ': {
                         if (!quoted) {
                             if (inputChars[idx - 1] != ' ' && inputChars[idx - 1] != ',') {
-                                throw new ArgumentParseException("", parameter.getType().getComponentType(), "");
+                                throw new ArgumentParseException("", parameter.getType().getComponentType(), "Array element at position " + idx + " is separated by space, but not comma delimited");
                             } else {
                                 idx++;
                                 break;
