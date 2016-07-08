@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.annotations.strings;
+package pw.stamina.mandate.internal.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

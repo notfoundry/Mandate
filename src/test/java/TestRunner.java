@@ -7,7 +7,7 @@ import tests.*;
  */
 public class TestRunner {
     public static void main(String[] args) {
-        Result result = JUnitCore.runClasses(ClassSyntaxInheritanceTest.class, ClassSyntaxOverrideTest.class, OptionalCommandArgumentTest.class, CommandFlagTest.class, OverlappingCommandFlagTest.class, ExclusiveCommandFlagTest.class);
+        Result result = JUnitCore.runClasses(ClassSyntaxInheritanceTest.class, ClassSyntaxOverrideTest.class, OptionalCommandArgumentTest.class, CommandFlagTest.class, OverlappingCommandFlagTest.class, ExclusiveCommandFlagTest.class, ArrayArgumentTest.class);
 
         System.out.println();
         result.getFailures().forEach(System.out::println);

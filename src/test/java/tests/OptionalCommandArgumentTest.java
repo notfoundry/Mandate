@@ -44,11 +44,11 @@ public class OptionalCommandArgumentTest {
 
     @Test
     public void testUsingFullCommandSignature() {
-        Execution result = commandManager.execute("execute first second 100");
+        Execution result = commandManager.execute("execute first \"second argument\" 100");
 
         Assert.assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("first second 100",
+        Assert.assertEquals("first second argument 100",
                 commandOutput.poll());
     }
 

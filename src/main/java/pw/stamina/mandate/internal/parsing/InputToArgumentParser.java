@@ -21,6 +21,8 @@ package pw.stamina.mandate.internal.parsing;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.internal.execution.argument.BaseCommandArgument;
 import pw.stamina.parsor.api.parsing.Parser;
+import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.exceptions.ParseFailException;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -28,7 +30,7 @@ import java.util.Deque;
 /**
  * @author Foundry
  */
-public enum InputToArgumentParser implements Parser<Deque<CommandArgument>, String> {
+public enum InputToArgumentParser implements Parser<String, Deque<CommandArgument>> {
     INSTANCE;
 
     public static InputToArgumentParser getInstance() {
@@ -36,11 +38,11 @@ public enum InputToArgumentParser implements Parser<Deque<CommandArgument>, Stri
     }
 
     @Override
-    public Deque<CommandArgument> parse(String input) {
+    public Deque<CommandArgument> parse(String input) throws ParseException {
         Deque<CommandArgument> arguments = new ArrayDeque<>();
         StringBuilder content = new StringBuilder();
 
-        boolean escaped = false, quoted = false;
+        boolean escaped = false, quoted = false; int depth = 0;
         for (char character : input.toCharArray()) {
             if (escaped) {
                 content.append(character);
@@ -52,21 +54,39 @@ public enum InputToArgumentParser implements Parser<Deque<CommandArgument>, Stri
                         break;
                     case '"':
                         quoted = !quoted;
+                        if (depth > 0) {
+                            content.append(character);
+                        }
+                        break;
+                    case ']':
+                        if (!quoted) {
+                            depth--;
+                        }
+                        content.append(character);
+                        break;
+                    case '[':
+                        if (!quoted) {
+                            depth++;
+                        }
+                        content.append(character);
                         break;
                     case ' ':
-                        if (!quoted) {
+                        if (!quoted && depth == 0) {
                             append(content, arguments);
                             break;
                         }
                     default:
-                        escaped = false;
                         content.append(character);
                 }
             }
         }
+        if (depth > 0) {
+            throw new ParseFailException(this, input, CommandArgument.class, "Found unterminated list in input: missing " + depth + " terminators");
+        } else if (depth < 0) {
+            throw new ParseFailException(this, input, CommandArgument.class, "Found " + Math.abs(depth) + " too many list terminators in input");
+        }
 
         append(content, arguments);
-
         return arguments;
     }
 

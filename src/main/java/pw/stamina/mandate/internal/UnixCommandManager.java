@@ -30,14 +30,12 @@ import pw.stamina.mandate.api.io.CommandInput;
 import pw.stamina.mandate.api.io.CommandOutput;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
-import pw.stamina.mandate.internal.execution.argument.handlers.BooleanArgumentHandler;
-import pw.stamina.mandate.internal.execution.argument.handlers.EnumArgumentHandler;
-import pw.stamina.mandate.internal.execution.argument.handlers.NumberArgumentHandler;
-import pw.stamina.mandate.internal.execution.argument.handlers.StringArgumentHandler;
+import pw.stamina.mandate.internal.execution.argument.handlers.*;
 import pw.stamina.mandate.internal.io.StandardErrorStream;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 import pw.stamina.mandate.internal.io.StandardOutputStream;
 import pw.stamina.mandate.internal.parsing.InputToArgumentParser;
+import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.mandate.internal.utils.Primitives;
 import pw.stamina.parsor.exceptions.ParseException;
 
@@ -71,7 +69,8 @@ public class UnixCommandManager implements CommandManager {
                 new StringArgumentHandler(),
                 new NumberArgumentHandler(),
                 new BooleanArgumentHandler(),
-                new EnumArgumentHandler()
+                new EnumArgumentHandler(),
+                new ArrayArgumentHandler()
         ).forEach(argumentHandlers::add);
     }
 
@@ -98,8 +97,15 @@ public class UnixCommandManager implements CommandManager {
 
         List<CommandArgument> consumedArgs = new ArrayList<>();
 
-        Deque<CommandArgument> arguments; SyntaxComponent component; CommandArgument currentArgument; int depth = 0;
-        if ((component = registeredCommands.get((currentArgument = (arguments = InputToArgumentParser.getInstance().parse(input)).getFirst()).getRaw())) != null) {
+        Deque<CommandArgument> arguments;
+        try {
+            arguments = InputToArgumentParser.getInstance().parse(input);
+        } catch (ParseException e) {
+            stderr.write("Exception tokenizing input: " + e.getLocalizedMessage());
+            return Execution.complete(ExitCode.INVALID);
+        }
+        SyntaxComponent component; CommandArgument currentArgument; int depth = 0;
+        if ((component = registeredCommands.get((currentArgument = arguments.getFirst()).getRaw())) != null) {
             while ((currentArgument = arguments.poll()) != null) {
                 consumedArgs.add(currentArgument);
                 if (component.findExecutables().isPresent()) {
@@ -147,6 +153,8 @@ public class UnixCommandManager implements CommandManager {
     public <T> Optional<ArgumentHandler<T>> findArgumentHandler(Class<T> type) {
         if (type.isPrimitive()) {
             type = Primitives.wrap(type);
+        } else if (type.isArray()) {
+            type = PrimitiveArrays.wrap(type);
         }
         for (ArgumentHandler argumentHandler : argumentHandlers) {
             for (Class handledType : argumentHandler.getHandledTypes()) {

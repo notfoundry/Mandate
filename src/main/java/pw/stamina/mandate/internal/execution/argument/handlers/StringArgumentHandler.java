@@ -19,13 +19,13 @@
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.internal.annotations.strings.Equals;
-import pw.stamina.mandate.internal.annotations.strings.Length;
+import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.api.execution.CommandParameter;
+import pw.stamina.mandate.internal.exceptions.ArgumentParseException;
+import pw.stamina.mandate.internal.annotations.strings.Equals;
+import pw.stamina.mandate.internal.annotations.Length;
 import pw.stamina.parsor.exceptions.ParseException;
-import pw.stamina.parsor.exceptions.ParseFailException;
 
 import java.util.regex.Pattern;
 
@@ -45,16 +45,16 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
                 if (!(equals.regex() ? Pattern.compile(string).matcher(input.getRaw()).matches() : string.equalsIgnoreCase(input.getRaw()))) continue;
                 return input.getRaw();
             }
-            throw new ParseFailException(input.getRaw(), this.getClass(), String.format("'%s' doesn't match %s (regex=%s)", input.getRaw(), String.format("['%s']", String.join("'/'", equals.value())), equals.regex()));
+            throw new ArgumentParseException(input.getRaw(), this.getClass(), String.format("'%s' doesn't match %s (regex=%s)", input.getRaw(), String.format("['%s']", String.join("'/'", equals.value())), equals.regex()));
         }
         Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
             int min = Math.min(length.min(), length.max());
             int max = Math.max(length.min(), length.max());
             if (input.getRaw().length() < min) {
-                throw new ParseFailException(input.getRaw(), String.class, String.format("'%s' is too short: length can be between %s-%s characters", input.getRaw(), min, max));
+                throw new ArgumentParseException(input.getRaw(), String.class, String.format("'%s' is too short: length can be between %s-%s characters", input.getRaw(), min, max));
             } else if (input.getRaw().length() > max) {
-                throw new ParseFailException(input.getRaw(), String.class, String.format("'%s' is too long: length can be between %s-%s characters", input.getRaw(), min, max));
+                throw new ArgumentParseException(input.getRaw(), String.class, String.format("'%s' is too long: length can be between %s-%s characters", input.getRaw(), min, max));
             }
         }
         return input.getRaw();
