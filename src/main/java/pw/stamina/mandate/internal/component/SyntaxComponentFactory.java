@@ -20,7 +20,7 @@ package pw.stamina.mandate.internal.component;
 
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.component.SyntaxComponent;
-import pw.stamina.mandate.api.exceptions.MalformedCommandException;
+import pw.stamina.mandate.internal.exceptions.MalformedCommandException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;

@@ -22,8 +22,8 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.flag.AutoFlag;
 import pw.stamina.mandate.api.annotations.flag.UserFlag;
 import pw.stamina.mandate.api.annotations.meta.Description;
-import pw.stamina.mandate.api.exceptions.MalformedCommandException;
-import pw.stamina.mandate.api.exceptions.UnsupportedParameterException;
+import pw.stamina.mandate.internal.exceptions.MalformedCommandException;
+import pw.stamina.mandate.internal.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.result.Execution;
@@ -66,7 +66,7 @@ public class MethodExecutable implements CommandExecutable {
     @Override
     public Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
-        return new AsynchronousExecution(io, backingMethod, methodParent, arrayConcat(new Object[] {io}, parsedArgs));
+        return ExecutionFactory.makeExecution(backingMethod, methodParent, arrayConcat(new Object[] {io}, parsedArgs));
     }
 
     @Override
@@ -122,9 +122,10 @@ public class MethodExecutable implements CommandExecutable {
             boolean[] reachedOptionals = {false}, reachedRequired = {false};
             return Arrays.stream(backingMethod.getParameters(), 1, backingMethod.getParameterCount()).map(parameter -> {
                 Class<?> type = parameter.getType();
-                AutoFlag autoFlag; UserFlag userFlag;
+                AutoFlag autoFlag = parameter.getDeclaredAnnotation(AutoFlag.class);
+                UserFlag userFlag = parameter.getDeclaredAnnotation(UserFlag.class);
 
-                if ((autoFlag = parameter.getDeclaredAnnotation(AutoFlag.class)) != null | (userFlag = parameter.getDeclaredAnnotation(UserFlag.class)) != null) {
+                if (autoFlag != null || userFlag != null) {
                     if (autoFlag != null && userFlag != null) {
                         throw new UnsupportedParameterException("Parameter " + parameter.getName()
                                 + " in method " + backingMethod.getName()
@@ -134,7 +135,6 @@ public class MethodExecutable implements CommandExecutable {
                                 + " in method " + backingMethod.getName()
                                 + " is annotated as flag, but exists after non-flag parameters");
                     }
-
                     for (String flag : (autoFlag != null ? autoFlag.flag() : userFlag.flag())) {
                         if (!usedFlags.add(flag)) {
                             throw new UnsupportedParameterException("Parameter " + parameter.getName()
@@ -142,10 +142,8 @@ public class MethodExecutable implements CommandExecutable {
                                     + " uses previously declared flag name '" + flag + "'");
                         }
                     }
-
-                    if (type == Optional.class) {
+                    if (type == Optional.class)
                         type = resolveGenericType(parameter);
-                    }
 
                 } else if (type == Optional.class) {
                     reachedOptionals[0] = true;
@@ -158,7 +156,6 @@ public class MethodExecutable implements CommandExecutable {
                                 + " is mandatory, but exists after optional parameters");
                     }
                     reachedRequired[0] = true;
-
                 }
 
                 if (!commandManager.findArgumentHandler(type).isPresent()) {
@@ -172,18 +169,18 @@ public class MethodExecutable implements CommandExecutable {
         }
     }
 
-    private static Object[] arrayConcat(Object[] first, Object[] second) {
-        Object[] result = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, result, first.length, second.length);
-        return result;
-    }
-
-    private static Class<?> resolveGenericType(Parameter parameter) {
+    private static Class<?> resolveGenericType(Parameter parameter) throws UnsupportedParameterException {
         final Type generic = parameter.getParameterizedType();
         if (generic instanceof ParameterizedType) {
             return (Class<?>) ((ParameterizedType) generic).getActualTypeArguments()[0];
         } else {
             throw new UnsupportedParameterException("failed to resolve argument type for optional parameter " + parameter.getName());
         }
+    }
+
+    private static Object[] arrayConcat(Object[] first, Object[] second) {
+        Object[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
     }
 }

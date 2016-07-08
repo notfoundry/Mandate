@@ -19,9 +19,9 @@ class AsynchronousExecution implements Execution {
 
     private final Future<ExitCode> pendingComputation;
 
-    AsynchronousExecution(IODescriptor io, Method executable, Object parent, Object... args) {
+    AsynchronousExecution(Method executable, Object parent, Object[] args) {
         this.executable = executable;
-        this.io = io;
+        this.io = (IODescriptor) args[0];
         pendingComputation = COMMAND_EXECUTOR.submit(() -> (ExitCode) executable.invoke(parent, args));
     }
 

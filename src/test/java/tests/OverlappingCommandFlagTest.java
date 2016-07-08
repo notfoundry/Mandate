@@ -5,7 +5,7 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.annotations.flag.AutoFlag;
-import pw.stamina.mandate.api.exceptions.UnsupportedParameterException;
+import pw.stamina.mandate.internal.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.UnixCommandManager;
