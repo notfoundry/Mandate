@@ -19,11 +19,10 @@
 package pw.stamina.mandate.internal.component;
 
 import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.component.SyntaxComponent;
-import pw.stamina.mandate.internal.exceptions.MalformedCommandException;
-import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
+import pw.stamina.mandate.api.component.SyntaxComponent;
+import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.internal.execution.MethodExecutable;
 
 import java.lang.reflect.Method;
@@ -43,7 +42,7 @@ public final class SyntaxComponentFactory {
     public static Set<SyntaxComponent> getComponents(Method backingMethod, Object container, CommandManager commandManager) {
         Syntax syntax; String[][] tree; Set<SyntaxComponent> parents;
         if ((syntax = backingMethod.getDeclaredAnnotation(Syntax.class)) == null && (syntax = backingMethod.getDeclaringClass().getDeclaredAnnotation(Syntax.class)) == null) {
-            throw new MalformedCommandException("No syntax annotation found for method " + backingMethod.getName() + " annotated as executable.");
+            throw new MissingSyntaxException("No syntax annotation found for method " + backingMethod.getName() + " annotated as executable.");
         }
 
         if ((tree = treeifySubSyntax(backingMethod.getDeclaredAnnotation(Executes.class).tree())).length > 0) {

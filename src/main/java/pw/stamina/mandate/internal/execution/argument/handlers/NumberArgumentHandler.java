@@ -28,13 +28,10 @@ import pw.stamina.mandate.internal.utils.Primitives;
 import pw.stamina.parsor.exceptions.ParseException;
 import pw.stamina.parsor.impl.parsers.standards.NumberParser;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Foundry
  */
 public final class NumberArgumentHandler implements ArgumentHandler<Number> {
-    private static final Pattern hexValidator = Pattern.compile("^(-|\\+)?(0x|0X|#)[a-fA-F0-9]+$"); //require hex prefix
 
     @Override
     public final Number parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {

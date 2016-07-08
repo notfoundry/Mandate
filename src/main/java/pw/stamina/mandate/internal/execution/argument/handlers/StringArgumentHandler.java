@@ -22,7 +22,7 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.internal.exceptions.ArgumentParseException;
+import pw.stamina.mandate.internal.execution.argument.ArgumentParseException;
 import pw.stamina.mandate.internal.annotations.strings.Equals;
 import pw.stamina.mandate.internal.annotations.Length;
 import pw.stamina.parsor.exceptions.ParseException;
@@ -52,9 +52,9 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
             int min = Math.min(length.min(), length.max());
             int max = Math.max(length.min(), length.max());
             if (input.getRaw().length() < min) {
-                throw new ArgumentParseException(input.getRaw(), String.class, String.format("'%s' is too short: length can be between %s-%s characters", input.getRaw(), min, max));
+                throw new ArgumentParseException(input.getRaw(), String.class, String.format("'%s' is too short: length can be between %d-%d characters", input.getRaw(), min, max));
             } else if (input.getRaw().length() > max) {
-                throw new ArgumentParseException(input.getRaw(), String.class, String.format("'%s' is too long: length can be between %s-%s characters", input.getRaw(), min, max));
+                throw new ArgumentParseException(input.getRaw(), String.class, String.format("'%s' is too long: length can be between %d-%d characters", input.getRaw(), min, max));
             }
         }
         return input.getRaw();
@@ -64,11 +64,11 @@ public class StringArgumentHandler implements ArgumentHandler<String> {
     public String getSyntax(CommandParameter parameter) {
         Equals equals = parameter.getAnnotation(Equals.class);
         if (equals != null) {
-            return parameter.getLabel() + " - " + String.format("String['%s', regex=%s]", String.join("'/'", equals.value()), equals.regex());
+            return parameter.getLabel() + " - " + String.format("String['%s', regex=%s]", String.join("/", equals.value()), equals.regex());
         }
         Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
-            return parameter.getLabel() + " - " + String.format("String[%s-%s]", Math.min(length.min(), length.max()), Math.max(length.min(), length.max()));
+            return parameter.getLabel() + " - " + String.format("String[%s-%s chars]", Math.min(length.min(), length.max()), Math.max(length.min(), length.max()));
         }
         return parameter.getLabel() + " - " + "String";
     }

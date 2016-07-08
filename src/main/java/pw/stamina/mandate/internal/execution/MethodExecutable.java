@@ -22,8 +22,6 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.flag.AutoFlag;
 import pw.stamina.mandate.api.annotations.flag.UserFlag;
 import pw.stamina.mandate.api.annotations.meta.Description;
-import pw.stamina.mandate.internal.exceptions.MalformedCommandException;
-import pw.stamina.mandate.internal.exceptions.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.result.Execution;
@@ -31,7 +29,9 @@ import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.internal.execution.parameter.DeclaredCommandParameter;
+import pw.stamina.mandate.internal.execution.result.ExecutionFactory;
 import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
+import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.parsor.exceptions.ParseException;
 
 import java.lang.reflect.Method;
@@ -160,6 +160,8 @@ public class MethodExecutable implements CommandExecutable {
 
                 if (!commandManager.findArgumentHandler(type).isPresent()) {
                     throw new UnsupportedParameterException(String.format("%s is not a supported parameter type", type.getCanonicalName()));
+                } else if (type.isArray() && !commandManager.findArgumentHandler((PrimitiveArrays.getBaseComponentType(type.getComponentType()))).isPresent()) {
+                    throw new UnsupportedParameterException(String.format("Array element %s is not a supported parameter type", type.getCanonicalName()));
                 }
 
                 return new DeclaredCommandParameter(parameter, type);
@@ -174,7 +176,7 @@ public class MethodExecutable implements CommandExecutable {
         if (generic instanceof ParameterizedType) {
             return (Class<?>) ((ParameterizedType) generic).getActualTypeArguments()[0];
         } else {
-            throw new UnsupportedParameterException("failed to resolve argument type for optional parameter " + parameter.getName());
+            throw new UnsupportedParameterException("Failed to resolve argument type for optional parameter " + parameter.getName());
         }
     }
 

@@ -1,4 +1,4 @@
-package pw.stamina.mandate.internal.execution;
+package pw.stamina.mandate.internal.execution.result;
 
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;

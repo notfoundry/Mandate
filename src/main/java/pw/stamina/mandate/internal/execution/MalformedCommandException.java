@@ -16,30 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.exceptions;
+package pw.stamina.mandate.internal.execution;
 
 /**
  * @author Foundry
  */
-public class UnsupportedParameterException extends MalformedCommandException {
+public class MalformedCommandException extends RuntimeException {
 
-    private static final long serialVersionUID = -3785102989459504215L;
+    private static final long serialVersionUID = 7123028407640145435L;
 
-    public UnsupportedParameterException() {}
+    public MalformedCommandException() {}
 
-    public UnsupportedParameterException(String message) {
+    public MalformedCommandException(String message) {
         super(message);
     }
 
-    public UnsupportedParameterException(Throwable cause) {
+    public MalformedCommandException(Throwable cause) {
         super(cause);
     }
 
-    public UnsupportedParameterException(String message, Throwable cause) {
+    public MalformedCommandException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public UnsupportedParameterException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public MalformedCommandException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }
