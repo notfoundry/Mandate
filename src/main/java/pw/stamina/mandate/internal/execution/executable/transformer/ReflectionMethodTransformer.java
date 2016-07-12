@@ -28,6 +28,25 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 /**
+ * A utility class allowing for the programmatic conversion of class methods to SAM interface implementations
+ * <p>
+ * ReflectionMethodTransformer provides methods for converting previously obtained reflection {@link Method method} objects through
+ * the {@link ReflectionMethodTransformer#transform(Class, Class, Object, Method, Object...) direct transformer}, as well as
+ * method objects discovered via their String name through the {@link ReflectionMethodTransformer#transform(Class, Class, Object, String, Class[]) lookup transformer}.
+ * <p>
+ * Both the direct and lookup transformers support passing captured arguments as a part of the conversion process through either their default or overloaded method variants.
+ * Captured arguments serve as constants references for invocation, meaning that the parameters present in the conversion target type SAM must be compatible
+ * with all parameters in the converted method minus the parameters that are having captured arguments supplied to them.
+ * <p>
+ * The SAM of the conversion target type must have an identical signature to the method being converted discounting captured arguments, with the
+ * exception of SAMs making use of parameterized types. The conversion system cannot reify these types prior to invoking the SAM of the transformed object,
+ * seeing as the JVM erases these types. As such, care must be taken to not provide incompatable transformation target types when dealing with parameterized arguments,
+ * as internally all references to that type will be of type {@link Object Object}, to which any argument can be passed.
+ * <p>
+ * When this class is initialized, it will attempt to acquire a privileged {@link java.lang.invoke.MethodHandles.Lookup MethodHandle Lookup} object with which
+ * private, protected, and package-local methods can be converted. If this conversion fails, the transformer will issue a warning that lookups will be limited to
+ * publicly accessible methods.
+ *
  * @author Foundry
  */
 public final class ReflectionMethodTransformer {
@@ -37,15 +56,32 @@ public final class ReflectionMethodTransformer {
 
     private ReflectionMethodTransformer() {}
 
+    /**
+     * Attempts to generated an instance of the conversion target type serving as an dynamic invoker for a specific reflection method
+     * <p>
+     * The conversion target must be an interface with one single non-default and non-static method to be considered valid. In other words,
+     * the {@link FunctionalInterface FunctionalInterface} annotation should be able to be applied to that interface without error.
+     *
+     * @param conversionTarget the conversion target to which the backing method should be converted
+     * @param parentClass the class type of the parent of the converted method
+     * @param parentInstance the object serving as the parent of the converted method, null if the method is static
+     * @param backingMethod the method to be converted to the conversion target type
+     * @param capturedState the captured state, if any, to be supplied to the converted method upon invocation
+     * @param <T> the type of the SAM object to be created
+     * @param <K> the type of the parent object in which the converted method is contained
+     * @return an object of type T with a single method accepting all non-captured arguments of the converted method
+     * @throws IllegalHandleLookupException if the required method handle cannot be looked up due to an access violation
+     * @throws MethodTransformationException if there are incompatibilities between the conversion target and the converted method
+     */
     @SuppressWarnings("unchecked")
-    public static <T, K> T transform(Class<T> lambdaClass, Class<? extends K> parentClass, K parentInstance, Method backingMethod, Object... capturedState) {
+    public static <T, K> T transform(Class<T> conversionTarget, Class<? extends K> parentClass, K parentInstance, Method backingMethod, Object... capturedState) {
         if (parentClass == null) throw new NullPointerException("parent class provided cannot be null");
-        validateLambdaTarget(lambdaClass, backingMethod, capturedState);    //before we go any further, check certain invariants
+        validateConversion(conversionTarget, backingMethod, capturedState);    //before we go any further, check certain invariants
         try {
             final MethodHandles.Lookup caller = LOOKUP.in(parentClass);   //transform a new lookup in our parent class
             MethodHandle implMethod; Method lambdaMethod = null;
 
-            for (Method method : lambdaClass.getMethods()) {    //guaranteed that only a single method exists
+            for (Method method : conversionTarget.getMethods()) {    //guaranteed that only a single method exists
                 if (!method.isDefault() && !Modifier.isStatic(method.getModifiers())) {
                     lambdaMethod = method;
                     break;
@@ -88,13 +124,13 @@ public final class ReflectionMethodTransformer {
                 final MethodType instantiatedMethodType = MethodType.methodType(backingMethod.getReturnType(), stripCapturedTypes(backingMethod.getParameterTypes(), capturedStateClasses));  //generate a type to match the backing method
                 final MethodType lambdaMethodType = MethodType.methodType(erasedReturnType, erasedBackingParameters);
                 if (Modifier.isStatic(methodModifiers)) {
-                    return (T) LambdaMetafactory.metafactory(caller, lambdaMethod.getName(), MethodType.methodType(lambdaClass, stripParameterTypes(backingMethod.getParameterTypes(), capturedStateClasses)),   //the type used for static invocations
+                    return (T) LambdaMetafactory.metafactory(caller, lambdaMethod.getName(), MethodType.methodType(conversionTarget, stripParameterTypes(backingMethod.getParameterTypes(), capturedStateClasses)),   //the type used for static invocations
                             lambdaMethodType, implMethod, instantiatedMethodType).dynamicInvoker().invokeWithArguments(Arrays.asList(capturedState));   //varargs seems to resolve a passed array as a single object otherwise
                 } else {
                     if (parentInstance == null) {   //assert that the backing instance for a non-static method is not null
                         throw new MethodTransformationException("Instance of parent class for non-static method " + backingMethod.getName() + " cannot be null");
                     }
-                    return (T) LambdaMetafactory.metafactory(caller, lambdaMethod.getName(), MethodType.methodType(lambdaClass, parentClass, (Class<?>[]) stripParameterTypes(backingMethod.getParameterTypes(), capturedStateClasses)),    //the type used for instance invocations
+                    return (T) LambdaMetafactory.metafactory(caller, lambdaMethod.getName(), MethodType.methodType(conversionTarget, parentClass, (Class<?>[]) stripParameterTypes(backingMethod.getParameterTypes(), capturedStateClasses)),    //the type used for instance invocations
                             lambdaMethodType, implMethod, instantiatedMethodType).dynamicInvoker().invokeWithArguments(Arrays.asList(arrayConcat(new Object[] {parentInstance}, capturedState)));
                 }
             } else {
@@ -106,11 +142,31 @@ public final class ReflectionMethodTransformer {
         }
     }
 
-    public static <T, K> T transform(Class<T> lambdaClass, Class<? extends K> parentClass, K parentInstance, String methodEquivalent, Class<?>[] methodParameters, Object... capturedState) {
+    /**
+     * Attempts to generated an instance of the conversion target type serving as an dynamic invoker for an unresolved method supplier with captured state
+     * <p>
+     * The conversion target must be an interface with one single non-default and non-static method to be considered valid. In other words,
+     * the {@link FunctionalInterface FunctionalInterface} annotation should be able to be applied to that interface without error.
+     * <p>
+     * @see ReflectionMethodTransformer#transform(Class, Class, Object, String, Class[], Object...)
+     *
+     * @param conversionTarget the conversion target to which the backing method should be converted
+     * @param parentClass the class type of the parent of the converted method
+     * @param parentInstance the object serving as the parent of the converted method, null if the method is static
+     * @param methodEquivalent the string name of the method to be converted to the conversion target type
+     * @param  methodParameters the method parameter types of the method to be looked up through the methodEquivalent argument
+     * @param capturedState the captured state, if any, to be supplied to the converted method upon invocation
+     * @param <T> the type of the SAM object to be created
+     * @param <K> the type of the parent object in which the converted method is contained
+     * @return an object of type T with a single method accepting all non-captured arguments of the converted method
+     * @throws IllegalHandleLookupException if the required method handle cannot be looked up due to an access violation
+     * @throws MethodTransformationException if there are incompatibilities between the conversion target and the converted method
+     */
+    public static <T, K> T transform(Class<T> conversionTarget, Class<? extends K> parentClass, K parentInstance, String methodEquivalent, Class<?>[] methodParameters, Object... capturedState) {
         for (Class<?> clazz = parentClass; clazz.getSuperclass() != null; clazz = clazz.getSuperclass()) {  //loop through inheritance tree
             for (Method method : clazz.getDeclaredMethods()) {
                 if (method.getName().equals(methodEquivalent) && Arrays.equals(method.getParameterTypes(), methodParameters))   //validate that method signature matches intention
-                    return transform(lambdaClass, parentClass, parentInstance, method, capturedState);
+                    return transform(conversionTarget, parentClass, parentInstance, method, capturedState);
             }
         }
         throw new MethodTransformationException("Method " + methodEquivalent
@@ -118,32 +174,51 @@ public final class ReflectionMethodTransformer {
                 + " does not exist in class " + parentClass.getSimpleName());
     }
 
-    public static <T, K> T transform(Class<T> lambdaClass, Class<? extends K> parentClass, K parentInstance, String methodEquivalent, Class<?>... methodParameters) {
-        return transform(lambdaClass, parentClass, parentInstance, methodEquivalent, methodParameters, new Object[0]);
+    /**
+     * Attempts to generated an instance of the conversion target type serving as an dynamic invoker for an unresolved method with no supplied captured state
+     * <p>
+     * The conversion target must be an interface with one single non-default and non-static method to be considered valid. In other words,
+     * the {@link FunctionalInterface FunctionalInterface} annotation should be able to be applied to that interface without error.
+     * <p>
+     * @see ReflectionMethodTransformer#transform(Class, Class, Object, String, Class[], Object...)
+     *
+     * @param conversionTarget the conversion target to which the backing method should be converted
+     * @param parentClass the class type of the parent of the converted method
+     * @param parentInstance the object serving as the parent of the converted method, null if the method is static
+     * @param methodEquivalent the string name of the method to be converted to the conversion target type
+     * @param  methodParameters the method parameter types of the method to be looked up through the methodEquivalent argument
+     * @param <T> the type of the SAM object to be created
+     * @param <K> the type of the parent object in which the converted method is contained
+     * @return an object of type T with a single method accepting all non-captured arguments of the converted method
+     * @throws IllegalHandleLookupException if the required method handle cannot be looked up due to an access violation
+     * @throws MethodTransformationException if there are incompatibilities between the conversion target and the converted method
+     */
+    public static <T, K> T transform(Class<T> conversionTarget, Class<? extends K> parentClass, K parentInstance, String methodEquivalent, Class<?>... methodParameters) {
+        return transform(conversionTarget, parentClass, parentInstance, methodEquivalent, methodParameters, new Object[0]);
     }
 
-    private static void validateLambdaTarget(Class<?> lambdaClass, Method methodEquivalent, Object... capturedState) throws MethodTransformationException {
-        if (lambdaClass == null) throw new MethodTransformationException("Lambda interface cannot be null");
+    private static void validateConversion(Class<?> conversionTarget, Method methodEquivalent, Object... capturedState) throws MethodTransformationException {
+        if (conversionTarget == null) throw new MethodTransformationException("Lambda interface cannot be null");
         if (methodEquivalent == null) throw new MethodTransformationException("Method equivalent cannot be null");
 
-        if (!lambdaClass.isInterface()) {   //basic check to ensure that you are dealing with an interface
-            throw new MethodTransformationException("Class " + lambdaClass.getSimpleName()
+        if (!conversionTarget.isInterface()) {   //basic check to ensure that you are dealing with an interface
+            throw new MethodTransformationException("Class " + conversionTarget.getSimpleName()
                     + " is not an interface and cannot be used as a lambda target");
         }
         Method functionalMethod = null;
-        for (Method method : lambdaClass.getMethods()) {
+        for (Method method : conversionTarget.getMethods()) {
             if (!method.isDefault() && !Modifier.isStatic(method.getModifiers())) {  //check to make sure that we aren't dealing with a default method
                 if (functionalMethod == null) { //first non-default method found
                     functionalMethod = method;
                 } else {   //more than one non-default method exists in interface
-                    throw new MethodTransformationException("Interface " + lambdaClass.getSimpleName()
+                    throw new MethodTransformationException("Interface " + conversionTarget.getSimpleName()
                             + "has more than one non-default method and cannot be used as a lambda target");
                 }
             }
         }
 
         if (functionalMethod == null) {   //interface has no non-default methods
-            throw new MethodTransformationException("Interface " + lambdaClass.getSimpleName() + " does not have any non-default methods");
+            throw new MethodTransformationException("Interface " + conversionTarget.getSimpleName() + " does not have any non-default methods");
         } else if (!functionalMethod.getReturnType().isAssignableFrom(methodEquivalent.getReturnType())) { //sanity check for incompatible return types
             throw new MethodTransformationException("Incompatible methods: backing method " + methodEquivalent.getName()
                     + " returns " + methodEquivalent.getReturnType()
