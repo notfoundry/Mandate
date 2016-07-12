@@ -58,13 +58,13 @@ public final class ReflectionMethodTransformer {
                     //private static methods don't use invokespecial bytecode, so account for that possibility
                     implMethod = Modifier.isStatic(methodModifiers) ? caller.unreflect(backingMethod) : caller.unreflectSpecial(backingMethod, parentClass);
                 } else {
-                    throw new MethodTransformationException("Tried to do lookup on private method " + backingMethod.getName() + ", but an access error occurred");
+                    throw new IllegalHandleLookupException("Tried to do lookup on private method " + backingMethod.getName() + ", but an access error occurred");
                 }
             } else if (Modifier.isProtected(methodModifiers)) {
                 if (DO_PRIVILEGED_LOOKUPS) {
                     implMethod = caller.unreflect(backingMethod);
                 } else {
-                    throw new MethodTransformationException("Tried to do lookup on protected method " + backingMethod.getName() + ", but an access error occurred");
+                    throw new IllegalHandleLookupException("Tried to do lookup on protected method " + backingMethod.getName() + ", but an access error occurred");
                 }
             } else if (Modifier.isPublic(methodModifiers)) {
                 implMethod = caller.unreflect(backingMethod);
@@ -72,7 +72,7 @@ public final class ReflectionMethodTransformer {
                 if (DO_PRIVILEGED_LOOKUPS) {
                     implMethod = caller.unreflect(backingMethod);
                 } else {
-                    throw new MethodTransformationException("Tried to do lookup on package-local method " + backingMethod.getName() + ", but an access error occurred");
+                    throw new IllegalHandleLookupException("Tried to do lookup on package-local method " + backingMethod.getName() + ", but an access error occurred");
                 }
             }
 
@@ -98,7 +98,7 @@ public final class ReflectionMethodTransformer {
                             lambdaMethodType, implMethod, instantiatedMethodType).dynamicInvoker().invokeWithArguments(Arrays.asList(arrayConcat(new Object[] {parentInstance}, capturedState)));
                 }
             } else {
-                throw new MethodTransformationException("Unable to do lookup on method \"" + backingMethod.getName() + "\", insufficient permissions from security manager?");
+                throw new IllegalHandleLookupException("Unable to do lookup on method \"" + backingMethod.getName() + "\", insufficient permissions from security manager?");
             }
         } catch (Throwable e) {
             e.printStackTrace();
