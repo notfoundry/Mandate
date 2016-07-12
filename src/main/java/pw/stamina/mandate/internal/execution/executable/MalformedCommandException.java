@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.execution;
+package pw.stamina.mandate.internal.execution.executable;
 
 /**
  * @author Foundry
@@ -25,21 +25,21 @@ public class MalformedCommandException extends RuntimeException {
 
     private static final long serialVersionUID = 7123028407640145435L;
 
-    public MalformedCommandException() {}
+    MalformedCommandException() {}
 
-    public MalformedCommandException(String message) {
+    MalformedCommandException(String message) {
         super(message);
     }
 
-    public MalformedCommandException(Throwable cause) {
+    MalformedCommandException(Throwable cause) {
         super(cause);
     }
 
-    public MalformedCommandException(String message, Throwable cause) {
+    MalformedCommandException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public MalformedCommandException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    MalformedCommandException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

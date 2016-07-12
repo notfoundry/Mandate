@@ -43,7 +43,7 @@ public interface CommandManager {
      * <p>
      * A command method is considered to be correctly defined if either of these requirements are met:
      *  <li>It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and has its own specific {@link Syntax Syntax} annotation</li>
-     *  <li>It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and it's containing class has a global {@link Syntax Syntax} annotation</li>
+     *  <li>It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and its containing class has a global {@link Syntax Syntax} annotation</li>
      *  <p>
      *  If duplicate commands exist in a registered container, a CommandManager implementation should take steps to prevent those commands from being re-added to the
      *  command registry
@@ -60,7 +60,7 @@ public interface CommandManager {
      * will immediately have a present exit code of {@link pw.stamina.mandate.api.execution.result.ExitCode#INVALID INVALID}. Otherwise,
      * this will return an {@link Execution execution} corresponding to the evaluated command running possibly asynchronously
      *
-     * @param input the input to be tokenized and parsed as a command and it's arguments
+     * @param input the input to be tokenized and parsed as a command and its arguments
      * @return a running execution if the invocation completed without errors, else a completed execution with an exit code of INVALID
      */
     Execution execute(String input);
@@ -72,7 +72,7 @@ public interface CommandManager {
      * will immediately have a present exit code of {@link pw.stamina.mandate.api.execution.result.ExitCode#INVALID INVALID}. Otherwise,
      * this will return an {@link Execution execution} corresponding to the evaluated command running possibly asynchronously
      *
-     * @param input the input to be tokenized and parsed as a command and it's arguments
+     * @param input the input to be tokenized and parsed as a command and its arguments
      * @return a running execution if the invocation completed without errors, else a completed execution with an exit code of INVALID
      */
     Execution execute(String input, IODescriptor descriptor);

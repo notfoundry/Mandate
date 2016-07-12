@@ -23,10 +23,10 @@ import pw.stamina.mandate.api.execution.argument.CommandArgument;
 /**
  * @author Foundry
  */
-public class BaseCommandArgument implements CommandArgument {
+class BaseCommandArgument implements CommandArgument {
     private final String argument;
 
-    public BaseCommandArgument(String argument) {
+    BaseCommandArgument(String argument) {
         this.argument = argument;
     }
 

@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 /**
  * @author Foundry
  */
-class AsynchronousExecution implements Execution {
+class AsynchronousMethodExecution implements Execution {
     private static final ExecutorService COMMAND_EXECUTOR = Executors.newCachedThreadPool();
 
     private final Method executable;
@@ -19,7 +19,7 @@ class AsynchronousExecution implements Execution {
 
     private final Future<ExitCode> pendingComputation;
 
-    AsynchronousExecution(Method executable, Object parent, Object[] args) {
+    AsynchronousMethodExecution(Method executable, Object parent, Object[] args) {
         this.executable = executable;
         this.io = (IODescriptor) args[0];
         pendingComputation = COMMAND_EXECUTOR.submit(() -> (ExitCode) executable.invoke(parent, args));

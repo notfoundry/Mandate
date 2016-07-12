@@ -6,7 +6,7 @@ import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.internal.annotations.Length;
 import pw.stamina.mandate.internal.execution.argument.ArgumentParseException;
-import pw.stamina.mandate.internal.execution.argument.BaseCommandArgument;
+import pw.stamina.mandate.internal.execution.argument.CommandArgumentFactory;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.parsor.exceptions.ParseException;
 
@@ -106,7 +106,7 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
 
         Object resultArray = Array.newInstance(parameter.getType().getComponentType(), rawComponents.size());
         for (int i = 0; i < rawComponents.size(); i++) {
-            Array.set(resultArray, i, handlerLookup.get().parse(new BaseCommandArgument(rawComponents.get(i)), new ArrayProxyCommandParameter(parameter), commandManager));
+            Array.set(resultArray, i, handlerLookup.get().parse(CommandArgumentFactory.newArgument(rawComponents.get(i)), new ArrayProxyCommandParameter(parameter), commandManager));
         }
         return resultArray;
     }

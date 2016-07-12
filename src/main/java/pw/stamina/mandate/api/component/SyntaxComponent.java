@@ -28,7 +28,7 @@ import java.util.Set;
  * A syntax component from the syntax hierarchy for a command
  * <p>
  * This serves as a general contract for what a syntax component should know about itself
- * and it's environment
+ * and its environment
  *
  * @author Foundry
  */

@@ -29,11 +29,11 @@ import java.util.Optional;
 /**
  * @author Foundry
  */
-public class DeclaredCommandParameter implements CommandParameter {
+class DeclaredCommandParameter implements CommandParameter {
     private final Parameter parameter;
     private final Class type;
 
-    public DeclaredCommandParameter(Parameter parameter, Class type) {
+    DeclaredCommandParameter(Parameter parameter, Class type) {
         this.parameter = parameter;
         this.type = type;
     }

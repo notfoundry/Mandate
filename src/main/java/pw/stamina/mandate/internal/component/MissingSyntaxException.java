@@ -3,7 +3,7 @@ package pw.stamina.mandate.internal.component;
 /**
  * @author Foundry
  */
-class MissingSyntaxException extends RuntimeException {
+public class MissingSyntaxException extends RuntimeException {
 
     private static final long serialVersionUID = 1054337915116756139L;
 

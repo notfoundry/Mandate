@@ -19,7 +19,7 @@
 package pw.stamina.mandate.internal.parsing;
 
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.internal.execution.argument.BaseCommandArgument;
+import pw.stamina.mandate.internal.execution.argument.CommandArgumentFactory;
 import pw.stamina.parsor.api.parsing.Parser;
 import pw.stamina.parsor.exceptions.ParseException;
 import pw.stamina.parsor.exceptions.ParseFailException;
@@ -72,7 +72,10 @@ public enum InputToArgumentParser implements Parser<String, Deque<CommandArgumen
                         break;
                     case ' ':
                         if (!quoted && depth == 0) {
-                            append(content, arguments);
+                            if (content.length() > 0) {
+                                arguments.add(CommandArgumentFactory.newArgument(content.toString()));
+                                content.setLength(0);
+                            }
                             break;
                         }
                     default:
@@ -86,14 +89,10 @@ public enum InputToArgumentParser implements Parser<String, Deque<CommandArgumen
             throw new ParseFailException(this, input, CommandArgument.class, "Found " + Math.abs(depth) + " too many list terminators in input");
         }
 
-        append(content, arguments);
+        if (content.length() > 0) {
+            arguments.add(CommandArgumentFactory.newArgument(content.toString()));
+            content.setLength(0);
+        }
         return arguments;
-    }
-
-    private static void append(StringBuilder content, Deque<CommandArgument> output) {
-        if (content.length() == 0) return;
-
-        output.add(new BaseCommandArgument(content.toString()));
-        content.setLength(0);
     }
 }

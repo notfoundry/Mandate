@@ -23,7 +23,7 @@ import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.component.SyntaxComponent;
 import pw.stamina.mandate.api.execution.CommandExecutable;
-import pw.stamina.mandate.internal.execution.MethodExecutable;
+import pw.stamina.mandate.internal.execution.executable.ExecutableFactory;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -48,9 +48,9 @@ public final class SyntaxComponentFactory {
         if ((tree = treeifySubSyntax(backingMethod.getDeclaredAnnotation(Executes.class).tree())).length > 0) {
             addSubSyntax((parents = Arrays.stream(syntax.syntax())
                     .map(BaseSyntaxComponent::new)
-                    .collect(Collectors.toCollection(LinkedHashSet::new))), tree, 0, new MethodExecutable(backingMethod, container, commandManager));
+                    .collect(Collectors.toCollection(LinkedHashSet::new))), tree, 0, ExecutableFactory.newExecutable(backingMethod, container, commandManager));
         } else {
-            CommandExecutable executable = new MethodExecutable(backingMethod, container, commandManager);
+            CommandExecutable executable = ExecutableFactory.newExecutable(backingMethod, container, commandManager);
             return Arrays.stream(syntax.syntax())
                     .map(s -> new BaseSyntaxComponent(s, executable))
                     .collect(Collectors.toCollection(LinkedHashSet::new));

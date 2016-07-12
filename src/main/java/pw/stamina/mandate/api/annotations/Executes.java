@@ -37,7 +37,7 @@ public @interface Executes {
 
     /**
      * The syntax tree, if any, that should be used to supplement the syntax definition
-     * attributed to this command by it's associated {@link Syntax Syntax} annotation.
+     * attributed to this command by its associated {@link Syntax Syntax} annotation.
      * <p>
      * An element of this array should be formatted as a pipe-delimited sequence of aliases for
      * the next element in the syntax tree that this command should be considered a part of.

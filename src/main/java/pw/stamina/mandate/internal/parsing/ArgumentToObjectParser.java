@@ -25,7 +25,7 @@ import pw.stamina.mandate.api.execution.CommandExecutable;
 import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.mandate.internal.execution.argument.BaseCommandArgument;
+import pw.stamina.mandate.internal.execution.argument.CommandArgumentFactory;
 import pw.stamina.parsor.api.parsing.Parser;
 import pw.stamina.parsor.exceptions.ParseException;
 import pw.stamina.parsor.exceptions.ParseFailException;
@@ -67,9 +67,9 @@ public class ArgumentToObjectParser implements Parser<Deque<CommandArgument>, Ob
 
                 String def = (parameters[i].getType() == Boolean.class || parameters[i].getType() == Boolean.TYPE) ? present != null ? "true" : "false" : present != null ? autoFlag.ifdef() : autoFlag.elsedef();
                 if (!parameters[i].isOptional()) {
-                    parsedArgs[i] = (!def.isEmpty()) ? argumentHandler.get().parse(new BaseCommandArgument(def), parameters[i], commandManager) : null;
+                    parsedArgs[i] = (!def.isEmpty()) ? argumentHandler.get().parse(CommandArgumentFactory.newArgument(def), parameters[i], commandManager) : null;
                 } else {
-                    parsedArgs[i] = (!def.isEmpty()) ? Optional.of(argumentHandler.get().parse(new BaseCommandArgument(def), parameters[i], commandManager)) : Optional.empty();
+                    parsedArgs[i] = (!def.isEmpty()) ? Optional.of(argumentHandler.get().parse(CommandArgumentFactory.newArgument(def), parameters[i], commandManager)) : Optional.empty();
                 }
 
             } else if ((userFlag = parameters[i].getAnnotation(UserFlag.class)) != null) {
@@ -82,9 +82,9 @@ public class ArgumentToObjectParser implements Parser<Deque<CommandArgument>, Ob
 
                 String def = (present != null) ? present.getRaw() : userFlag.elsedef();
                 if (!parameters[i].isOptional()) {
-                    parsedArgs[i] = (!def.isEmpty()) ? argumentHandler.get().parse(new BaseCommandArgument(def), parameters[i], commandManager) : null;
+                    parsedArgs[i] = (!def.isEmpty()) ? argumentHandler.get().parse(CommandArgumentFactory.newArgument(def), parameters[i], commandManager) : null;
                 } else {
-                    parsedArgs[i] = (!def.isEmpty()) ? Optional.of(argumentHandler.get().parse(new BaseCommandArgument(def), parameters[i], commandManager)) : Optional.empty();
+                    parsedArgs[i] = (!def.isEmpty()) ? Optional.of(argumentHandler.get().parse(CommandArgumentFactory.newArgument(def), parameters[i], commandManager)) : Optional.empty();
                 }
 
             } else {
@@ -97,7 +97,7 @@ public class ArgumentToObjectParser implements Parser<Deque<CommandArgument>, Ob
         }
 
         if (!arguments.isEmpty()) {
-            throw new ParseFailException(this, arguments.toString(), CommandArgument.class, String.format("Passed %d invalid xor previously present argument(s): %s", arguments.size(), arguments.toString()));
+            throw new ParseFailException(this, arguments.toString(), CommandArgument.class, String.format("Passed %d invalid or previously present argument(s): %s", arguments.size(), arguments.toString()));
         } else {
             return parsedArgs;
         }

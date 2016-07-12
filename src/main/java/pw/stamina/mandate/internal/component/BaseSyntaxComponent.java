@@ -26,16 +26,16 @@ import java.util.*;
 /**
  * @author Foundry
  */
-public class BaseSyntaxComponent implements SyntaxComponent {
+class BaseSyntaxComponent implements SyntaxComponent {
     private Map<String, SyntaxComponent> childMap;
     private final String syntax;
     private Set<CommandExecutable> executables;
 
-    public BaseSyntaxComponent(String syntax) {
+    BaseSyntaxComponent(String syntax) {
         this(syntax, new CommandExecutable[0]);
     }
 
-    public BaseSyntaxComponent(String syntax, CommandExecutable... executables) {
+    BaseSyntaxComponent(String syntax, CommandExecutable... executables) {
         this.syntax = syntax;
         if (executables.length > 0) {
             this.executables = new HashSet<>(Arrays.asList(executables));

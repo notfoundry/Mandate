@@ -11,6 +11,6 @@ public final class ExecutionFactory {
     private ExecutionFactory() {}
 
     public static Execution makeExecution(Method executable, Object parent, Object[] args) {
-        return new AsynchronousExecution(executable, parent, args);
+        return new AsynchronousMethodExecution(executable, parent, args);
     }
 }
