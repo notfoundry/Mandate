@@ -26,6 +26,7 @@ import java.util.Set;
 
 /**
  * A syntax component from the syntax hierarchy for a command
+ * <p>
  * This serves as a general contract for what a syntax component should know about itself
  * and it's environment
  *
@@ -45,8 +46,9 @@ public interface SyntaxComponent {
     SyntaxComponent getChild(String syntax);
 
     /**
-     * Adds a syntax component as a child of this one. Generally, a SyntaxComponent implementation
-     * should prevent duplicate pieces of syntax from existing as children
+     * Adds a syntax component as a child of this one.
+     * <p>
+     * Generally, a SyntaxComponent implementation should prevent duplicate pieces of syntax from existing as children
      * @param component the syntax component to be added as a child of this one
      */
     void addChild(SyntaxComponent component);
@@ -57,8 +59,9 @@ public interface SyntaxComponent {
     Optional<Collection<SyntaxComponent>> findChildren();
 
     /**
-     * Adds an executable to the executables coupled with this piece of syntax. Generally, a SyntaxComponent
-     * implementation should prevent duplicate executables from being coupled to itself
+     * Adds an executable to the executables coupled with this piece of syntax.
+     * <p>
+     * Generally, a SyntaxComponent implementation should prevent duplicate executables from being coupled to itself
      * @param executable the executable to couple to this piece of syntax
      */
     void addExecutable(CommandExecutable executable);

@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation denoting a parameter that should be considered to be a command flag requiring a single operand
+ * <p>
  * This should generally be used in cases where additional information is required to discern the meaning of this flag,
  * such as providing a file path to a logging flag.
  *
@@ -36,6 +37,7 @@ public @interface UserFlag {
 
     /**
      * An array of the strings that should be matched against when checking for the presence of this flag
+     * <p>
      * A CommandExecutable implementation should generally prevent duplicate flag definitions from existing
      * in a command, as the behavior of the flag is in that case undefined should it still be permissible
      *
@@ -45,7 +47,9 @@ public @interface UserFlag {
 
     /**
      * The input that should be parsed to a value of the parameter type annotated by this if the described flag
-     * is marked as missing. It is the responsibility of the developer defining this to ensure that
+     * is marked as missing.
+     * <p>
+     * It is the responsibility of the developer defining this to ensure that
      * the value described here is valid input for the argument parser corresponding to referenced type.
      *
      * @return the input that should be parsed to an argument for the annotated parameter
@@ -53,8 +57,9 @@ public @interface UserFlag {
     String elsedef() default "";
 
     /**
-     * A set of flags, if any, that should be incompatible with this flag. This should
-     * be used when only one flag out of some number of other flags should be present at any given time.
+     * A set of flags, if any, that should be incompatible with this flag.
+     * <p>
+     * This should be used when only one flag out of some number of other flags should be present at any given time.
      *
      * @return a set of flags that should be incompatible with this one
      */

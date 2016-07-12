@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation providing a name, along with usage information for, the annotated command parameter
+ * <p>
  * This should be used primarily to supplement command manager implementations that might choose
  * to provide auto-generated manual pages for registered commands
  *
@@ -40,7 +41,7 @@ public @interface Usage {
     String name();
 
     /**
-     * A usage string supplementing the defintion of the annotated parameter.
+     * A usage string supplementing the definition of the annotated parameter.
      *
      * @return The defined usage help text for this particular parameter
      */

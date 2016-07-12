@@ -12,7 +12,9 @@ public interface CommandOutput {
 
     /**
      * Submits a string to the output stream represented by this instance
-     * The usage of this object is up to the implementation to decide, depending on its inteded use
+     * <p>
+     * The usage of this object is up to the implementation to decide, depending on its intended use
+     *
      * @param o the object to be written to the stream
      */
     void write(Object o);

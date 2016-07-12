@@ -29,6 +29,7 @@ import java.util.Optional;
 
 /**
  * A central manager and executor for a collection of registered commands
+ * <p>
  * A CommandManager is used to coordinate much of the process of using Mandate, including providing a
  * central hub for registering commands, handling the parsing and eventual execution of user input, and
  * allowing external components to interact with the command ecosystem
@@ -39,9 +40,11 @@ public interface CommandManager {
 
     /**
      * Registers all correctly defined commands in the specified container object
+     * <p>
      * A command method is considered to be correctly defined if either of these requirements are met:
-     *  - It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and has its own specific {@link Syntax Syntax} annotation
-     *  - It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and it's containing class has a global {@link Syntax Syntax} annotation
+     *  <li>It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and has its own specific {@link Syntax Syntax} annotation</li>
+     *  <li>It is flagged as an {@link pw.stamina.mandate.api.annotations.Executes executor} and it's containing class has a global {@link Syntax Syntax} annotation</li>
+     *  <p>
      *  If duplicate commands exist in a registered container, a CommandManager implementation should take steps to prevent those commands from being re-added to the
      *  command registry
      *
@@ -52,6 +55,7 @@ public interface CommandManager {
 
     /**
      * Tries to execute a command based on the provided input
+     * <p>
      * If the execution fails as a result of invalid or malformed user input, the result of this
      * will immediately have a present exit code of {@link pw.stamina.mandate.api.execution.result.ExitCode#INVALID INVALID}. Otherwise,
      * this will return an {@link Execution execution} corresponding to the evaluated command running possibly asynchronously
@@ -63,6 +67,7 @@ public interface CommandManager {
 
     /**
      * Tries to execute a command based on the provided input, using the provided IODescriptor for the execution
+     * <p>
      * If the execution fails as a result of invalid or malformed user input, the result of this
      * will immediately have a present exit code of {@link pw.stamina.mandate.api.execution.result.ExitCode#INVALID INVALID}. Otherwise,
      * this will return an {@link Execution execution} corresponding to the evaluated command running possibly asynchronously

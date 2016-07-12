@@ -20,6 +20,7 @@ package pw.stamina.mandate.api.execution.result;
 
 /**
  * An enumeration of the possible exit codes for a command
+ * <p>
  * All commands annotated as {@link pw.stamina.mandate.api.annotations.Executes executes} must return one of these constant values.
  * <li>{@link #SUCCESS SUCCESS}</li>
  * <li>{@link #FAILURE FAILURE}</li>

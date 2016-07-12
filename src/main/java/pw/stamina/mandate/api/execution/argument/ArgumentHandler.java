@@ -24,6 +24,7 @@ import pw.stamina.parsor.exceptions.ParseException;
 
 /**
  * An argument handler designed to parse a CommandArgument to a reified Object type
+ * <p>
  * A {@link CommandManager CommandManager} implementation may choose to have any given number of argument handlers, queryable through {@link CommandManager#findArgumentHandler(Class) findArgumentHandler}.
  *
  * @param <T> the type of object to which this argument handler will formally parse input

@@ -12,6 +12,7 @@ public interface CommandInput {
 
     /**
      * Finds and returns the next complete token from this input stream
+     * <p>
      * This method may block while waiting for input
      *
      * @return the next complete token from this input stream

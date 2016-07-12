@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 
 /**
  * A parameter for a command, generally used as a target for an {@link pw.stamina.mandate.api.execution.argument.ArgumentHandler ArgumentHandler}
+ * <p>
  * CommandParameters should provide enough information for an argument parsing system to successful determine the reified object type that this parameter
  * is targeting, whether this parameter is a wrapped {@link java.util.Optional Optional} value, and if this parameter is a flag
  *
@@ -40,6 +41,7 @@ public interface CommandParameter {
 
     /**
      * Returns an array consisting of all the annotations present on the backing parameter
+     * <p>
      * If there are no annotations present, this array will have a length of zero
      *
      * @return an array consisting of all the annotations present on the backing parameter

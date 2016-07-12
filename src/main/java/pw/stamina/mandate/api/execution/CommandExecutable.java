@@ -56,6 +56,7 @@ public interface CommandExecutable {
 
     /**
      * Returns the minimum number of arguments that can be provided to this executable for an execution to be valid.
+     * <p>
      * This should be equal to the number of mandatory parameters for this executable, discounting any optional parameters or flags.
      *
      * @return the minimum number of arguments that can be provided to this executable for an execution to be valid
@@ -64,7 +65,8 @@ public interface CommandExecutable {
 
     /**
      * Returns the maximum number of arguments that can be provided to this executable for an execution to be valid.
-     * This should be equal to the total number of parameters for this executable, discounting any flags that are incompatable with any previously found flag
+     * <p>
+     * This should be equal to the total number of parameters for this executable, discounting any flags that are incompatible with any previously found flag
      *
      * @return the maximum number of arguments that can be provided to this executable for an execution to be valid
      */

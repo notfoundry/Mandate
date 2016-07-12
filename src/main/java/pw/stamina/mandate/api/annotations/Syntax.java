@@ -26,6 +26,7 @@ import java.lang.annotation.Target;
 /**
  * An annotation used to define the global default syntax for all methods annotated with {@link Executes executes} in the target class,
  * or as a syntax tree override for one of the aforementioned methods
+ * <p>
  * This should be applied at the class level if all commands in the class should inherit from a common base syntax component, otherwise
  * individual commands should have their own {@link Syntax Syntax} annotations as needed
  *
@@ -37,9 +38,12 @@ public @interface Syntax {
 
     /**
      * The base syntax components that target command(s) should be considered to be children of
+     * <p>
      * An element of this array should be a single word, representing an alias or definition for the name
-     * of the target command(s). An example of this might be {"execute", "exec", "do"} for a command that intends to have a
-     * fully-qualified executor of "execute [sub-syntax] [command arguments]"
+     * of the target command(s).
+     * <p>
+     * An example of this might be {@code {"execute", "exec", "do"}} for a command that intends to have a
+     * fully-qualified executor of {@code execute [sub-syntax] [command arguments]}
      *
      * @return the base components of the syntax tree for the target command(s)
      */

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * An Execution represents a possibly asynchronous command execution taking place
+ * <p>
  * Methods are provided to check if the execution is
  * complete, to wait for its completion, and to retrieve the result of
  * the execution.  The result can only be retrieved using method
@@ -32,10 +33,12 @@ public interface Execution {
     ExitCode result(long timeout, TimeUnit unit) throws TimeoutException;
 
     /**
-     * Attempts to cancel execution of this task.  This attempt will
-     * fail if the task has already completed, has already been cancelled,
-     * or could not be cancelled for some other reason. If successful,
-     * and this task has not started when {@code cancel} is called,
+     * Attempts to cancel execution of this task.
+     * <p>
+     * This attempt will fail if the task has already completed, has already been cancelled,
+     * or could not be cancelled for some other reason.
+     * <p>
+     * If successful, and this task has not started when {@link Execution#kill kill} is called,
      * this task should never run.
      *
      * @return {@code false} if the execution could not be cancelled,
@@ -46,7 +49,7 @@ public interface Execution {
 
     /**
      * Returns {@code true} if this execution completed.
-     *
+     * <p>
      * Completion may be due to normal termination, an exception, or
      * cancellation -- in all of these cases, this method will return
      * {@code true}.
