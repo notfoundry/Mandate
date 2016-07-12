@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.execution;
+package pw.stamina.mandate.internal.execution.executable;
 
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.flag.AutoFlag;
@@ -28,8 +28,10 @@ import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.execution.parameter.DeclaredCommandParameter;
-import pw.stamina.mandate.internal.execution.result.ExecutionFactory;
+import pw.stamina.mandate.internal.execution.executable.transformer.ReflectionMethodTransformer;
+import pw.stamina.mandate.internal.execution.executable.transformer.TransformationTarget;
+import pw.stamina.mandate.internal.execution.parameter.CommandParameterFactory;
+import pw.stamina.mandate.internal.execution.result.AsynchronousTransformedExecution;
 import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.parsor.exceptions.ParseException;
@@ -44,14 +46,14 @@ import java.util.stream.Collectors;
 /**
  * @author Foundry
  */
-public class MethodExecutable implements CommandExecutable {
+class TransformingExecutable implements CommandExecutable {
     private final Method backingMethod;
-    private final Object methodParent;
+    private final TransformationTarget executable;
     private final CommandManager commandManager;
     private final List<CommandParameter> parameters;
     private ArgumentToObjectParser argumentParser;
 
-    public MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
+    TransformingExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
         if (backingMethod.getReturnType() != ExitCode.class) {
             throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does have a return type of " + ExitCode.class.getCanonicalName());
         } else if (backingMethod.getParameterCount() == 0 || backingMethod.getParameterTypes()[0] != IODescriptor.class) {
@@ -59,14 +61,13 @@ public class MethodExecutable implements CommandExecutable {
         }
 
         this.parameters = generateCommandParameters((this.backingMethod = backingMethod), (this.commandManager = commandManager));
-        this.methodParent = methodParent;
-        this.backingMethod.setAccessible(true);
+        this.executable = ReflectionMethodTransformer.transform(TransformationTarget.class, methodParent.getClass(), methodParent, backingMethod);
     }
 
     @Override
     public Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
-        return ExecutionFactory.makeExecution(backingMethod, methodParent, arrayConcat(new Object[] {io}, parsedArgs));
+        return new AsynchronousTransformedExecution(executable, io, parsedArgs);
     }
 
     @Override
@@ -99,7 +100,7 @@ public class MethodExecutable implements CommandExecutable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MethodExecutable that = (MethodExecutable) o;
+        TransformingExecutable that = (TransformingExecutable) o;
         return this.minimumArguments() == that.minimumArguments() && this.maximumArguments() == that.maximumArguments();
     }
 
@@ -113,7 +114,7 @@ public class MethodExecutable implements CommandExecutable {
 
     @Override
     public String toString() {
-        return String.format("MethodExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
+        return String.format("TransformingExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
     }
 
     private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) throws UnsupportedParameterException {
@@ -164,7 +165,7 @@ public class MethodExecutable implements CommandExecutable {
                     throw new UnsupportedParameterException(String.format("Array element %s is not a supported parameter type", type.getCanonicalName()));
                 }
 
-                return new DeclaredCommandParameter(parameter, type);
+                return CommandParameterFactory.newParameter(parameter, type);
             }).collect(Collectors.toList());
         } else {
             return Collections.emptyList();
