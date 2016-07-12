@@ -6,7 +6,7 @@ import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.UnixCommandManager;
 
-import java.util.NoSuchElementException;
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -26,7 +26,7 @@ public class InteractiveCommandLine {
 
     @Executes
     @Syntax(syntax = "accept")
-    public ExitCode acceptUserInput(IODescriptor io) throws NoSuchElementException {
+    public ExitCode acceptUserInput(IODescriptor io) throws IOException {
         io.out().write("Please enter something:");
         String input = io.in().read();
         io.out().write(input);

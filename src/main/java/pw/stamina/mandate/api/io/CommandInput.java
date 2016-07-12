@@ -1,11 +1,21 @@
 package pw.stamina.mandate.api.io;
 
-import java.util.NoSuchElementException;
+import java.io.IOException;
 
 /**
+ * A stream of input from which a running command can read if supplementary input is necessary
+ *
  * @author Foundry
  */
 @FunctionalInterface
 public interface CommandInput {
-    String read() throws NoSuchElementException;
+
+    /**
+     * Finds and returns the next complete token from this input stream
+     * This method may block while waiting for input
+     *
+     * @return the next complete token from this input stream
+     * @throws IOException
+     */
+    String read() throws IOException;
 }

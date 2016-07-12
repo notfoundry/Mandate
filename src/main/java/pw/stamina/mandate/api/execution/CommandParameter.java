@@ -22,8 +22,8 @@ import java.lang.annotation.Annotation;
 
 /**
  * A parameter for a command, generally used as a target for an {@link pw.stamina.mandate.api.execution.argument.ArgumentHandler ArgumentHandler}
- * CommandParameters should provide enough information for an argument parsing system to successfuly determine the reified object type that this parameter
- * is targetting, whether this parameter is a wrapped {@link java.util.Optional Optional} value, and if this parameter is a flag
+ * CommandParameters should provide enough information for an argument parsing system to successful determine the reified object type that this parameter
+ * is targeting, whether this parameter is a wrapped {@link java.util.Optional Optional} value, and if this parameter is a flag
  *
  * @author Foundry
  */
