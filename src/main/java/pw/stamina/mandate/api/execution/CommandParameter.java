@@ -18,14 +18,12 @@
 
 package pw.stamina.mandate.api.execution;
 
-import pw.stamina.commons.interfaces.Labeled;
-
 import java.lang.annotation.Annotation;
 
 /**
  * @author Foundry
  */
-public interface CommandParameter extends Labeled {
+public interface CommandParameter {
     <A extends Annotation> A getAnnotation(Class<A> annotationClass);
 
     Annotation[] getAnnotations();
@@ -35,4 +33,6 @@ public interface CommandParameter extends Labeled {
     boolean isOptional();
 
     String getDescription();
+
+    String getLabel();
 }
