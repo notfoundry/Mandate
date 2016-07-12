@@ -113,7 +113,7 @@ class MethodExecutable implements CommandExecutable {
 
     @Override
     public String toString() {
-        return String.format("TransformingExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
+        return String.format("MethodExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
     }
 
     private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) throws UnsupportedParameterException {

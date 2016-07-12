@@ -16,21 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate;
+package pw.stamina.mandate.internal.execution.executable.transformer;
 
 /**
  * @author Foundry
  */
-public final class Mandate {
-    private Mandate() {
-        throw new IllegalStateException(this.getClass().getCanonicalName() + " cannot be instantiated.");
+public class InvokerProxyGenerationException extends RuntimeException {
+
+    private static final long serialVersionUID = -9003638433958538032L;
+
+    InvokerProxyGenerationException() {}
+
+    InvokerProxyGenerationException(String message) {
+        super(message);
     }
 
-    public static String getVersion() {
-        return "1.5.0";
+    InvokerProxyGenerationException(Throwable cause) {
+        super(cause);
     }
 
-    public static String getFormattedVersion() {
-        return "Mandate v" + getVersion();
+    InvokerProxyGenerationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    InvokerProxyGenerationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

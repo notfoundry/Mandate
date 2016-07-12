@@ -53,8 +53,15 @@ public class InteractiveCommandLine {
 
     @Executes
     @Syntax(syntax = {"sum", "add"})
-    public ExitCode sum(IODescriptor io, int augend, int addend) {
+    public ExitCode sum(IODescriptor io, long augend, long addend) {
         io.out().write(augend + addend);
+        return ExitCode.SUCCESS;
+    }
+
+    @Executes
+    @Syntax(syntax = {"take"})
+    public ExitCode sum(IODescriptor io, Integer augend) {
+        io.out().write(augend);
         return ExitCode.SUCCESS;
     }
 

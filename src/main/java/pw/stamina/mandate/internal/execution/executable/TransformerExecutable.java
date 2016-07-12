@@ -28,10 +28,10 @@ import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.execution.executable.transformer.ReflectionMethodTransformer;
-import pw.stamina.mandate.internal.execution.executable.transformer.TransformationTarget;
+import pw.stamina.mandate.internal.execution.executable.transformer.InvokerProxy;
+import pw.stamina.mandate.internal.execution.executable.transformer.InvokerProxyFactory;
 import pw.stamina.mandate.internal.execution.parameter.CommandParameterFactory;
-import pw.stamina.mandate.internal.execution.result.AsynchronousTransformedExecution;
+import pw.stamina.mandate.internal.execution.result.AsynchronousTransformerExecution;
 import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.parsor.exceptions.ParseException;
@@ -46,14 +46,14 @@ import java.util.stream.Collectors;
 /**
  * @author Foundry
  */
-class TransformingExecutable implements CommandExecutable {
+class TransformerExecutable implements CommandExecutable {
     private final Method backingMethod;
-    private final TransformationTarget executable;
+    private final InvokerProxy invoker;
     private final CommandManager commandManager;
     private final List<CommandParameter> parameters;
     private ArgumentToObjectParser argumentParser;
 
-    TransformingExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
+    TransformerExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
         if (backingMethod.getReturnType() != ExitCode.class) {
             throw new MalformedCommandException("Annotated method '" + backingMethod.getName() + "' does have a return type of " + ExitCode.class.getCanonicalName());
         } else if (backingMethod.getParameterCount() == 0 || backingMethod.getParameterTypes()[0] != IODescriptor.class) {
@@ -61,13 +61,13 @@ class TransformingExecutable implements CommandExecutable {
         }
 
         this.parameters = generateCommandParameters((this.backingMethod = backingMethod), (this.commandManager = commandManager));
-        this.executable = ReflectionMethodTransformer.transform(TransformationTarget.class, methodParent.getClass(), methodParent, backingMethod);
+        this.invoker = InvokerProxyFactory.makeProxy(backingMethod, methodParent);
     }
 
     @Override
     public Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
-        return new AsynchronousTransformedExecution(executable, io, parsedArgs);
+        return new AsynchronousTransformerExecution(invoker, io, parsedArgs);
     }
 
     @Override
@@ -100,7 +100,7 @@ class TransformingExecutable implements CommandExecutable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TransformingExecutable that = (TransformingExecutable) o;
+        TransformerExecutable that = (TransformerExecutable) o;
         return this.minimumArguments() == that.minimumArguments() && this.maximumArguments() == that.maximumArguments();
     }
 
@@ -114,7 +114,7 @@ class TransformingExecutable implements CommandExecutable {
 
     @Override
     public String toString() {
-        return String.format("TransformingExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
+        return String.format("TransformerExecutable{name=%s, parameters=%s}", backingMethod.getName(), parameters);
     }
 
     private static List<CommandParameter> generateCommandParameters(Method backingMethod, CommandManager commandManager) throws UnsupportedParameterException {
