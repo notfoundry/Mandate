@@ -27,16 +27,46 @@ import java.util.Deque;
 import java.util.List;
 
 /**
+ * An command that can be executed with a stack of arguments and an {@link IODescriptor IODescriptor}, providing an {@link pw.stamina.mandate.api.execution.result.ExitCode ExitCode} as a result of that execution
+ *
  * @author Foundry
  */
 public interface CommandExecutable {
+
+    /**
+     * Invokes the command that this executable is the terminal operation for, returning a possibly
+     * asynchronous {@link Execution execution} representing a running invocation of this executable
+     *
+     * @param arguments the un-parsed user input tokens that should be parsed as arguments to this executable
+     * @param io the descriptor for the IO streams available to the running command
+     * @return a possibly asynchronous execution representing a running invocation of this executable
+     * @throws ParseException
+     */
     Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException;
 
+    /**
+     * @return a list of the parameters that this executable is defined as having
+     */
     List<CommandParameter> getParameters();
 
+    /**
+     * @return a friendly description of this executable
+     */
     String getDescription();
 
+    /**
+     * Returns the minimum number of arguments that can be provided to this executable for an execution to be valid.
+     * This should be equal to the number of mandatory parameters for this executable, discounting any optional parameters or flags.
+     *
+     * @return the minimum number of arguments that can be provided to this executable for an execution to be valid
+     */
     int minimumArguments();
 
+    /**
+     * Returns the maximum number of arguments that can be provided to this executable for an execution to be valid.
+     * This should be equal to the total number of parameters for this executable, discounting any flags that are incompatable with any previously found flag
+     *
+     * @return the maximum number of arguments that can be provided to this executable for an execution to be valid
+     */
     int maximumArguments();
 }

@@ -19,8 +19,34 @@
 package pw.stamina.mandate.api.execution.result;
 
 /**
+ * An enumeration of the possible exit codes for a command
+ * All commands annotated as {@link pw.stamina.mandate.api.annotations.Executes executes} must return one of these constant values.
+ * <li>{@link #SUCCESS SUCCESS}</li>
+ * <li>{@link #FAILURE FAILURE}</li>
+ * <li>{@link #TERMINATED TERMINATED}</li>
+ * <li>{@link #INVALID INVALID}</li>
+ *
  * @author Foundry
  */
 public enum ExitCode {
-    SUCCESS, FAILURE, TERMINATED, INVALID;
+
+    /**
+     * The exit code returned for a successful command execution
+     */
+    SUCCESS,
+
+    /**
+     * The exit code returned for a failed command execution
+     */
+    FAILURE,
+
+    /**
+     * The exit code returned for command execution that was terminated prior to completion
+     */
+    TERMINATED,
+
+    /**
+     * The exit code returned for an execution that was never started as a result of invalid user input
+     */
+    INVALID;
 }

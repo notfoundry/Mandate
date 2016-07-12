@@ -19,8 +19,14 @@
 package pw.stamina.mandate.api.execution.argument;
 
 /**
+ * An encapsulated representation of a single tokenized piece of user input to be parsed as an argument
+ *
  * @author Foundry
  */
 public interface CommandArgument {
+
+    /**
+     * @return the raw string token represented by this instance
+     */
     String getRaw();
 }

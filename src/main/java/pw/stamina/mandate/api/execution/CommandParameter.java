@@ -21,18 +21,51 @@ package pw.stamina.mandate.api.execution;
 import java.lang.annotation.Annotation;
 
 /**
+ * A parameter for a command, generally used as a target for an {@link pw.stamina.mandate.api.execution.argument.ArgumentHandler ArgumentHandler}
+ * CommandParameters should provide enough information for an argument parsing system to successfuly determine the reified object type that this parameter
+ * is targetting, whether this parameter is a wrapped {@link java.util.Optional Optional} value, and if this parameter is a flag
+ *
  * @author Foundry
  */
 public interface CommandParameter {
+
+    /**
+     * Returns the specified annotation if it is present on the backing parameter represented by this instance, else null
+     *
+     * @param annotationClass the class of the annotation to be looked up
+     * @param <A> the type of the annotation to be looked up
+     * @return the specified annotation if it is present on the backing parameter represented by this instance, else null
+     */
     <A extends Annotation> A getAnnotation(Class<A> annotationClass);
 
+    /**
+     * Returns an array consisting of all the annotations present on the backing parameter
+     * If there are no annotations present, this array will have a length of zero
+     *
+     * @return an array consisting of all the annotations present on the backing parameter
+     */
     Annotation[] getAnnotations();
 
+    /**
+     * @return the reified type of this parameter
+     */
     Class<?> getType();
 
+    /**
+     * Returns whether or not this parameter should be considered to be optional
+     * @return {@code true} if this parameter is optional, else {@code false}
+     */
     boolean isOptional();
 
+    /**
+     * Returns a friendly description of this parameter. See {@link pw.stamina.mandate.api.annotations.meta.Usage Usage}
+     * @return a friendly description of this parameter
+     */
     String getDescription();
 
+    /**
+     * Returns a friendly name for this parameter. See {@link pw.stamina.mandate.api.annotations.meta.Usage Usage}
+     * @return a friendly name for this parameter
+     */
     String getLabel();
 }
