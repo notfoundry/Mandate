@@ -23,6 +23,7 @@ import java.util.Queue;
 /**
  * @author Foundry
  */
+@Syntax(syntax = "run")
 public class ArrayArgumentTest {
 
     private Queue<Object> commandErrors = new ArrayDeque<>();
@@ -97,28 +98,24 @@ public class ArrayArgumentTest {
     }
 
     @Executes(tree = "strings")
-    @Syntax(syntax = "run")
     public ExitCode runStrings(IODescriptor io, String[] strings) {
         io.out().write(Arrays.toString(strings));
         return ExitCode.SUCCESS;
     }
 
     @Executes(tree = "ints")
-    @Syntax(syntax = "run")
     public ExitCode runInts(IODescriptor io, int[] ints) {
         io.out().write(Arrays.toString(ints));
         return ExitCode.SUCCESS;
     }
 
     @Executes(tree = "clampedints")
-    @Syntax(syntax = "run")
     public ExitCode runClampedInts(IODescriptor io, @Length(min = 5, max = 5) int[] ints) {
         io.out().write(Arrays.toString(ints));
         return ExitCode.SUCCESS;
     }
 
     @Executes(tree = "2dstrings")
-    @Syntax(syntax = "run")
     public ExitCode run2DStrings(IODescriptor io, String[][] strings) {
         io.out().write(Arrays.deepToString(strings));
         return ExitCode.SUCCESS;

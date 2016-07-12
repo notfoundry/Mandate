@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation denoting a parameter that should be considered to be a command flag not requiring any operands.
+ * An annotation denoting a parameter that should be considered to be a command flag not requiring any operands
  * This should generally be used in cases where the presence xor absence of a flag denotes a binary difference in the operation
  * of a command. Though this is generally best suited for boolean parameters, parameters of any type may be annotated with this
  * so long as a valid {@link #ifdef ifdef} definition is provided to supplement it.

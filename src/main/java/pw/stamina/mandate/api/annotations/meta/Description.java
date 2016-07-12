@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotating giving description metadata to a declared command.
+ * An annotating giving description metadata to a declared command
  * This should be used primarily to supplement command manager implementations that might choose
  * to provide auto-generated manual pages for registered commands
  *

@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation used to define the global default syntax for all methods annotated with {@link Executes executes} in the target class,
- * or as a syntax tree override for one of the aforementioned methods.
+ * or as a syntax tree override for one of the aforementioned methods
  * This should be applied at the class level if all commands in the class should inherit from a common base syntax component, otherwise
  * individual commands should have their own {@link Syntax Syntax} annotations as needed
  *

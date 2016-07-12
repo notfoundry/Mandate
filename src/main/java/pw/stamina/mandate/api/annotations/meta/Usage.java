@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation providing a name, along with usage information for, the annotated command parameter.
+ * An annotation providing a name, along with usage information for, the annotated command parameter
  * This should be used primarily to supplement command manager implementations that might choose
  * to provide auto-generated manual pages for registered commands
  *

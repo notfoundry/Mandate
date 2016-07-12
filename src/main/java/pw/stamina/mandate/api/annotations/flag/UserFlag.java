@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation denoting a parameter that should be considered to be a command flag requiring a single operand.
+ * An annotation denoting a parameter that should be considered to be a command flag requiring a single operand
  * This should generally be used in cases where additional information is required to discern the meaning of this flag,
  * such as providing a file path to a logging flag.
  *

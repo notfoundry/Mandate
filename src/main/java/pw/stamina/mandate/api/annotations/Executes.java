@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation used to declare a specific method as being an executable command.
+ * An annotation used to declare a specific method as being an executable command
  * This should be used in conjunction with the {@link Syntax Syntax} annotation to define the
  * base command that this executable should be linked to.
  *
