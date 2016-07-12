@@ -29,6 +29,7 @@ import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.CommandInput;
 import pw.stamina.mandate.api.io.CommandOutput;
 import pw.stamina.mandate.api.io.IODescriptor;
+import pw.stamina.mandate.internal.io.SimpleIODescriptor;
 import pw.stamina.mandate.internal.component.SyntaxComponentFactory;
 import pw.stamina.mandate.internal.execution.argument.handlers.*;
 import pw.stamina.mandate.internal.io.StandardErrorStream;
@@ -87,12 +88,12 @@ public class UnixCommandManager implements CommandManager {
     }
 
     @Override
-    public Execution execute(String input) {
+    public Execution execute(String input, IODescriptor descriptor) {
         if (input == null) {
-            stderr.get().write("Invalid input: input cannot be empty");
+            descriptor.err().write("Invalid input: input cannot be empty");
             return Execution.complete(ExitCode.INVALID);
         } else if (input.length() == 0) {
-            stderr.get().write("Invalid input: input cannot be empty");
+            descriptor.err().write("Invalid input: input cannot be empty");
             return Execution.complete(ExitCode.INVALID);
         }
 
@@ -100,7 +101,7 @@ public class UnixCommandManager implements CommandManager {
         try {
             arguments = InputToArgumentParser.getInstance().parse(input);
         } catch (ParseException e) {
-            stderr.get().write("Exception tokenizing input: " + e.getLocalizedMessage());
+            descriptor.err().write("Exception tokenizing input: " + e.getLocalizedMessage());
             return Execution.complete(ExitCode.INVALID);
         }
 
@@ -114,7 +115,7 @@ public class UnixCommandManager implements CommandManager {
                     for (CommandExecutable executable : component.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
                             try {
-                                return executable.execute(arguments, IODescriptor.from(stdin.get(), stdout.get(), stderr.get()));
+                                return executable.execute(arguments, descriptor);
                             } catch (ParseException e) {
                                 lastException = e;
                             }
@@ -123,7 +124,7 @@ public class UnixCommandManager implements CommandManager {
                         }
                     }
                     if (lastException != null) {
-                        stderr.get().write(lastException.getLocalizedMessage());
+                        descriptor.err().write(lastException.getLocalizedMessage());
                         return Execution.complete(ExitCode.INVALID);
                     } else if (lowestConsumed != Integer.MAX_VALUE) {
                         depth += lowestConsumed;
@@ -135,18 +136,23 @@ public class UnixCommandManager implements CommandManager {
                 } else {
                     consumedArgs.addAll(arguments);
                     if (++depth <= consumedArgs.size()) {
-                        stderr.get().write(String.format("Invalid argument(s) '%s' passed to command '%s'", consumedArgs.subList(depth, consumedArgs.size()), consumedArgs.subList(0, depth)));
+                        descriptor.err().write(String.format("Invalid argument(s) '%s' passed to command '%s'", consumedArgs.subList(depth, consumedArgs.size()), consumedArgs.subList(0, depth)));
                     } else {
-                        stderr.get().write(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs));
+                        descriptor.err().write(String.format("Missing %d argument(s) for command '%s'", depth - consumedArgs.size(), consumedArgs));
                     }
                     return Execution.complete(ExitCode.INVALID);
                 }
             }
             return Execution.complete(ExitCode.INVALID);
         } else {
-            stderr.get().write(String.format("'%s' is not a valid command", currentArgument));
+            descriptor.err().write(String.format("'%s' is not a valid command", currentArgument));
             return Execution.complete(ExitCode.INVALID);
         }
+    }
+
+    @Override
+    public Execution execute(String input) {
+        return execute(input, SimpleIODescriptor.from(stdin.get(), stdout.get(), stderr.get()));
     }
 
     @Override
