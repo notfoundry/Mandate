@@ -24,10 +24,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * An annotating giving description metadata to a declared command.
+ * This should be used primarily to supplement command manager implementations that might choose
+ * to provide auto-generated manual pages for registered commands
+ *
  * @author Foundry
  */
 @Target(value=ElementType.METHOD)
 @Retention(value=RetentionPolicy.RUNTIME)
 public @interface Description {
+
+    /**
+     * An series of strings, each representing one line in the description of the annotated command.
+     * Each element in the array should be considered to be delimited by the result of {@link System#lineSeparator lineSeparator}
+     * as the values are declared
+     *
+     * @return the description of the annotated command
+     */
     String[] value();
 }

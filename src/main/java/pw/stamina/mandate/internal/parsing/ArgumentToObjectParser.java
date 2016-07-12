@@ -76,7 +76,7 @@ public class ArgumentToObjectParser implements Parser<Deque<CommandArgument>, Ob
                 CommandArgument present = popFlagAndOperandIfPresent(arguments, userFlag.flag());
 
                 Optional<String> conflictingFlagLookup;
-                if (present != null && (conflictingFlagLookup = findConflictingFlag(userFlag.flag(), userFlag.or(), excludedFlags)).isPresent()) {
+                if (present != null && (conflictingFlagLookup = findConflictingFlag(userFlag.flag(), userFlag.xor(), excludedFlags)).isPresent()) {
                     throw new ParseFailException(this, present.getRaw(), AutoFlag.class, String.format("Provided flag '%s' conflicts with exclusive flag '%s'", present.getRaw(), conflictingFlagLookup.get()));
                 }
 
@@ -97,7 +97,7 @@ public class ArgumentToObjectParser implements Parser<Deque<CommandArgument>, Ob
         }
 
         if (!arguments.isEmpty()) {
-            throw new ParseFailException(this, arguments.toString(), CommandArgument.class, String.format("Passed %d invalid or previously present argument(s): %s", arguments.size(), arguments.toString()));
+            throw new ParseFailException(this, arguments.toString(), CommandArgument.class, String.format("Passed %d invalid xor previously present argument(s): %s", arguments.size(), arguments.toString()));
         } else {
             return parsedArgs;
         }

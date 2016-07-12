@@ -24,10 +24,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * An annotation used to declare a specific method as being an executable command.
+ * This should be used in conjunction with the {@link Syntax Syntax} annotation to define the
+ * base command that this executable should be linked to.
+ *
  * @author Foundry
  */
 @Target(value=ElementType.METHOD)
 @Retention(value=RetentionPolicy.RUNTIME)
 public @interface Executes {
+
+    /**
+     * The syntax tree, if any, that should be used to supplement the syntax definition
+     * attributed to this command by it's associated {@link Syntax Syntax} annotation.
+     * An element of this array should be formatted as a pipe-delimited sequence of aliases for
+     * the next element in the syntax tree that this command should be considered a part of.
+     * An example of this might be {"return|ret", "string|str"} for a command that intends to have a
+     * fully-qualified executor of "[command name] return string [command arguments]"
+     *
+     * @return the supplementary syntax tree for this command
+     */
     String[] tree() default {};
 }

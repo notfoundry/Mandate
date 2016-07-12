@@ -24,13 +24,26 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * An annotation providing a name, along with usage information for, the annotated command parameter.
+ * This should be used primarily to supplement command manager implementations that might choose
+ * to provide auto-generated manual pages for registered commands
+ *
  * @author Foundry
  */
 @Target(value=ElementType.PARAMETER)
 @Retention(value=RetentionPolicy.RUNTIME)
 public @interface Usage {
+
+    /**
+     * @return The preferred name of this parameter
+     */
     String name();
 
+    /**
+     * A usage string supplementing the defintion of the annotated parameter.
+     *
+     * @return The defined usage help text for this particular parameter
+     */
     String usage() default "";
 }
 
