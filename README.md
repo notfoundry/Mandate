@@ -2,6 +2,8 @@
 
 Mandate allows you to define specific methods as "commands", which can then be registered to a central command manager for future invocation
 
+The system fully supports commands having flags with and without operands, mandatory parameters, and optional parameters.
+
 ###Intro
 To add Mandate to your project, it is suggested that you use Maven; use this dependency:
 ```xml
