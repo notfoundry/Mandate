@@ -43,12 +43,18 @@ import java.util.stream.Collectors;
 
 /**
  * @author Foundry
+ * @deprecated see {@link TransformerExecutable TransformerExecutable}
  */
 class MethodExecutable implements CommandExecutable {
+
     final Method backingMethod;
+
     final Object methodParent;
+
     final CommandManager commandManager;
+
     final List<CommandParameter> parameters;
+    
     ArgumentToObjectParser argumentParser;
 
     MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
