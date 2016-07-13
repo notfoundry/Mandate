@@ -18,7 +18,7 @@
 
 package pw.stamina.mandate.internal.execution.argument;
 
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 /**
  * @author Foundry

@@ -38,7 +38,7 @@ import pw.stamina.mandate.internal.io.StandardOutputStream;
 import pw.stamina.mandate.internal.parsing.InputToArgumentParser;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 import pw.stamina.mandate.internal.utils.Primitives;
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 import java.lang.reflect.Method;
 import java.util.*;

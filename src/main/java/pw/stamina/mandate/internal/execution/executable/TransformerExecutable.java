@@ -34,7 +34,7 @@ import pw.stamina.mandate.internal.execution.parameter.CommandParameterFactory;
 import pw.stamina.mandate.internal.execution.result.ExecutionFactory;
 import pw.stamina.mandate.internal.parsing.ArgumentToObjectParser;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

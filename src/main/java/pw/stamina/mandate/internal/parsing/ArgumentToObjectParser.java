@@ -27,8 +27,8 @@ import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.internal.execution.argument.CommandArgumentFactory;
 import pw.stamina.parsor.api.parsing.Parser;
-import pw.stamina.parsor.exceptions.ParseException;
-import pw.stamina.parsor.exceptions.ParseFailException;
+import pw.stamina.parsor.api.parsing.ParseException;
+import pw.stamina.parsor.internal.parsers.ParseFailException;
 
 import java.util.*;
 

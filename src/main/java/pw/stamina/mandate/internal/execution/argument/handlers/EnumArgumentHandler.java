@@ -22,8 +22,8 @@ import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.execution.CommandParameter;
 import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.parsor.exceptions.ParseException;
-import pw.stamina.parsor.impl.parsers.standards.EnumParser;
+import pw.stamina.parsor.api.parsing.ParseException;
+import pw.stamina.parsor.internal.parsers.EnumParser;
 
 import java.util.Arrays;
 

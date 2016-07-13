@@ -20,7 +20,7 @@ package pw.stamina.mandate.api.execution.argument;
 
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.execution.CommandParameter;
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 /**
  * An argument handler designed to parse a CommandArgument to a reified Object type
