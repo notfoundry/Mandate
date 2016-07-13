@@ -131,7 +131,7 @@ public final class ReflectionMethodTransformer {
                         throw new MethodTransformationException("Instance of parent class for non-static method " + backingMethod.getName() + " cannot be null");
                     }
                     return (T) LambdaMetafactory.metafactory(caller, lambdaMethod.getName(), MethodType.methodType(conversionTarget, parentClass, (Class<?>[]) stripParameterTypes(backingMethod.getParameterTypes(), capturedStateClasses)),    //the type used for instance invocations
-                            lambdaMethodType, implMethod, instantiatedMethodType).dynamicInvoker().invokeWithArguments(Arrays.asList(arrayConcat(new Object[] {parentInstance}, capturedState)));
+                            lambdaMethodType, implMethod, instantiatedMethodType).dynamicInvoker().invokeWithArguments(Arrays.asList(insertAtHead(parentInstance, capturedState)));
                 }
             } else {
                 throw new IllegalHandleLookupException("Unable to do lookup on method \"" + backingMethod.getName() + "\", insufficient permissions from security manager?");
@@ -264,9 +264,10 @@ public final class ReflectionMethodTransformer {
         return Arrays.copyOfRange(parameterTypes, 0, captureTypes.length);
     }
 
-    private static Object[] arrayConcat(Object[] first, Object[] second) {
-        Object[] result = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, result, first.length, second.length);
+    private static Object[] insertAtHead(Object element, Object[] array) {
+        Object[] result = new Object[array.length+1];
+        result[0] = element;
+        System.arraycopy(array, 0, result, 1, array.length);
         return result;
     }
 

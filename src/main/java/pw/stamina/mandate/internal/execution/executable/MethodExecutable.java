@@ -54,7 +54,7 @@ class MethodExecutable implements CommandExecutable {
     final CommandManager commandManager;
 
     final List<CommandParameter> parameters;
-    
+
     ArgumentToObjectParser argumentParser;
 
     MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
