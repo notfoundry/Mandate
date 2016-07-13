@@ -39,7 +39,7 @@ public class AsynchronousTransformerExecution implements Execution {
 
     public AsynchronousTransformerExecution(InvokerProxy invoker, IODescriptor io, Object[] args) {
         this.invoker = invoker;
-        this.io = (IODescriptor) args[0];
+        this.io = io;
         pendingComputation = COMMAND_EXECUTOR.submit(() -> invoker.execute(io, args));
     }
 

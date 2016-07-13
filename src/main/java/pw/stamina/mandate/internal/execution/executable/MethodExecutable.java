@@ -45,11 +45,11 @@ import java.util.stream.Collectors;
  * @author Foundry
  */
 class MethodExecutable implements CommandExecutable {
-    private final Method backingMethod;
-    private final Object methodParent;
-    private final CommandManager commandManager;
-    private final List<CommandParameter> parameters;
-    private ArgumentToObjectParser argumentParser;
+    final Method backingMethod;
+    final Object methodParent;
+    final CommandManager commandManager;
+    final List<CommandParameter> parameters;
+    ArgumentToObjectParser argumentParser;
 
     MethodExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
         if (backingMethod.getReturnType() != ExitCode.class) {
@@ -66,7 +66,7 @@ class MethodExecutable implements CommandExecutable {
     @Override
     public Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
-        return ExecutionFactory.makeExecution(backingMethod, methodParent, arrayConcat(new Object[] {io}, parsedArgs));
+        return ExecutionFactory.makeExecution(backingMethod, methodParent, io, parsedArgs);
     }
 
     @Override
@@ -178,11 +178,5 @@ class MethodExecutable implements CommandExecutable {
         } else {
             throw new UnsupportedParameterException("Failed to resolve argument type for optional parameter " + parameter.getName());
         }
-    }
-
-    private static Object[] arrayConcat(Object[] first, Object[] second) {
-        Object[] result = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, result, first.length, second.length);
-        return result;
     }
 }

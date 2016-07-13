@@ -69,7 +69,7 @@ public final class InvokerProxyFactory {
             fv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(Object.class)), null, null);
+            mv = cw.visitMethod(ACC_PUBLIC, "<init>", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(executorInterface)), null, null);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(Object.class), "<init>", "()V", false);
@@ -107,7 +107,7 @@ public final class InvokerProxyFactory {
         cw.visitEnd();
 
         try {
-            return (InvokerProxy) SystemClassLoader.defineClass(proxyCanonicalName, cw.toByteArray()).getDeclaredConstructor(Object.class).newInstance(ReflectionMethodTransformer.transform(executorInterface, methodParent.getClass(), methodParent, backingMethod));
+            return (InvokerProxy) SystemClassLoader.defineClass(proxyCanonicalName, cw.toByteArray()).getDeclaredConstructor(executorInterface).newInstance(ReflectionMethodTransformer.transform(executorInterface, methodParent.getClass(), methodParent, backingMethod));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new InvokerProxyGenerationException("Exception creating invoker proxy for method '" + backingMethod + "'", e);
         }

@@ -37,10 +37,10 @@ class AsynchronousMethodExecution implements Execution {
 
     private final Future<ExitCode> pendingComputation;
 
-    AsynchronousMethodExecution(Method executable, Object parent, Object[] args) {
+    AsynchronousMethodExecution(Method executable, Object parent, IODescriptor io, Object[] args) {
         this.executable = executable;
-        this.io = (IODescriptor) args[0];
-        pendingComputation = COMMAND_EXECUTOR.submit(() -> (ExitCode) executable.invoke(parent, args));
+        this.io = io;
+        pendingComputation = COMMAND_EXECUTOR.submit(() -> (ExitCode) executable.invoke(parent, insertAtHead(io, args)));
     }
 
     @Override
@@ -73,5 +73,12 @@ class AsynchronousMethodExecution implements Execution {
     @Override
     public boolean completed() {
         return pendingComputation.isDone();
+    }
+
+    private static Object[] insertAtHead(Object element, Object[] array) {
+        Object[] result = new Object[array.length+1];
+        result[0] = element;
+        System.arraycopy(array, 0, result, 1, array.length);
+        return result;
     }
 }

@@ -27,7 +27,7 @@ public final class Mandate {
     }
 
     public static String getVersion() {
-        return "1.5.0";
+        return "1.5.2";
     }
 
     public static String getFormattedVersion() {
