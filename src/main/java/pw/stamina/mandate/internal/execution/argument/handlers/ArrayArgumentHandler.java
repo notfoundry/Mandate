@@ -26,7 +26,7 @@ import pw.stamina.mandate.internal.annotations.Length;
 import pw.stamina.mandate.internal.execution.argument.ArgumentParseException;
 import pw.stamina.mandate.internal.execution.argument.CommandArgumentFactory;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;

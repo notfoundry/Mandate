@@ -21,7 +21,7 @@ package pw.stamina.mandate.api.execution;
 import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 import java.util.Deque;
 import java.util.List;

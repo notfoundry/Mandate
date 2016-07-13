@@ -25,8 +25,8 @@ import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
 import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
 import pw.stamina.mandate.internal.utils.Primitives;
-import pw.stamina.parsor.exceptions.ParseException;
-import pw.stamina.parsor.impl.parsers.standards.NumberParser;
+import pw.stamina.parsor.api.parsing.ParseException;
+import pw.stamina.parsor.internal.parsers.NumberParser;
 
 /**
  * @author Foundry

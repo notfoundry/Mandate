@@ -25,7 +25,7 @@ import pw.stamina.mandate.api.execution.argument.CommandArgument;
 import pw.stamina.mandate.internal.execution.argument.ArgumentParseException;
 import pw.stamina.mandate.internal.annotations.strings.Equals;
 import pw.stamina.mandate.internal.annotations.Length;
-import pw.stamina.parsor.exceptions.ParseException;
+import pw.stamina.parsor.api.parsing.ParseException;
 
 import java.util.regex.Pattern;
 
