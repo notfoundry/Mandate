@@ -27,6 +27,7 @@ import java.util.concurrent.*;
 
 /**
  * @author Foundry
+ * @deprecated see {@link AsynchronousTransformerExecution AsynchronousTransformerExecution}
  */
 class AsynchronousMethodExecution implements Execution {
     private static final ExecutorService COMMAND_EXECUTOR = Executors.newCachedThreadPool();

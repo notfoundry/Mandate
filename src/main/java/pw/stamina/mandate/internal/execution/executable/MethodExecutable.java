@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Foundry
+ * @deprecated see {@link TransformerExecutable TransformerExecutable}
  */
 class MethodExecutable implements CommandExecutable {
     final Method backingMethod;

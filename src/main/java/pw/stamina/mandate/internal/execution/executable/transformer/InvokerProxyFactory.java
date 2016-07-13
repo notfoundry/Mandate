@@ -25,6 +25,7 @@ import org.objectweb.asm.Type;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
 import pw.stamina.mandate.internal.execution.executable.transformer.dynamic.ReflectionMethodTransformer;
+import pw.stamina.mandate.internal.utils.Primitives;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -93,8 +94,10 @@ public final class InvokerProxyFactory {
                 mv.visitVarInsn(ALOAD, 2);
                 mv.visitLdcInsn(i-1);
                 mv.visitInsn(AALOAD);
-                mv.visitTypeInsn(CHECKCAST, Type.getInternalName(paramTypes[i]));
-                if (paramTypes[i].isPrimitive()) {
+                if (!paramTypes[i].isPrimitive()){
+                    mv.visitTypeInsn(CHECKCAST, Type.getInternalName(paramTypes[i]));
+                } else {
+                    mv.visitTypeInsn(CHECKCAST, Type.getInternalName(Primitives.wrap(paramTypes[i])));
                     UNBOXING_ACTIONS.get(paramTypes[i]).accept(mv);
                 }
             }
