@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.execution.executable.transformer;
+package pw.stamina.mandate.internal.execution.executable.transformer.dynamic;
 
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
@@ -40,7 +40,7 @@ import java.util.Arrays;
  * <p>
  * The SAM of the conversion target type must have an identical signature to the method being converted discounting captured arguments, with the
  * exception of SAMs making use of parameterized types. The conversion system cannot reify these types prior to invoking the SAM of the transformed object,
- * seeing as the JVM erases these types. As such, care must be taken to not provide incompatable transformation target types when dealing with parameterized arguments,
+ * seeing as the JVM erases these types. As such, care must be taken to not provide incompatible transformation target types when dealing with parameterized arguments,
  * as internally all references to that type will be of type {@link Object Object}, to which any argument can be passed.
  * <p>
  * When this class is initialized, it will attempt to acquire a privileged {@link java.lang.invoke.MethodHandles.Lookup MethodHandle Lookup} object with which

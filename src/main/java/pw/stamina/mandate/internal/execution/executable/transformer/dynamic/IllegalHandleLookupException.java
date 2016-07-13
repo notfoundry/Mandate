@@ -16,15 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.execution.executable.transformer;
-
-import pw.stamina.mandate.api.execution.result.ExitCode;
-import pw.stamina.mandate.api.io.IODescriptor;
+package pw.stamina.mandate.internal.execution.executable.transformer.dynamic;
 
 /**
  * @author Foundry
  */
-@FunctionalInterface
-public interface TransformationTarget {
-    ExitCode execute(IODescriptor io, Object... arguments);
+public class IllegalHandleLookupException extends MethodTransformationException {
+
+    private static final long serialVersionUID = -2771117835000342459L;
+
+    IllegalHandleLookupException() {}
+
+    IllegalHandleLookupException(String message) {
+        super(message);
+    }
+
+    IllegalHandleLookupException(Throwable cause) {
+        super(cause);
+    }
+
+    IllegalHandleLookupException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    IllegalHandleLookupException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

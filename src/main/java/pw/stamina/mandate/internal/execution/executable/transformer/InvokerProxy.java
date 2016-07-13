@@ -18,28 +18,12 @@
 
 package pw.stamina.mandate.internal.execution.executable.transformer;
 
+import pw.stamina.mandate.api.execution.result.ExitCode;
+import pw.stamina.mandate.api.io.IODescriptor;
+
 /**
  * @author Foundry
  */
-public class MethodTransformationException extends RuntimeException {
-
-    private static final long serialVersionUID = -2771117835000342459L;
-
-    MethodTransformationException() {}
-
-    MethodTransformationException(String message) {
-        super(message);
-    }
-
-    MethodTransformationException(Throwable cause) {
-        super(cause);
-    }
-
-    MethodTransformationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    MethodTransformationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+public interface InvokerProxy {
+    ExitCode execute(IODescriptor io, Object... args);
 }

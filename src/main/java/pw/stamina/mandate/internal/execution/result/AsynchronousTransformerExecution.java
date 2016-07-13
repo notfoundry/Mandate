@@ -21,26 +21,26 @@ package pw.stamina.mandate.internal.execution.result;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.execution.executable.transformer.TransformationTarget;
+import pw.stamina.mandate.internal.execution.executable.transformer.InvokerProxy;
 
 import java.util.concurrent.*;
 
 /**
  * @author Foundry
  */
-public class AsynchronousTransformedExecution implements Execution {
+public class AsynchronousTransformerExecution implements Execution {
     private static final ExecutorService COMMAND_EXECUTOR = Executors.newCachedThreadPool();
 
-    private final TransformationTarget executable;
+    private final InvokerProxy invoker;
 
     private final IODescriptor io;
 
     private final Future<ExitCode> pendingComputation;
 
-    public AsynchronousTransformedExecution(TransformationTarget executable, IODescriptor io, Object[] args) {
-        this.executable = executable;
-        this.io = (IODescriptor) args[0];
-        pendingComputation = COMMAND_EXECUTOR.submit(() -> executable.execute(io, args));
+    public AsynchronousTransformerExecution(InvokerProxy invoker, IODescriptor io, Object[] args) {
+        this.invoker = invoker;
+        this.io = io;
+        pendingComputation = COMMAND_EXECUTOR.submit(() -> invoker.execute(io, args));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class AsynchronousTransformedExecution implements Execution {
         try {
             return pendingComputation.get();
         } catch (Exception e) {
-            io.err().write(String.format("Exception while executing command: %s", e));
+            io.err().write(String.format("Exception while executing method: %s", e));
             return ExitCode.TERMINATED;
         }
     }
@@ -60,7 +60,7 @@ public class AsynchronousTransformedExecution implements Execution {
         } catch (TimeoutException e) {
             throw e;
         } catch (Exception e) {
-            io.err().write(String.format("Exception while executing command: %s", e));
+            io.err().write(String.format("Exception while executing method: %s", e));
             return ExitCode.TERMINATED;
         }
     }
