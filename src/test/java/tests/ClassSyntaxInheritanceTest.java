@@ -18,16 +18,19 @@
 
 package tests;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import pw.stamina.mandate.Mandate;
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.annotations.Executes;
+import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.UnixCommandManager;
-import pw.stamina.mandate.api.annotations.Executes;
-import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.internal.io.StandardInputStream;
 
 import java.util.ArrayDeque;
@@ -42,7 +45,7 @@ public class ClassSyntaxInheritanceTest {
 
     private Queue<Object> commandOutput = new ArrayDeque<>();
 
-    private CommandManager commandManager = new UnixCommandManager(StandardInputStream::get, () -> commandOutput::add, () -> commandErrors::add);
+    private CommandManager commandManager = Mandate.newManager(StandardInputStream::get, () -> commandOutput::add, () -> commandErrors::add);
 
     @Rule
     public TestWatcher watcher = new TestWatcher() {

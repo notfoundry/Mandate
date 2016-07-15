@@ -18,12 +18,27 @@
 
 package pw.stamina.mandate;
 
+import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.io.CommandInput;
+import pw.stamina.mandate.api.io.CommandOutput;
+import pw.stamina.mandate.internal.UnixCommandManager;
+
+import java.util.function.Supplier;
+
 /**
  * @author Foundry
  */
 public final class Mandate {
     private Mandate() {
         throw new IllegalStateException(this.getClass().getCanonicalName() + " cannot be instantiated.");
+    }
+
+    public static CommandManager newManager() {
+        return new UnixCommandManager();
+    }
+
+    public static CommandManager newManager(Supplier<CommandInput> stdin, Supplier<CommandOutput> stdout, Supplier<CommandOutput> stderr) {
+        return new UnixCommandManager(stdin, stdout, stderr);
     }
 
     public static String getVersion() {

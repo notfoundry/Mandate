@@ -19,21 +19,21 @@
 package tests;
 
 import org.junit.Test;
+import pw.stamina.mandate.Mandate;
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.annotations.flag.AutoFlag;
-import pw.stamina.mandate.internal.execution.executable.UnsupportedParameterException;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.UnixCommandManager;
+import pw.stamina.mandate.internal.execution.executable.UnsupportedParameterException;
 
 /**
  * @author Foundry
  */
 public class OverlappingCommandFlagTest {
 
-    private CommandManager commandManager = new UnixCommandManager();
+    private CommandManager commandManager = Mandate.newManager();
 
     @Test(expected = UnsupportedParameterException.class)
     public void testFailedFlagUse() {

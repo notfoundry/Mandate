@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import pw.stamina.mandate.Mandate;
 import pw.stamina.mandate.api.CommandManager;
 import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.Syntax;
 import pw.stamina.mandate.api.execution.result.Execution;
 import pw.stamina.mandate.api.execution.result.ExitCode;
 import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.UnixCommandManager;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -32,7 +32,7 @@ import java.util.Scanner;
  */
 public class InteractiveCommandLine {
     public static void main(String[] args) {
-        final CommandManager commandManager = new UnixCommandManager();
+        final CommandManager commandManager = Mandate.newManager();
         commandManager.register(new InteractiveCommandLine());
         Scanner scanner = new Scanner(System.in);
 
