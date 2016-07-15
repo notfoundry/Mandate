@@ -99,6 +99,15 @@ manager.execute("greet --repetitions 6 yo! Robert -c");
 As you can see, *Flags* can be present anywhere in the input provided by the user. *Enforced* and *Optional* arguments, however, must be provided through the input in declaration order
 
 
+###Argument Values
+Mandate has built-in support for:
+  * All primitive types and their wrapper classes
+  * String arguments
+  * BigInteger and BigDecimal
+  * Enumerations
+
+Furthermore, N-dimensional arrays of any supported types are also implicitly supported.
+
 ###Dependencies
 Mandate requires ObjectWeb ASM 3.0+, which Maven users can integrate with this dependency:
 ```xml
