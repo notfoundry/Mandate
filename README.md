@@ -43,7 +43,7 @@ You can add any collection of commands to the classpath of your *CommandManager*
 //register the commands in that class
 manager.register(new MyClassWithCommandMethods());
 ```
-If multiple classes register methods with similar command syntax, the *CommandManager* will try to resolve the differences as best it can. Registration of a correctly-formatted *command-executable* method can fail if it has the exact same minimum and maximum number of parameters of previously-registered command with the same syntax tree.
+If multiple classes register methods with similar command syntax, the *CommandManager* will try to resolve the differences as best it can. Registration of a correctly-formatted *command-executable* method can fail if it has the exact same minimum and maximum number of parameters of a previously registered command with the same syntax tree leading up to the command.
 
 ---
 
