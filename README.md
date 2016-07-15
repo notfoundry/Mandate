@@ -33,7 +33,7 @@ To break down the semantics of a command definition:
   * **@Executes** marks a method as being *command-executable*, meaming that it is valid for registration to the command classpath. This annotation is also used to define further required elements in a command syntax tree besides the name or alias of a command through the annotation's *tree* element
   * **@Syntax** defines the usable base name and aliases for a command. This can be applied either directly to a method as shown in the example above, or to a class in which command-executable methods exist. The second option might be preferable when you have multiple commands that start with the same base name that have sub-syntax defined in the *Executes* annotation, such as "select direction right" or "select fruit orange". A command-executable method with a *Syntax* annotation will always override whatever class-level syntax may exist
   * **ExitCode** is the return type that all *command-executable* methods must have . This is an enumeration with the constants SUCCESS, FAILURE, TERMINATED, and INVALID, any of which can be used to report the termination state of the running command.
-  * **IODescriptor** must be the type of the first parameter of any *command-executable* method. This serves a similar purpose to Unix file descriptors, giving commands knowledge of their input, output, and error streams. This allows developers to define very robust systems of supplying, consuming, and piping input to, from, and between commands.
+  * **IODescriptor** must be the type of the first parameter of any *command-executable* method. This serves a similar purpose to Unix file descriptors, giving commands knowledge of their input, output, and error streams. This allows developers to define robust systems of supplying, consuming, and piping data to, from, and between commands.
 
 ---
 
@@ -55,7 +55,7 @@ System.out.println(exec.result());  //should print SUCCESS
 ```
 This method will return a result of type **Execution**, representing a possibly parallel command execution. Executions define similar methods to *Future* objects, letting you block on, poll, and cancel any pending execution.
 
-You may notice there is no reference to the string "Greetings!" anywhere here. That's because the outputs of the *greet* command were left to the output stream assigned to the execution through the *IODescriptor* argument. By default, any CommandManager will have a defualt **CommandInput** reading from *System.in*, and default **CommandOutput**s printing to *System.out*. This, however, is totally configurable.
+You may notice there is no reference to the string "Greetings!" anywhere here. That's because the outputs of the *greet* command were left to the output stream assigned to the execution through the *IODescriptor* argument. By default, any CommandManager will have a **CommandInput** reading from *System.in* for input, and **CommandOutput**s printing to *System.out* for output and error messages. This, however, is totally configurable.
 
 
 ###Argument Types
@@ -75,7 +75,7 @@ public ExitCode greetMe(IODescriptor io,
     return ExitCode.SUCCESS;
 }
 ```
-To describe the different kinds of arguments
+To describe the different kinds of arguments:
   * **@AutoFlag** decribes an flag that does not require an operand. These flags are configurable with the *ifdef* and *elsedef* elements in the *AutoFlag* annotation to define what the input to parse for these parameters should be if the flag is present or missing, but special behavior exists for boolean types (which only have two possible values).
   *  **@UserFlag** describes a flag that requires an operand to be provided by the user. In most cases, *UserFlag*s and *Optional* arguments can be used interchangably as they both serve the same purpose. However. *UseFlag*s have access to their *elsedef* element describing specifically what to parse for the parameter.
 
@@ -96,7 +96,7 @@ Once registered, invoking the command descibed above might look like
 // will print "to Robert: YO! YO! YO! YO! YO! YO!"
 manager.execute("greet --repetitions 6 yo! Robert -c");
 ```
-As you can see, *Flags* can be provided anywhere in the input provided by the user. *Enforced* and *Optional* arguments, however, must be provided in declaration order through the input
+As you can see, *Flags* can be present anywhere in the input provided by the user. *Enforced* and *Optional* arguments, however, must be provided through the input in declaration order
 
 
 ###Dependencies
