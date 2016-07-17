@@ -35,7 +35,7 @@ public final class EnumArgumentHandler implements ArgumentHandler<Enum> {
     @Override
     public Enum parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
         @SuppressWarnings("unchecked")
-        EnumParser<? extends Enum> parser = new EnumParser(parameter.getType());
+        EnumParser<? extends Enum> parser = EnumParser.of((Class<? extends Enum>) parameter.getType(), Enum::toString);
         return parser.parse(input.getRaw());
     }
 
