@@ -19,6 +19,7 @@
 package pw.stamina.mandate.internal.execution.executable;
 
 import pw.stamina.mandate.api.CommandManager;
+import pw.stamina.mandate.api.annotations.Executes;
 import pw.stamina.mandate.api.annotations.flag.AutoFlag;
 import pw.stamina.mandate.api.annotations.flag.UserFlag;
 import pw.stamina.mandate.api.annotations.meta.Description;
@@ -48,17 +49,19 @@ import java.util.stream.Collectors;
  */
 class TransformerExecutable implements CommandExecutable {
 
-    final String executableName;
+    private final String executableName;
 
-    final Description executableDescription;
+    private final Description executableDescription;
 
-    final InvokerProxy invokerProxy;
+    private final InvokerProxy invokerProxy;
 
-    final CommandManager commandManager;
+    private final CommandManager commandManager;
 
-    final List<CommandParameter> parameters;
+    private final List<CommandParameter> parameters;
 
-    ArgumentToObjectParser argumentParser;
+    private final boolean parallel;
+
+    private ArgumentToObjectParser argumentParser;
 
     TransformerExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) throws MalformedCommandException {
         if (backingMethod.getReturnType() != ExitCode.class) {
@@ -71,12 +74,13 @@ class TransformerExecutable implements CommandExecutable {
         this.executableName = backingMethod.getName();
         this.executableDescription = backingMethod.getDeclaredAnnotation(Description.class);
         this.invokerProxy = InvokerProxyFactory.makeProxy(backingMethod, methodParent);
+        this.parallel = backingMethod.getDeclaredAnnotation(Executes.class).async();
     }
 
     @Override
     public Execution execute(Deque<CommandArgument> arguments, IODescriptor io) throws ParseException {
         final Object[] parsedArgs = (argumentParser == null ? (argumentParser = new ArgumentToObjectParser(this, commandManager)) : argumentParser).parse(arguments);
-        return ExecutionFactory.makeExecution(invokerProxy, null, io, parsedArgs);
+        return ExecutionFactory.makeExecution(invokerProxy, null, io, parsedArgs, parallel);
     }
 
     @Override

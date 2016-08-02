@@ -85,7 +85,7 @@ public final class Mandate {
      * @return the semantic version number of this copy of Mandate
      */
     public static String getVersion() {
-        return "1.6.2";
+        return "1.6.3";
     }
 
     /**

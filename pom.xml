@@ -24,7 +24,7 @@
 
     <groupId>pw.stamina.mandate</groupId>
     <artifactId>Mandate</artifactId>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
 
     <dependencies>
         <dependency>

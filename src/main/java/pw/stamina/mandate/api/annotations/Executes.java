@@ -48,4 +48,16 @@ public @interface Executes {
      * @return the supplementary syntax tree for this command
      */
     String[] tree() default {};
+
+    /**
+     * Whether or not the annotated command should be executed asynchronously
+     * <p>
+     * If this is marked as {@code true}, the command will proceed in a non-blocking fashion, allowing
+     * the calling thread to continue without having to wait for the result code of the command. If this is
+     * {@code false}, the calling thread will block until the invoked command is finished executing.
+     * <p>
+     * By default, this is {@code false}
+     * @return whether or not the annotated command should be executed asynchronously
+     */
+    boolean async() default false;
 }

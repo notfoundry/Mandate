@@ -30,11 +30,6 @@ public final class ExecutableFactory {
     private ExecutableFactory() {}
 
     public static CommandExecutable newExecutable(Method backingMethod, Object methodParent, CommandManager commandManager) {
-        /*boolean fastTrack = true;
-        for (Class<?> parameter : backingMethod.getParameterTypes()) {
-            if (parameter.isPrimitive()) fastTrack = false;
-        }
-        return fastTrack ? new TransformerExecutable(backingMethod, methodParent, commandManager) : new MethodExecutable(backingMethod, methodParent, commandManager);*/
         return new TransformerExecutable(backingMethod, methodParent, commandManager);
     }
 }
