@@ -24,16 +24,16 @@ import java.lang.reflect.Method;
 /**
  * @author Foundry
  */
-final class SystemClassLoader {
+final class ClassLoaderSupport {
 
     private static final Method CLASS_LOADER_DEFINER;
 
-    private SystemClassLoader() {}
+    private ClassLoaderSupport() {}
 
-    static Class<?> defineClass(String className, byte[] bytes) {
+    static Class<?> defineClass(ClassLoader classLoader, String className, byte[] bytes) {
         Object[] args = new Object[] {className, bytes, 0, bytes.length};
         try {
-            return (Class) CLASS_LOADER_DEFINER.invoke(ClassLoader.getSystemClassLoader(), args);
+            return (Class) CLASS_LOADER_DEFINER.invoke(classLoader, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new TransformationTargetGenerationException("Exception defining class '" + className + "'", e);
         }
@@ -42,9 +42,7 @@ final class SystemClassLoader {
     static {
         Method m = null;
         try {
-            ClassLoader loader = ClassLoader.getSystemClassLoader();
-            Class<?> cls = Class.forName("java.lang.ClassLoader");
-            Method method = cls.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
+            final Method method = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
             method.setAccessible(true);
             m = method;
         } catch (Exception e) {

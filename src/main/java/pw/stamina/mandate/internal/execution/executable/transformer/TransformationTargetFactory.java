@@ -49,7 +49,7 @@ public final class TransformationTargetFactory {
 
         cw.visitEnd();
 
-        return SystemClassLoader.defineClass(className, cw.toByteArray());
+        return ClassLoaderSupport.defineClass(TransformationTargetFactory.class.getClassLoader(), className, cw.toByteArray());
     }
 
     private static String makeUniqueName(Package parentPackage, Method method) {

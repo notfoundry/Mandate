@@ -110,7 +110,7 @@ public final class InvokerProxyFactory {
         cw.visitEnd();
 
         try {
-            return (InvokerProxy) SystemClassLoader.defineClass(proxyCanonicalName, cw.toByteArray()).getDeclaredConstructor(executorInterface).newInstance(ReflectionMethodTransformer.transform(executorInterface, methodParent.getClass(), methodParent, backingMethod));
+            return (InvokerProxy) ClassLoaderSupport.defineClass(InvokerProxyFactory.class.getClassLoader(), proxyCanonicalName, cw.toByteArray()).getDeclaredConstructor(executorInterface).newInstance(ReflectionMethodTransformer.transform(executorInterface, methodParent.getClass(), methodParent, backingMethod));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new InvokerProxyGenerationException("Exception creating invoker proxy for method '" + backingMethod + "'", e);
         }
