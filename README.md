@@ -1,4 +1,4 @@
-##A fluent command processing, in the spirit of POSIX
+##A fluent command processing system, in the spirit of POSIX
 
 [![Build Status](https://travis-ci.org/foundry27/Mandate.svg?branch=master)](https://travis-ci.org/foundry27/Mandate)
 [![codecov](https://codecov.io/gh/foundry27/Mandate/branch/master/graph/badge.svg)](https://codecov.io/gh/foundry27/Mandate)
