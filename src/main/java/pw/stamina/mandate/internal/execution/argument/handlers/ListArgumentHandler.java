@@ -123,8 +123,9 @@ public class ListArgumentHandler implements ArgumentHandler<List<?>> {
             }
         }
         final Type[] resolutionTypes = getTypeParameters(typeParameters[0]);
+
         return rawComponents.stream()
-                .map(component -> handlerLookup.parse(
+                .map(component -> (Object) handlerLookup.parse(
                         commandContext.getCommandConfiguration().getArgumentCreationStrategy().newArgument(component),
                         new ListProxyCommandParameter(parameter, resolutionTypes),
                         commandContext)
