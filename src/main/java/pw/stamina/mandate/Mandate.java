@@ -100,7 +100,7 @@ public final class Mandate {
      * @return the semantic version number of this copy of Mandate
      */
     public static String getVersion() {
-        return "2.0.0";
+        return "2.0.1";
     }
 
     /**
