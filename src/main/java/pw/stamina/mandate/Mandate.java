@@ -18,20 +18,24 @@
 
 package pw.stamina.mandate;
 
-import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.io.CommandInput;
-import pw.stamina.mandate.api.io.CommandOutput;
-import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.UnixCommandManager;
-
-import java.util.function.Supplier;
+import pw.stamina.mandate.execution.CommandContext;
+import pw.stamina.mandate.execution.ConfigurationBuilder;
+import pw.stamina.mandate.execution.ContextBuilder;
+import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistryBuilder;
+import pw.stamina.mandate.execution.argument.ArgumentProviderBuilder;
+import pw.stamina.mandate.internal.execution.SimpleConfigurationBuilder;
+import pw.stamina.mandate.internal.execution.argument.SimpleArgumentHandlerRegistryBuilder;
+import pw.stamina.mandate.internal.execution.argument.implicit.SimpleArgumentProviderBuilder;
+import pw.stamina.mandate.io.IOBuilder;
+import pw.stamina.mandate.internal.execution.SimpleContextBuilder;
+import pw.stamina.mandate.internal.io.SimpleIOBuilder;
 
 /**
  * This class serves as a manifest of information pertaining to this version of Mandate, along
- * with acting as a central factory for CommandManager instances
+ * with acting as a central factory for CommandContext instances
  * <p>
- * CommandManager instances can be obtained either through the {@link Mandate#newManager() nullary} or {@link Mandate#newManager(Supplier, Supplier, Supplier) ternary}
- * factory methods in this class, which serve to either give default CommandManager implementations or implementations with the specified suppliers
+ * CommandContext instances can be obtained either through the {@link Mandate#newContext() nullary} or {@link Mandate#newContext() ternary}
+ * factory methods in this class, which serve to either give default CommandContext implementations or implementations with the specified suppliers
  * of CommandInput and CommandOutput objects for the input, output, and error streams of running commands.
  *
  * @author Foundry
@@ -43,7 +47,7 @@ public final class Mandate {
     }
 
     /**
-     * This constructs a new CommandManager instance, conforming with the specification as described by the public API interfaces
+     * This constructs a new CommandContext instance, conforming with the specification as described by the public API interfaces
      * <p>
      * These instances are not cached, so it is essential that a references to the created instance be maintained for it to be useful. Else, you
      * risk losing the registered commands in the manager.
@@ -51,28 +55,39 @@ public final class Mandate {
      * The instance will be constructed with reasonable defaults for its standard input, output, and error streams,
      * reading from {@link System#in System.in} for input and printing to {@link System#out System.out} for output.
      *
-     * @return a new CommandManager instance
+     * @return a new CommandContext instance
      */
-    public static CommandManager newManager() {
-        return new UnixCommandManager();
+    public static CommandContext newContext() {
+        return newContextBuilder()
+                .usingIOEnvironment(newIOBuilder()
+                        .build())
+                .usingConfiguration(newConfigurationBuilder()
+                        .build())
+                .withHandlerRegistry(newHandlerRegistryBuilder()
+                        .build())
+                .withArgumentProvider(newArgumentProviderBuilder()
+                        .build())
+                .build();
     }
 
-    /**
-     * This constructs a new CommandManager instance, conforming with the specification as described by the public API interfaces
-     * <p>
-     * These instances are not cached, so it is essential that a references to the created instance be maintained for it to be useful. Else, you
-     * risk losing the registered commands in the manager.
-     * <p>
-     * The instance will be constructed with the guarantee that the provided input, output, and error streams will be used in the command execution
-     * process unless they are overridden by piped command input/output or by a call to {@link CommandManager#execute(String, IODescriptor) execute with a specific IODescriptor}
-     *
-     * @param stdin the supplier of CommandInput objects to be provided to running commands as input streams
-     * @param stdout the supplier of CommandOutput objects to be provided to running commands as output streams
-     * @param stderr the supplier of CommandOutput objects to be provided to running commands as error streams
-     * @return a new CommandManager instance with the specified IO stream suppliers
-     */
-    public static CommandManager newManager(Supplier<CommandInput> stdin, Supplier<CommandOutput> stdout, Supplier<CommandOutput> stderr) {
-        return new UnixCommandManager(stdin, stdout, stderr);
+    public static ContextBuilder newContextBuilder() {
+        return new SimpleContextBuilder();
+    }
+
+    public static IOBuilder newIOBuilder() {
+        return new SimpleIOBuilder();
+    }
+
+    public static ConfigurationBuilder newConfigurationBuilder() {
+        return new SimpleConfigurationBuilder();
+    }
+
+    public static ArgumentHandlerRegistryBuilder newHandlerRegistryBuilder() {
+        return new SimpleArgumentHandlerRegistryBuilder();
+    }
+
+    public static ArgumentProviderBuilder newArgumentProviderBuilder() {
+        return new SimpleArgumentProviderBuilder();
     }
 
     /**
@@ -85,7 +100,7 @@ public final class Mandate {
      * @return the semantic version number of this copy of Mandate
      */
     public static String getVersion() {
-        return "1.6.3";
+        return "2.0.0";
     }
 
     /**

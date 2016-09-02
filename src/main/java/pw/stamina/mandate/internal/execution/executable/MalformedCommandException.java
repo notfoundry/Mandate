@@ -25,21 +25,21 @@ public class MalformedCommandException extends RuntimeException {
 
     private static final long serialVersionUID = 7123028407640145435L;
 
-    MalformedCommandException() {}
+    protected MalformedCommandException() {}
 
-    MalformedCommandException(String message) {
+    protected MalformedCommandException(final String message) {
         super(message);
     }
 
-    MalformedCommandException(Throwable cause) {
+    protected MalformedCommandException(final Throwable cause) {
         super(cause);
     }
 
-    MalformedCommandException(String message, Throwable cause) {
+    protected MalformedCommandException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    MalformedCommandException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected MalformedCommandException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

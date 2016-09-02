@@ -31,15 +31,15 @@ public final class PrimitiveArrays {
 
     private PrimitiveArrays() {}
 
-    public static Class wrap(Class unwrapped) {
+    public static Class wrap(final Class unwrapped) {
         return UNWRAPPED_TO_WRAPPED_CACHE.computeIfAbsent(Primitives.wrap(getBaseComponentType(validateIsArray(unwrapped))), componentType -> Array.newInstance(componentType, getDimensions(unwrapped)).getClass());
     }
 
-    public static Class unwrap(Class wrapped) {
+    public static Class unwrap(final Class wrapped) {
         return WRAPPED_TO_UNWRAPPED_CACHE.computeIfAbsent(Primitives.unwrap(getBaseComponentType(validateIsArray(wrapped))), componentType -> Array.newInstance(componentType, getDimensions(wrapped)).getClass());
     }
 
-    private static Class validateIsArray(Class arrayClass) {
+    private static <T> Class<T> validateIsArray(final Class<T> arrayClass) {
         if (!arrayClass.isArray()) {
             throw new IllegalArgumentException("Class \"" + arrayClass.getSimpleName() + "\" is not an array type");
         }

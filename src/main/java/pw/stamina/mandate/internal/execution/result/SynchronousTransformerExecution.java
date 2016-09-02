@@ -1,5 +1,5 @@
 /*
- * Causam - A maximally decoupled event system for Java
+ * Mandate - A flexible annotation-based command parsing and execution system
  * Copyright (C) 2016 Foundry
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,13 @@
 
 package pw.stamina.mandate.internal.execution.result;
 
-import pw.stamina.mandate.api.execution.result.Execution;
-import pw.stamina.mandate.api.execution.result.ExitCode;
-import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.execution.executable.transformer.InvokerProxy;
+import pw.stamina.mandate.execution.ExecutionContext;
+import pw.stamina.mandate.execution.result.Execution;
+import pw.stamina.mandate.execution.result.ExitCode;
+import pw.stamina.mandate.internal.execution.executable.invoker.CommandInvoker;
 
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Foundry
@@ -31,12 +32,12 @@ import java.util.concurrent.*;
 public class SynchronousTransformerExecution implements Execution {
     private final ExitCode exitCode;
 
-    public SynchronousTransformerExecution(InvokerProxy invoker, IODescriptor io, Object[] args) {
+    public SynchronousTransformerExecution(final CommandInvoker invoker, final ExecutionContext executionContext, final Object[] args) {
         ExitCode exitCode;
         try {
-            exitCode = invoker.execute(io, args);
-        } catch (Exception e) {
-            io.err().write(String.format("Exception while executing method: %s", e));
+            exitCode = invoker.invoke(args);
+        } catch (final Exception e) {
+            executionContext.getIODescriptor().err().write(String.format("Exception while executing command: %s", e));
             exitCode = ExitCode.TERMINATED;
         }
         this.exitCode = exitCode;
@@ -48,7 +49,7 @@ public class SynchronousTransformerExecution implements Execution {
     }
 
     @Override
-    public ExitCode result(long timeout, TimeUnit unit) throws TimeoutException {
+    public ExitCode result(final long timeout, final TimeUnit unit) throws TimeoutException {
         return exitCode;
     }
 

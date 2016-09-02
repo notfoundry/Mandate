@@ -18,11 +18,14 @@
 
 package pw.stamina.mandate.internal.execution.parameter;
 
-import pw.stamina.mandate.api.annotations.meta.Usage;
-import pw.stamina.mandate.api.execution.CommandParameter;
+import pw.stamina.mandate.annotations.Implicit;
+import pw.stamina.mandate.annotations.meta.Usage;
+import pw.stamina.mandate.execution.parameter.CommandParameter;
+import pw.stamina.mandate.internal.utils.GenericResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -30,16 +33,18 @@ import java.util.Optional;
  * @author Foundry
  */
 class DeclaredCommandParameter implements CommandParameter {
+
     private final Parameter parameter;
+
     private final Class type;
 
-    DeclaredCommandParameter(Parameter parameter, Class type) {
+    DeclaredCommandParameter(final Parameter parameter, final Class type) {
         this.parameter = parameter;
         this.type = type;
     }
 
     @Override
-    public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+    public <A extends Annotation> A getAnnotation(final Class<A> annotationClass) {
         return this.parameter.getAnnotation(annotationClass);
     }
 
@@ -59,19 +64,29 @@ class DeclaredCommandParameter implements CommandParameter {
     }
 
     @Override
+    public boolean isImplicit() {
+        return getAnnotation(Implicit.class) != null;
+    }
+
+    @Override
     public String getDescription() {
-        Usage usage = getAnnotation(Usage.class);
+        final Usage usage = getAnnotation(Usage.class);
         return usage != null ? usage.usage() : "";
     }
 
     @Override
     public String getLabel() {
-        Usage usage = getAnnotation(Usage.class);
+        final Usage usage = getAnnotation(Usage.class);
         return usage != null ? usage.name() : parameter.getName();
     }
 
     @Override
+    public Type[] getTypeParameters() {
+        return GenericResolver.typeParametersOf(parameter.getParameterizedType());
+    }
+
+    @Override
     public String toString() {
-        return String.format("DeclaredCommandParameter{name=%s, type=%s, optional=%s, annotations=%s}", getLabel(), getType().getCanonicalName(), isOptional(), Arrays.toString(getAnnotations()));
+        return String.format("DeclaredCommandParameter{name=%s, type=%s, optional=%s, implicit=%s, annotations=%s}", getLabel(), getType().getCanonicalName(), isOptional(), isImplicit(), Arrays.toString(getAnnotations()));
     }
 }

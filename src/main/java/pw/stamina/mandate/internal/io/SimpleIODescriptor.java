@@ -18,9 +18,9 @@
 
 package pw.stamina.mandate.internal.io;
 
-import pw.stamina.mandate.api.io.CommandInput;
-import pw.stamina.mandate.api.io.CommandOutput;
-import pw.stamina.mandate.api.io.IODescriptor;
+import pw.stamina.mandate.io.CommandInput;
+import pw.stamina.mandate.io.CommandOutput;
+import pw.stamina.mandate.io.IODescriptor;
 
 /**
  * @author Foundry
@@ -30,7 +30,7 @@ public final class SimpleIODescriptor implements IODescriptor {
     private final CommandOutput out;
     private final CommandOutput err;
 
-    private SimpleIODescriptor(CommandInput in, CommandOutput out, CommandOutput err) {
+    public SimpleIODescriptor(final CommandInput in, final CommandOutput out, final CommandOutput err) {
         this.in = in;
         this.out = out;
         this.err = err;
@@ -49,9 +49,5 @@ public final class SimpleIODescriptor implements IODescriptor {
     @Override
     public CommandOutput err() {
         return err;
-    }
-
-    public static IODescriptor from(CommandInput in, CommandOutput out, CommandOutput err) {
-        return new SimpleIODescriptor(in, out, err);
     }
 }

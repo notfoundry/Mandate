@@ -42,7 +42,7 @@ public enum Primitives {
     private final Class wrapped;
     private final char jvmName;
 
-    Primitives(Class unwrapped, Class wrapped, char jvmName) {
+    <T> Primitives(final Class<T> unwrapped, final Class<T> wrapped, final char jvmName) {
         this.unwrapped = unwrapped;
         this.wrapped = wrapped;
         this.jvmName = jvmName;
@@ -60,19 +60,19 @@ public enum Primitives {
         return jvmName;
     }
 
-    public static Class wrap(Class unwrapped) {
+    public static <T> Class<T> wrap(final Class<T> unwrapped) {
         final Class wrapped = Primitives.UNWRAPPED_TO_WRAPPED.get(unwrapped);
         return (wrapped != null) ? wrapped : unwrapped;
     }
 
-    public static Class unwrap(Class wrapped) {
+    public static <T> Class<T> unwrap(final Class<T> wrapped) {
         final Class unwrapped = Primitives.WRAPPED_TO_UNWRAPPED.get(wrapped);
         return (unwrapped != null) ? unwrapped : wrapped;
     }
 
-    public static char jvmName(Class unwrapped) {
+    public static char jvmName(final Class<?> unwrapped) {
         if (unwrapped.isPrimitive()) {
-            for (Primitives p : values()) {
+            for (final Primitives p : values()) {
                 if (p.unwrapped == unwrapped) return p.jvmName;
             }
         }

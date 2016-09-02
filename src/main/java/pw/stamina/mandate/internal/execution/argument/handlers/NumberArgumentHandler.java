@@ -18,44 +18,59 @@
 
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
-import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.CommandParameter;
-import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.api.execution.argument.CommandArgument;
+import pw.stamina.mandate.execution.CommandContext;
+import pw.stamina.mandate.execution.argument.ArgumentHandler;
+import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
 import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
 import pw.stamina.mandate.internal.utils.Primitives;
-import pw.stamina.parsor.api.parsing.ParseException;
-import pw.stamina.parsor.internal.parsers.NumberParser;
+import pw.stamina.mandate.parsing.InputParsingException;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /**
  * @author Foundry
  */
 public final class NumberArgumentHandler implements ArgumentHandler<Number> {
 
+    private static final Predicate<String> HEX_VALIDATOR_PREDICATE = Pattern.compile("^(-|\\+)?(0x|0X|#)[a-fA-F0-9]+$").asPredicate();
+
+    private static final Predicate<String> OCTAL_VALIDATOR_PREDICATE = Pattern.compile("^(-|\\+)?0[1-7][0-7]*$").asPredicate();
+
+    private static final Map<Class<? extends Number>, Function<String, ? extends Number>> NUMBER_DECODERS;
+
     @Override
-    public final Number parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        Class<? extends Number> numberClass; NumberParser parser; Number resultNumber = (parser = new NumberParser((numberClass = Primitives.wrap(parameter.getType())))).parse(input.getRaw());
+    public final Number parse(final CommandArgument input, final CommandParameter parameter, final CommandContext commandContext) throws InputParsingException {
+        @SuppressWarnings("unchecked")
+        final Class<? extends Number> numberClass = (Class<? extends Number>) Primitives.wrap(parameter.getType());
+        Number resultNumber = parseNumber(input.getRaw(), numberClass);
 
         if (numberClass == Float.class || numberClass == Double.class) {
             final RealClamp realClamp = parameter.getAnnotation(RealClamp.class);
             if (realClamp != null) {
-                double min = Math.min(realClamp.min(), realClamp.max());
-                double max = Math.max(realClamp.min(), realClamp.max());
-                if (!Double.isNaN(min) && resultNumber.doubleValue() < min) {
+                final double min, max;
+                if (!Double.isNaN((min = Math.min(realClamp.min(), realClamp.max()))) && resultNumber.doubleValue() < min) {
                     resultNumber = (numberClass == Float.class ? (float) min : min);
-                } else if (!Double.isNaN(max) && resultNumber.doubleValue() > max) {
+                } else if (!Double.isNaN((max = Math.max(realClamp.min(), realClamp.max()))) && resultNumber.doubleValue() > max) {
                     resultNumber = (numberClass == Float.class ? (float) max : max);
                 }
             }
         } else {
             final IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
             if (intClamp != null) {
-                Long min, max;
+                final Long min, max;
                 if (resultNumber.longValue() < (min = Math.min(intClamp.min(), intClamp.max()))) {
-                    resultNumber = parser.parse(min.toString());
+                    resultNumber = parseNumber(min.toString(), numberClass);
                 } else if (resultNumber.longValue() > (max = (Math.max(intClamp.min(), intClamp.max())))) {
-                    resultNumber = parser.parse(max.toString());
+                    resultNumber = parseNumber(max.toString(), numberClass);
                 }
             }
         }
@@ -63,23 +78,26 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
     }
 
     @Override
-    public final String getSyntax(CommandParameter parameter) {
-        Class<? extends Number> numberClass; String suffix, prefix = (numberClass = Primitives.wrap(parameter.getType())).getSimpleName();
+    public final String getSyntax(final CommandParameter parameter) {
+        final Class<? extends Number> numberClass; final String suffix;
+        @SuppressWarnings("unchecked")
+        final String prefix = (numberClass = Primitives.wrap((Class<? extends Number>) parameter.getType())).getSimpleName();
+
         if (numberClass == Float.class || numberClass == Double.class) {
-            RealClamp realClamp = parameter.getAnnotation(RealClamp.class);
+            final RealClamp realClamp = parameter.getAnnotation(RealClamp.class);
             if (realClamp == null) {
                 return parameter.getLabel() + " - " + prefix;
             }
-            double min = Math.min(realClamp.min(), realClamp.max());
-            double max = Math.max(realClamp.min(), realClamp.max());
+            final double min = Math.min(realClamp.min(), realClamp.max());
+            final double max = Math.max(realClamp.min(), realClamp.max());
             suffix = !Double.isNaN(min) && !Double.isNaN(max) ? String.format("%s-%s", min, max) : (!Double.isNaN(min) ? ">" + min : (!Double.isNaN(max) ? "<" + max : "?"));
         } else {
-            IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
+            final IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
             if (intClamp == null) {
                 return parameter.getLabel() + " - " + prefix;
             }
-            long min = Math.min(intClamp.min(), intClamp.max());
-            long max = Math.max(intClamp.min(), intClamp.max());
+            final long min = Math.min(intClamp.min(), intClamp.max());
+            final long max = Math.max(intClamp.min(), intClamp.max());
             suffix = Long.MIN_VALUE != min && Long.MAX_VALUE != max ? String.format("%s-%s", min, max) : (Long.MIN_VALUE != min ? ">" + min : (Long.MAX_VALUE != max ? "<" + max : "?"));
         }
         return parameter.getLabel() + " - " + String.format("%s[%s]", prefix, suffix);
@@ -88,5 +106,53 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
     @Override
     public Class[] getHandledTypes() {
         return new Class[] {Number.class};
+    }
+
+    private static <R extends Number> R parseNumber(final String input, final Class<R> numberClass) throws InputParsingException {
+        try {
+            final Function<String, ? extends Number> decoder = NUMBER_DECODERS.get(numberClass);
+            return numberClass.cast(decoder.apply(input));
+        } catch (final NumberFormatException e) {
+            throw new InputParsingException(String.format("'%s' cannot be parsed to a(n) %s", input, numberClass.getCanonicalName()), e);
+        }
+    }
+
+    private static Double decodeDouble(final String input) throws NumberFormatException {
+        return (HEX_VALIDATOR_PREDICATE.test(input) || OCTAL_VALIDATOR_PREDICATE.test(input))
+                ? Long.decode(input).doubleValue()
+                : Double.valueOf(input);
+    }
+
+    private static Float decodeFloat(final String input) throws NumberFormatException {
+        return (HEX_VALIDATOR_PREDICATE.test(input) || OCTAL_VALIDATOR_PREDICATE.test(input))
+                ? Integer.decode(input).floatValue()
+                : Float.valueOf(input);
+    }
+
+    private static BigInteger decodeBigInteger(final String input) throws NumberFormatException {
+        return HEX_VALIDATOR_PREDICATE.test(input)
+                ? new BigInteger((input.charAt(0) == '0' ? input.substring(2) : input.substring(1)), 16)
+                : new BigInteger(input, (OCTAL_VALIDATOR_PREDICATE.test(input) ? 8 : 10));
+    }
+
+    private static BigDecimal decodeBigDecimal(final String input) throws NumberFormatException {
+        return HEX_VALIDATOR_PREDICATE.test(input)
+                ? new BigDecimal(new BigInteger((input.charAt(0) == '0' ? input.substring(2) : input.substring(1)), 16))
+                : (OCTAL_VALIDATOR_PREDICATE.test(input)
+                ? new BigDecimal(new BigInteger(input, 8))
+                : new BigDecimal(input));
+    }
+
+    static {
+        final Map<Class<? extends Number>, Function<String, ? extends Number>> decoders = new HashMap<>();
+        decoders.put(Byte.class, Byte::decode);
+        decoders.put(Short.class, Short::decode);
+        decoders.put(Integer.class, Integer::decode);
+        decoders.put(Long.class, Long::decode);
+        decoders.put(Double.class, NumberArgumentHandler::decodeDouble);
+        decoders.put(Float.class, NumberArgumentHandler::decodeFloat);
+        decoders.put(BigInteger.class, NumberArgumentHandler::decodeBigInteger);
+        decoders.put(BigDecimal.class, NumberArgumentHandler::decodeBigDecimal);
+        NUMBER_DECODERS = Collections.unmodifiableMap(decoders);
     }
 }

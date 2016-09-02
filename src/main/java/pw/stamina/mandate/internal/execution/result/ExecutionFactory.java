@@ -18,47 +18,17 @@
 
 package pw.stamina.mandate.internal.execution.result;
 
-import pw.stamina.mandate.api.execution.result.Execution;
-import pw.stamina.mandate.api.io.IODescriptor;
-import pw.stamina.mandate.internal.execution.executable.transformer.InvokerProxy;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import pw.stamina.mandate.execution.ExecutionContext;
+import pw.stamina.mandate.execution.result.Execution;
+import pw.stamina.mandate.internal.execution.executable.invoker.CommandInvoker;
 
 /**
  * @author Foundry
  */
 public final class ExecutionFactory {
-
-    private static final Map<Class<?>, Function<Object, Function<Object, Function<IODescriptor, Function<Object[], Function<Boolean, Execution>>>>>> EXECUTION_SUPPLIERS;
-
     private ExecutionFactory() {}
 
-    public static <T> Execution makeExecution(T executable, Object parent, IODescriptor io, Object[] args, boolean parallel) {
-        Execution execution; Class<?> executableClass;
-        Function<Object, Function<Object, Function<IODescriptor, Function<Object[], Function<Boolean, Execution>>>>> lookup;
-        if ((lookup = EXECUTION_SUPPLIERS.get((executableClass = executable.getClass()))) == null) {
-            for (Map.Entry<Class<?>, Function<Object, Function<Object, Function<IODescriptor, Function<Object[], Function<Boolean, Execution>>>>>> e : EXECUTION_SUPPLIERS.entrySet()) {
-                if (e.getKey().isAssignableFrom(executableClass)) {
-                    lookup = e.getValue();
-                    break;
-                }
-            }
-            if (lookup == null) {
-                throw new IllegalArgumentException("Executables of type '" + executable.getClass().getCanonicalName() + "' are not supported at this time");
-            }
-        }
-        return lookup.apply(executable).apply(parent).apply(io).apply(args).apply(parallel);
-    }
-
-    static {
-        Map<Class<?>, Function<Object, Function<Object, Function<IODescriptor, Function<Object[], Function<Boolean, Execution>>>>>> suppliers = new HashMap<>();
-        suppliers.put(InvokerProxy.class, executable -> parent -> io -> args -> async -> {
-            return (async
-                    ? new AsynchronousTransformerExecution((InvokerProxy) executable, io, args)
-                    : new SynchronousTransformerExecution((InvokerProxy) executable, io, args));
-        });
-        EXECUTION_SUPPLIERS = suppliers;
+    public static Execution makeExecution(CommandInvoker invoker, ExecutionContext executionContext, Object[] parsedArguments, boolean parallel) {
+        return (parallel) ? new AsynchronousInvokerExecution(invoker, executionContext, parsedArguments) : new SynchronousTransformerExecution(invoker, executionContext, parsedArguments);
     }
 }

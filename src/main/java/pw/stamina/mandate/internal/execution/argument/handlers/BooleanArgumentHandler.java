@@ -18,25 +18,29 @@
 
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
-import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.CommandParameter;
-import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.parsor.api.parsing.ParseException;
-import pw.stamina.parsor.internal.parsers.singletons.BooleanParser;
+import pw.stamina.mandate.execution.CommandContext;
+import pw.stamina.mandate.execution.argument.ArgumentHandler;
+import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.execution.parameter.CommandParameter;
+import pw.stamina.mandate.parsing.InputParsingException;
+
+import java.util.*;
 
 /**
  * @author Foundry
  */
 public final class BooleanArgumentHandler implements ArgumentHandler<Boolean> {
 
+    private static final Map<String, Boolean> BOOLEAN_LOOKUPS;
+
     @Override
-    public Boolean parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        return BooleanParser.get().parse(input.getRaw());
+    public Boolean parse(final CommandArgument input, final CommandParameter parameter, final CommandContext commandContext) throws InputParsingException {
+        return Optional.ofNullable(BOOLEAN_LOOKUPS.get(input.getRaw().toLowerCase()))
+                .orElseThrow(() -> new InputParsingException(String.format("'%s' cannot be parsed to a boolean.", input)));
     }
 
     @Override
-    public String getSyntax(CommandParameter parameter) {
+    public String getSyntax(final CommandParameter parameter) {
         return parameter.getLabel() + " - " + "Boolean";
     }
 
@@ -45,5 +49,11 @@ public final class BooleanArgumentHandler implements ArgumentHandler<Boolean> {
         return new Class[] {Boolean.class};
     }
 
+    static {
+        final HashMap<String, Boolean> lookups = new HashMap<>();
+        Arrays.asList("enable", "true", "yes", "on", "1").forEach(x -> lookups.put(x, true));
+        Arrays.asList("disable", "false", "off", "no", "0").forEach(x -> lookups.put(x, false));
+        BOOLEAN_LOOKUPS = Collections.unmodifiableMap(lookups);
+    }
 }
 

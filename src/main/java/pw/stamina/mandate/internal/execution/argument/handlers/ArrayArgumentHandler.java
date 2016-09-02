@@ -18,22 +18,21 @@
 
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
-import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.CommandParameter;
-import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.api.execution.argument.CommandArgument;
+import pw.stamina.mandate.execution.CommandContext;
+import pw.stamina.mandate.execution.parameter.CommandParameter;
+import pw.stamina.mandate.execution.argument.ArgumentHandler;
+import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.parsing.InputParsingException;
 import pw.stamina.mandate.internal.annotations.Length;
-import pw.stamina.mandate.internal.execution.argument.ArgumentParseException;
-import pw.stamina.mandate.internal.execution.argument.CommandArgumentFactory;
+import pw.stamina.mandate.internal.execution.argument.ArgumentParsingException;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
-import pw.stamina.parsor.api.parsing.ParseException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Foundry
@@ -41,13 +40,12 @@ import java.util.Optional;
 public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
 
     @Override
-    public Object parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        @SuppressWarnings("unchecked")
-        Optional<ArgumentHandler> handlerLookup = commandManager.findArgumentHandler((Class) parameter.getType().getComponentType());
-        if (!handlerLookup.isPresent()) throw new ArgumentParseException("", parameter.getType().getComponentType(), "");
+    public Object parse(final CommandArgument input, final CommandParameter parameter, final CommandContext commandContext) throws InputParsingException {
+        final ArgumentHandler<?> handlerLookup = commandContext.getArgumentHandlers().findArgumentHandler((Class<?>) (Class) parameter.getType().getComponentType())
+                .orElseThrow(() -> new ArgumentParsingException(String.format("%s is not a supported parameter type", parameter.getType().getComponentType())));
 
-        List<String> rawComponents = new ArrayList<>();
-        StringBuilder rawComponent = new StringBuilder();
+        final List<String> rawComponents = new ArrayList<>();
+        final StringBuilder rawComponent = new StringBuilder(input.getRaw().length());
 
         char[] inputChars; boolean escaped = false, quoted = false; int depth = 0;
         for (int idx = 1; idx < (inputChars = input.getRaw().toCharArray()).length - 1; idx++) {
@@ -64,12 +62,14 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
                         quoted = !quoted;
                         break;
                     }
+                    case '}':   //fall through
                     case ']':
                         if (!quoted) {
                             depth--;
                         }
                         rawComponent.append(inputChars[idx]);
                         break;
+                    case '{':    //fall through
                     case '[':
                         if (!quoted) {
                             depth++;
@@ -91,7 +91,7 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
                     case ' ': {
                         if (!quoted && depth == 0) {
                             if (inputChars[idx - 1] != ' ' && inputChars[idx - 1] != ',') {
-                                throw new ArgumentParseException("", parameter.getType().getComponentType(), "Array element at position " + idx + " is separated by space, but not comma delimited");
+                                throw new ArgumentParsingException("Array element at position " + idx + " is separated by space, but not comma delimited");
                             } else {
                                 idx++;
                                 break;
@@ -111,31 +111,31 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
             rawComponent.setLength(0);
         }
 
-        Length length = parameter.getAnnotation(Length.class);
+        final Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
-            int min = Math.min(length.min(), length.max());
-            int max = Math.max(length.min(), length.max());
+            final int min = Math.min(length.min(), length.max());
+            final int max = Math.max(length.min(), length.max());
             if (rawComponents.size() < min) {
-                throw new ArgumentParseException(input.getRaw(), parameter.getType(), String.format("'%s' is too short: length can be between %d-%d elements", input.getRaw(), min, max));
+                throw new ArgumentParsingException(String.format("'%s' is too short: length can be between %d-%d elements", input.getRaw(), min, max));
             } else if (rawComponents.size() > max) {
-                throw new ArgumentParseException(input.getRaw(), parameter.getType(), String.format("'%s' is too long: length can be between %d-%d elements", input.getRaw(), min, max));
+                throw new ArgumentParsingException(String.format("'%s' is too long: length can be between %d-%d elements", input.getRaw(), min, max));
             }
         }
 
-        Object resultArray = Array.newInstance(parameter.getType().getComponentType(), rawComponents.size());
+        final Object resultArray = Array.newInstance(parameter.getType().getComponentType(), rawComponents.size());
         for (int i = 0; i < rawComponents.size(); i++) {
-            Array.set(resultArray, i, handlerLookup.get().parse(CommandArgumentFactory.newArgument(rawComponents.get(i)), new ArrayProxyCommandParameter(parameter), commandManager));
+            Array.set(resultArray, i, handlerLookup.parse(commandContext.getCommandConfiguration().getArgumentCreationStrategy().newArgument(rawComponents.get(i)), new ArrayProxyCommandParameter(parameter), commandContext));
         }
         return resultArray;
     }
 
     @Override
-    public String getSyntax(CommandParameter parameter) {
-        Length length = parameter.getAnnotation(Length.class);
+    public String getSyntax(final CommandParameter parameter) {
+        final Length length = parameter.getAnnotation(Length.class);
         if (length != null) {
-            return parameter.getLabel() + " - " + String.format("Array(%s%s)[length=%d-%d]", parameter.getType().getSimpleName(), String.join("", Collections.nCopies(PrimitiveArrays.getDimensions(parameter.getType()).length, "[]")), Math.min(length.min(), length.max()), Math.max(length.min(), length.max()));
+            return parameter.getLabel() + " - " + String.format("Array(%s%s)[length=%d-%d]", parameter.getType().getComponentType().getSimpleName(), String.join("", Collections.nCopies(PrimitiveArrays.getDimensions(parameter.getType()).length, "[]")), Math.min(length.min(), length.max()), Math.max(length.min(), length.max()));
         }
-        return parameter.getLabel() + " - " + String.format("Array(%s%s)", parameter.getType().getSimpleName(), String.join("", Collections.nCopies(PrimitiveArrays.getDimensions(parameter.getType()).length, "[]")));
+        return parameter.getLabel() + " - " + String.format("Array(%s%s)", parameter.getType().getComponentType().getSimpleName(), String.join("", Collections.nCopies(PrimitiveArrays.getDimensions(parameter.getType()).length, "[]")));
     }
 
     @Override
@@ -146,12 +146,12 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
     private static class ArrayProxyCommandParameter implements CommandParameter {
         private final CommandParameter backingParameter;
 
-        ArrayProxyCommandParameter(CommandParameter backingParameter) {
+        ArrayProxyCommandParameter(final CommandParameter backingParameter) {
             this.backingParameter = backingParameter;
         }
 
         @Override
-        public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+        public <A extends Annotation> A getAnnotation(final Class<A> annotationClass) {
             return backingParameter.getAnnotation(annotationClass);
         }
 
@@ -166,8 +166,18 @@ public final class ArrayArgumentHandler implements ArgumentHandler<Object> {
         }
 
         @Override
+        public Type[] getTypeParameters() {
+            return new Type[0]; //arrays cannot have type parameters
+        }
+
+        @Override
         public boolean isOptional() {
             return backingParameter.isOptional();
+        }
+
+        @Override
+        public boolean isImplicit() {
+            return backingParameter.isImplicit();
         }
 
         @Override

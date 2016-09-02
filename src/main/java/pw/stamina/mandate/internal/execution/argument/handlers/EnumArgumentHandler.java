@@ -18,30 +18,33 @@
 
 package pw.stamina.mandate.internal.execution.argument.handlers;
 
-import pw.stamina.mandate.api.CommandManager;
-import pw.stamina.mandate.api.execution.CommandParameter;
-import pw.stamina.mandate.api.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.api.execution.argument.CommandArgument;
-import pw.stamina.parsor.api.parsing.ParseException;
-import pw.stamina.parsor.internal.parsers.EnumParser;
+import pw.stamina.mandate.execution.CommandContext;
+import pw.stamina.mandate.execution.argument.ArgumentHandler;
+import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.execution.parameter.CommandParameter;
+import pw.stamina.mandate.parsing.InputParsingException;
 
 import java.util.Arrays;
 
 /**
  * @author Foundry
  */
-public final class EnumArgumentHandler implements ArgumentHandler<Enum> {
+public final class EnumArgumentHandler implements ArgumentHandler<Enum<?>> {
 
     @Override
-    public Enum parse(CommandArgument input, CommandParameter parameter, CommandManager commandManager) throws ParseException {
-        @SuppressWarnings("unchecked")
-        EnumParser<? extends Enum> parser = EnumParser.of((Class<? extends Enum>) parameter.getType(), Enum::toString);
-        return parser.parse(input.getRaw());
+    public Enum<?> parse(final CommandArgument input, final CommandParameter parameter, final CommandContext commandContext) throws InputParsingException {
+        final String lookupString = input.getRaw().toLowerCase();
+        for (final Enum<?> constant : (Enum<?>[]) parameter.getType().getEnumConstants()) {
+            if (constant.name().toLowerCase().equals(lookupString) || constant.toString().equals(lookupString)) {
+                return constant;
+            }
+        }
+        throw new InputParsingException(String.format("'%s' is not a valid constant in enumeration %s", input.getRaw(), parameter.getType().getCanonicalName()));
     }
 
     @Override
-    public String getSyntax(CommandParameter parameter) {
-        String constantsString = Arrays.toString(parameter.getType().getEnumConstants());
+    public String getSyntax(final CommandParameter parameter) {
+        final String constantsString = Arrays.toString(parameter.getType().getEnumConstants());
         return parameter.getLabel() + " - " + "one of " + constantsString.substring(1, constantsString.length() - 1);
     }
 
