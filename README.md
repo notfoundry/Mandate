@@ -1,6 +1,7 @@
 ##A fluent command processing, in the spirit of POSIX
 
 [![Build Status](https://travis-ci.org/foundry27/Mandate.svg?branch=master)](https://travis-ci.org/foundry27/Mandate)
+[![codecov](https://codecov.io/gh/foundry27/Mandate/branch/master/graph/badge.svg)](https://codecov.io/gh/foundry27/Mandate)
 
 ###What is it?
 Mandate provides an API for using annotated method definitions to parse user input as *commands*, similar to GNU's getopt except with integrated functionality for defining, searching for, executing, and linking the commands to which that input is presented.
