@@ -116,13 +116,3 @@ Mandate has built-in support for:
   * Sets of any kind
   * Lists of any kind
   * Maps mapping values of one kind to those of another
-
-###Dependencies
-Mandate requires ObjectWeb ASM 3.0+, which Maven users can integrate with this dependency:
-```xml
-<dependency>
-    <groupId>org.ow2.asm</groupId>
-    <artifactId>asm</artifactId>
-    <version>5.1</version>
-</dependency>
-```
