@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import pw.stamina.mandate.execution.result.ExitCode;
 import pw.stamina.mandate.internal.execution.parameter.UnsupportedParameterException;
 
 /**
- * @author Foundry
+ * @author Mark Johnson
  */
 public class OverlappingCommandFlagTestSuite {
 

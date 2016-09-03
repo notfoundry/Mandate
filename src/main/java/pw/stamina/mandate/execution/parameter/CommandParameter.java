@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
  * CommandParameters should provide enough information for an argument parsing system to successful determine the reified object type that this parameter
  * is targeting, whether this parameter is a wrapped {@link java.util.Optional Optional} value, and if this parameter is a flag
  *
- * @author Foundry
+ * @author Mark Johnson
  */
 public interface CommandParameter extends AnnotatedElement {
 

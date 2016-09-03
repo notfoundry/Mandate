@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import java.util.Optional;
 import java.util.Queue;
 
 /**
- * @author Foundry
+ * @author Mark Johnson
  */
 public class OptionalCommandArgumentTestSuite {
     private final Queue<Object> commandErrors = new ArrayDeque<>();

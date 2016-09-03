@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package pw.stamina.mandate.internal.io.streams;
 import pw.stamina.mandate.io.CommandOutput;
 
 /**
- * @author Foundry
+ * @author Mark Johnson
  */
 public enum StandardOutputStream implements CommandOutput {
     INSTANCE;

@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * An command that can be executed with a stack of arguments and an {@link IODescriptor IODescriptor}, providing an {@link pw.stamina.mandate.execution.result.ExitCode ExitCode} as a result of that execution
  *
- * @author Foundry
+ * @author Mark Johnson
  */
 public interface CommandExecutable {
 

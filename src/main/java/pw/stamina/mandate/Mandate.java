@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import pw.stamina.mandate.internal.io.SimpleIOBuilder;
  * factory methods in this class, which serve to either give default CommandContext implementations or implementations with the specified suppliers
  * of CommandInput and CommandOutput objects for the input, output, and error streams of running commands.
  *
- * @author Foundry
+ * @author Mark Johnson
  */
 public final class Mandate {
 

@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * This should be used in conjunction with the {@link Syntax Syntax} annotation to define the
  * base command that this executable should be linked to.
  *
- * @author Foundry
+ * @author Mark Johnson
  */
 @Target(value=ElementType.METHOD)
 @Retention(value=RetentionPolicy.RUNTIME)

@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import pw.stamina.mandate.execution.argument.CommandArgumentCreationStrategy;
 import java.util.Deque;
 
 /**
- * @author Foundry
+ * @author Mark Johnson
  */
 public interface InputTokenizationStrategy {
     Deque<CommandArgument> parse(String input, CommandArgumentCreationStrategy argumentCreationStrategy) throws InputTokenizationException;

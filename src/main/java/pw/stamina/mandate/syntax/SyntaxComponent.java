@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import java.util.Set;
  * This serves as a general contract for what a syntax component should know about itself
  * and its environment
  *
- * @author Foundry
+ * @author Mark Johnson
  */
 public interface SyntaxComponent {
 

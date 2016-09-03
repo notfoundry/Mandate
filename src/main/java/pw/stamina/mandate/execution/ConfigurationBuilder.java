@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import pw.stamina.mandate.parsing.InputTokenizationStrategy;
 import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
 
 /**
- * @author Foundry
+ * @author Mark Johnson
  */
 public interface ConfigurationBuilder {
     ConfigurationBuilder usingSyntaxCreationStrategy(SyntaxComponentCreationStrategy syntaxComponentCreationStrategy);

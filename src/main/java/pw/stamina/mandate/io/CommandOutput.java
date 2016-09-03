@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2016 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ package pw.stamina.mandate.io;
  * This is generally used to allow commands to print messages as they run, giving them an incredibly
  * uncomplicated interface for doing so through the {@link CommandOutput#write(Object) write} method
  *
- * @author Foundry
+ * @author Mark Johnson
  */
 @FunctionalInterface
 public interface CommandOutput {
