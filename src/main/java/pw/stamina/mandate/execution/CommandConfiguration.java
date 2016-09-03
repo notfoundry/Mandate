@@ -26,6 +26,9 @@ import pw.stamina.mandate.parsing.InputTokenizationStrategy;
 import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
 
 /**
+ * A configuration object that a {@link CommandContext CommandContext} may use to determine how various parts of the
+ * command registration, linkage, and execution processes should proceed.
+ *
  * @author Mark Johnson
  */
 public interface CommandConfiguration {

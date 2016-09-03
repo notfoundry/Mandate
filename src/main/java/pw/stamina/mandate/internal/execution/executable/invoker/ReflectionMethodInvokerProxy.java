@@ -21,6 +21,8 @@ package pw.stamina.mandate.internal.execution.executable.invoker;
 import pw.stamina.mandate.execution.result.ExitCode;
 
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * @author Mark Johnson
@@ -34,6 +36,10 @@ public class ReflectionMethodInvokerProxy implements CommandInvoker {
     public ReflectionMethodInvokerProxy(final Method backingMethod, final Object methodParent) {
         this.backingMethod = backingMethod;
         this.methodParent = methodParent;
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            this.backingMethod.setAccessible(true);
+            return null;
+        });
     }
 
     @Override
