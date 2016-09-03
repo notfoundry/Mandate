@@ -25,6 +25,18 @@
     <groupId>pw.stamina</groupId>
     <artifactId>mandate</artifactId>
     <version>2.0.4</version>
+    <packaging>jar</packaging>
+
+    <name>Mandate</name>
+    <description>A fluent command processing system, in the spirit of POSIX</description>
+    <url>https://github.com/foundry27/Mandate</url>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+        </license>
+    </licenses>
 
     <dependencies>
         <dependency>
@@ -68,6 +80,20 @@
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
