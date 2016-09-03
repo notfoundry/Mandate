@@ -34,7 +34,7 @@ public interface CommandInput {
      * This method may block while waiting for input
      *
      * @return the next complete token from this input stream
-     * @throws IOException
+     * @throws IOException if there was an exception reading the input
      */
     String read() throws IOException;
 }

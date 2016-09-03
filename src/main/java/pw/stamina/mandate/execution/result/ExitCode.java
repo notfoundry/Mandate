@@ -22,10 +22,12 @@ package pw.stamina.mandate.execution.result;
  * An enumeration of the possible exit codes for a command
  * <p>
  * All commands annotated as {@link pw.stamina.mandate.annotations.Executes executes} must return one of these constant values.
+ * <ul>
  * <li>{@link #SUCCESS SUCCESS}</li>
  * <li>{@link #FAILURE FAILURE}</li>
  * <li>{@link #TERMINATED TERMINATED}</li>
  * <li>{@link #INVALID INVALID}</li>
+ * </ul>
  *
  * @author Mark Johnson
  */

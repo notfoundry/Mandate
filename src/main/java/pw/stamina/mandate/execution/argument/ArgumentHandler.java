@@ -40,7 +40,7 @@ public interface ArgumentHandler<T> {
      * @param parameter the parameter for which the input should be parsed to an argument
      * @param commandContext the command manager that this handler is registered to
      * @return a parsed argument of type T, guaranteed to be compatible with the provided CommandParameter
-     * @throws InputParsingException
+     * @throws InputParsingException if the provided input could not be parsed to a value matching the provided parameter
      */
     T parse(CommandArgument input, CommandParameter parameter, CommandContext commandContext) throws InputParsingException;
 

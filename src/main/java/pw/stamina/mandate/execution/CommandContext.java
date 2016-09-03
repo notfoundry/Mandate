@@ -41,8 +41,10 @@ public interface CommandContext {
      * Registers all correctly defined commands in the specified container object
      * <p>
      * A command method is considered to be correctly defined if either of these requirements are met:
+     *  <ul>
      *  <li>It is flagged as an {@link pw.stamina.mandate.annotations.Executes executor} and has its own specific {@link Syntax Syntax} annotation</li>
      *  <li>It is flagged as an {@link pw.stamina.mandate.annotations.Executes executor} and its containing class has a global {@link Syntax Syntax} annotation</li>
+     *  </ul>
      *  <p>
      *  If duplicate commands exist in a registered container, a CommandContext implementation should take steps to prevent those commands from being re-added to the
      *  command registry
@@ -72,6 +74,7 @@ public interface CommandContext {
      * this will return an {@link Execution execution} corresponding to the evaluated command running possibly asynchronously
      *
      * @param input the input to be tokenized and parsed as a command and its arguments
+     * @param descriptor the IODescriptor to use for the terminating command in this execution
      * @return a running execution if the invocation completed without errors, else a completed execution with an exit code of INVALID
      */
     Execution execute(String input, IODescriptor descriptor);

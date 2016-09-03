@@ -46,7 +46,10 @@ public interface Execution {
      * Waits if necessary for at most the given time for the computation
      * to complete, and then retrieves its result, if available.
      *
+     * @param timeout how long, in the provided timeunit, to wait for the execution to finish
+     * @param unit the unit of time in which the timeout is presented
      * @return the terminal exit code delivered by the executed command
+     * @throws TimeoutException if the execution times out before returning a result
      */
     ExitCode result(long timeout, TimeUnit unit) throws TimeoutException;
 
@@ -56,7 +59,7 @@ public interface Execution {
      * This attempt will fail if the task has already completed, has already been cancelled,
      * or could not be cancelled for some other reason.
      * <p>
-     * If successful, and this task has not started when {@link Execution#kill kill} is called,
+     * If successful, and this task has not started when this method is called,
      * this task should never run.
      *
      * @return {@code false} if the execution could not be cancelled,
