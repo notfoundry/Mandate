@@ -111,24 +111,26 @@ public class SetArgumentHandler implements ArgumentHandler<Set<?>> {
             rawComponent.setLength(0);
         }
 
-        final Length length = parameter.getAnnotation(Length.class);
-        if (length != null) {
-            final int min = Math.min(length.min(), length.max());
-            final int max = Math.max(length.min(), length.max());
-            if (rawComponents.size() < min) {
-                throw new ArgumentParsingException(String.format("'%s' is too short: length can be between %d-%d elements", input.getRaw(), min, max));
-            } else if (rawComponents.size() > max) {
-                throw new ArgumentParsingException(String.format("'%s' is too long: length can be between %d-%d elements", input.getRaw(), min, max));
-            }
-        }
-
         final Type[] resolutionTypes = getTypeParameters(typeParameters[0]);
-        return rawComponents.stream()
+        final Set<?> reifiedComponents = rawComponents.stream()
                 .map(component -> (Object) handlerLookup.parse(
                         commandContext.getCommandConfiguration().getArgumentCreationStrategy().newArgument(component),
                         new SetProxyCommandParameter(parameter, resolutionTypes),
                         commandContext)
                 ).collect(Collectors.toSet());
+
+        final Length length = parameter.getAnnotation(Length.class);
+        if (length != null) {
+            final int min = Math.min(length.min(), length.max());
+            final int max = Math.max(length.min(), length.max());
+            if (reifiedComponents.size() < min) {
+                throw new ArgumentParsingException(String.format("'%s' is too short: length can be between %d-%d elements", input.getRaw(), min, max));
+            } else if (reifiedComponents.size() > max) {
+                throw new ArgumentParsingException(String.format("'%s' is too long: length can be between %d-%d elements", input.getRaw(), min, max));
+            }
+        }
+
+        return reifiedComponents;
 
     }
 
