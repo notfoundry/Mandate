@@ -39,7 +39,7 @@ import java.util.Queue;
 /**
  * @author Mark Johnson
  */
-@Syntax(tree = "foo")
+@Syntax(root = "foo")
 public class ClassSyntaxOverrideTestSuite {
     private final Queue<Object> commandErrors = new ArrayDeque<>();
 
@@ -84,7 +84,7 @@ public class ClassSyntaxOverrideTestSuite {
     }
 
     @Executes
-    @Syntax(tree = {"sum", "add"})
+    @Syntax(root = {"sum", "add"})
     public ExitCode sum(@Implicit final IODescriptor io, final int augend, final int addend) {
         io.out().write(augend + addend);
         return ExitCode.SUCCESS;

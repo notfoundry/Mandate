@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * @author Mark Johnson
  */
-@Syntax(tree = "implicit")
+@Syntax(root = "implicit")
 public class ImplicitArgumentsTestSuite {
 
     private final Queue<Object> commandErrors = new ArrayDeque<>();

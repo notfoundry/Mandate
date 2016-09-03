@@ -94,7 +94,7 @@ public class CommandFlagTestSuite {
     }
 
     @Executes
-    @Syntax(tree = "greet")
+    @Syntax(root = "greet")
     public ExitCode doGreeting(@Implicit final IODescriptor io,
                                @AutoFlag(flag = {"-caps"}) final boolean useCaps,
                                @UserFlag(flag = {"-recipient"}, elsedef = "someone") final String recipient,

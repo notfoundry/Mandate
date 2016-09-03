@@ -48,7 +48,7 @@ public class ImmutableSyntaxComponentDecorator implements SyntaxComponent {
 
     @Override
     public void addChild(final SyntaxComponent component) {
-        throw new UnsupportedOperationException("Syntax components cannot be manually added to an existing syntax tree");
+        throw new UnsupportedOperationException("Syntax components cannot be manually added to an existing syntax root");
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ImmutableSyntaxComponentDecorator implements SyntaxComponent {
 
     @Override
     public void addExecutable(final CommandExecutable executable) {
-        throw new UnsupportedOperationException("Executable components cannot be manually added to an existing syntax tree");
+        throw new UnsupportedOperationException("Executable components cannot be manually added to an existing syntax root");
     }
 
     @Override

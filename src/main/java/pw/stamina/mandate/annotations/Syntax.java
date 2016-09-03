@@ -47,5 +47,5 @@ public @interface Syntax {
      *
      * @return the base components of the syntax tree for the target command(s)
      */
-    String[] tree() default {};
+    String[] root() default {};
 }

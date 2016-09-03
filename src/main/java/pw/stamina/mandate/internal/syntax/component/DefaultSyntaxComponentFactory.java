@@ -48,13 +48,13 @@ public enum DefaultSyntaxComponentFactory implements SyntaxComponentCreationStra
 
         if ((tree = treeifySubSyntax(backingMethod.getDeclaredAnnotation(Executes.class).tree())).length > 0) {
             addSubSyntax(
-                    (parents = Arrays.stream(syntax.tree())
+                    (parents = Arrays.stream(syntax.root())
                             .map(BaseSyntaxComponent::new)
                             .collect(Collectors.toCollection(LinkedHashSet::new))
             ), tree, 0, commandContext.getCommandConfiguration().getExecutableCreationStrategy().newExecutable(backingMethod, container, commandContext));
         } else {
             final CommandExecutable executable = commandContext.getCommandConfiguration().getExecutableCreationStrategy().newExecutable(backingMethod, container, commandContext);
-            return Arrays.stream(syntax.tree())
+            return Arrays.stream(syntax.root())
                     .map(s -> new BaseSyntaxComponent(s, executable))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         }

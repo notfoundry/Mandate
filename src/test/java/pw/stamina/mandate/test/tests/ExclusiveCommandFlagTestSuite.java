@@ -86,7 +86,7 @@ public class ExclusiveCommandFlagTestSuite {
     }
 
     @Executes
-    @Syntax(tree = "run")
+    @Syntax(root = "run")
     public ExitCode run(
             @AutoFlag(flag = {"f1", "-flag1"}, xor = {"f2", "-flag2"}) final boolean flag1,
             @AutoFlag(flag = {"f2", "-flag2"}, xor = {"f1", "-flag1"}) final boolean flag2) {

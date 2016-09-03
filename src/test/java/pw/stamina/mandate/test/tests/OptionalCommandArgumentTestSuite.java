@@ -96,7 +96,7 @@ public class OptionalCommandArgumentTestSuite {
     }
 
     @Executes
-    @Syntax(tree = "execute")
+    @Syntax(root = "execute")
     public ExitCode doThing(@Implicit final IODescriptor io, final String arg1, final Optional<String> arg2, final Optional<Integer> arg3) {
         io.out().write(String.format("%s %s %d", arg1, arg2.orElse("DEFAULT"), arg3.orElse(0)));
         return ExitCode.SUCCESS;

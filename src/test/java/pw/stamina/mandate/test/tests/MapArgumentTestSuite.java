@@ -91,14 +91,14 @@ public class MapArgumentTestSuite {
     }
 
     @Executes
-    @Syntax(tree = "stringintmap")
+    @Syntax(root = "stringintmap")
     public ExitCode stringIntMapCommand(@Implicit final IODescriptor io, final Map<String, Integer> map) {
         io.out().write(map);
         return ExitCode.SUCCESS;
     }
 
     @Executes
-    @Syntax(tree = "2dstringintmap")
+    @Syntax(root = "2dstringintmap")
     public ExitCode stringIntMapCommand2D(@Implicit final IODescriptor io, final Map<String, Map<String, Integer>> map) {
         io.out().write(map);
         return ExitCode.SUCCESS;

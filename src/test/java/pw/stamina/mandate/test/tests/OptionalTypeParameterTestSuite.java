@@ -75,7 +75,7 @@ public class OptionalTypeParameterTestSuite {
     }
 
     @Executes
-    @Syntax(tree = "optionalparameters")
+    @Syntax(root = "optionalparameters")
     public ExitCode optionalIntegerList(@Implicit final IODescriptor io, final List<Optional<Integer>> list) {
         io.out().write(list);
         return ExitCode.SUCCESS;

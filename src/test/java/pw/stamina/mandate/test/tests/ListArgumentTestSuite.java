@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * @author Mark Johnson
  */
-@Syntax(tree = "run")
+@Syntax(root = "run")
 public class ListArgumentTestSuite {
 
     private final Queue<Object> commandErrors = new ArrayDeque<>();

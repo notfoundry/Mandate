@@ -39,7 +39,7 @@ import java.util.Queue;
 /**
  * @author Mark Johnson
  */
-@Syntax(tree = {"execute", "exec", "do"})
+@Syntax(root = {"execute", "exec", "do"})
 public class ClassSyntaxInheritanceTestSuite {
     private final Queue<Object> commandErrors = new ArrayDeque<>();
 

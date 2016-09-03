@@ -40,7 +40,7 @@ public class OverlappingCommandFlagTestSuite {
     }
 
     @Executes
-    @Syntax(tree = "run")
+    @Syntax(root = "run")
     public ExitCode run(
             @AutoFlag(flag = {"f", "flag1"}) final boolean flag1,
             @AutoFlag(flag = {"f", "flag2"}) final boolean flag2) {

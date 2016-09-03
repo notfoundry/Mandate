@@ -40,7 +40,7 @@ import java.util.Queue;
 /**
  * @author Mark Johnson
  */
-@Syntax(tree = "run")
+@Syntax(root = "run")
 public class ArrayArgumentTestSuite {
 
     private final Queue<Object> commandErrors = new ArrayDeque<>();

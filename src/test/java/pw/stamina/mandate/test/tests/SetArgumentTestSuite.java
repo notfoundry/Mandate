@@ -38,7 +38,7 @@ import java.util.*;
 /**
  * @author Mark Johnson
  */
-@Syntax(tree = "run")
+@Syntax(root = "run")
 public class SetArgumentTestSuite {
 
     private final Queue<Object> commandErrors = new ArrayDeque<>();
