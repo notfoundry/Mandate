@@ -26,7 +26,7 @@ From there, you'll need to make your first command method somewhere in a class
 //either define a class or add methods to an old one
 class MyClassWithCommandMethods {
     @Executes
-    @Syntax(tree = "greet")
+    @Syntax(root = "greet")
     public ExitCode greetMe(@Implicit IODescriptor io, String greeting) {
         io.out().write(greeting);
         return ExitCode.SUCCESS;
@@ -68,7 +68,7 @@ Mandate commands can define four types of arguments, those being **Flags**, **En
 
 ```java
 @Executes
-@Syntax(tree = "greet")
+@Syntax(root = "greet")
 public ExitCode greetMe(@Implicit IODescriptor io,
                         @AutoFlag(flag = {"c", "-caps"}) boolean useCaps,
                         @UserFlag(flag = {"r", "-repetitions"}, elsedef = "1") int repetitions,
