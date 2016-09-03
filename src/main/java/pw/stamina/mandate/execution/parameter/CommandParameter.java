@@ -44,39 +44,63 @@ public interface CommandParameter extends AnnotatedElement {
     /**
      * Returns an array consisting of all the annotations present on the backing parameter
      * <p>
-     * If there are no annotations present, this array will have a length of zero
+     * If there are no annotations present, this array will have a length of zero.
      *
      * @return an array consisting of all the annotations present on the backing parameter
      */
     Annotation[] getAnnotations();
 
+    /**
+     * Returns an array consisting of all the annotations present on the backing parameter, ignoring any inherited annotations
+     * <p>
+     * If there are no annotations present, this array will have a length of zero.
+     *
+     * @return an array consisting of all the annotations present on the backing parameter
+     */
     default Annotation[] getDeclaredAnnotations() {
         return getAnnotations();
     }
 
     /**
+     * Returns the object type represented by this parameter
+     *
      * @return the reified type of this parameter
      */
     Class<?> getType();
 
+    /**
+     * Returns all type parameters present on the backing parameter.
+     * <p>
+     * If the backing parameter is not parameterized, this array will have a length of zero.
+     *
+     * @return an array consisting of all the type parameters present on the backing parameter
+     */
     Type[] getTypeParameters();
 
     /**
      * Returns whether or not this parameter should be considered to be optional
+     *
      * @return {@code true} if this parameter is optional, else {@code false}
      */
     boolean isOptional();
 
+    /**
+     * Returns whether or not this parameter is implicit or mandatory
+     *
+     * @return {@code true} if this parameter is implicit, else {@code false}
+     */
     boolean isImplicit();
 
     /**
      * Returns a friendly description of this parameter. See {@link pw.stamina.mandate.annotations.meta.Usage Usage}
+     *
      * @return a friendly description of this parameter
      */
     String getDescription();
 
     /**
      * Returns a friendly name for this parameter. See {@link pw.stamina.mandate.annotations.meta.Usage Usage}
+     *
      * @return a friendly name for this parameter
      */
     String getLabel();

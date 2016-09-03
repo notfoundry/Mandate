@@ -22,12 +22,43 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
+ * A registry of {@link pw.stamina.mandate.annotations.Implicit implicit argument} value providers. {@link pw.stamina.mandate.execution.CommandContext CommandContext}
+ * instances may use this as a registry of all valid implicit types and their associated value suppliers to more effectively support
+ * implicit values in command execution.
+ * <p>
+ * This provider makes the guarantee that no two providers may be present for any given type,
+ * preventing any potential ambiguities in implicit argument value resolution.
+ *
  * @author Mark Johnson
  */
 public interface ArgumentProvider {
+
+    /**
+     * Attempts to register a new implicit value provider to this provider registry. The registration will fail if it will result
+     * in a potentially ambiguous choice of value suppliers, such as when a provider of values of type V has already been
+     * registered to this registry.
+     *
+     * @param valueType A class representing the type of value that this provider will be supplying
+     * @param valueProvider the provider supplying values of type V
+     * @param <V> the type of value that this provider will be supplying
+     */
     <V> void registerProvider(Class<V> valueType, Supplier<? extends V> valueProvider);
 
+    /**
+     * Attempts to locate a provider of values of type V, if one is present.
+     *
+     * @param valueType A class representing the type of value that this provider to be located should supply
+     * @param <V> the type of value that this provider to be located should supply
+     * @return A present {@link Optional Optional} value wrapping the located provider if it is present, else an {@link Optional#empty() empty Optional}
+     */
     <V> Optional<Supplier<? extends V>> findProvider(Class<V> valueType);
 
+    /**
+     * Determines if there is a argument provider present that is capable of returning values of the type
+     * described by valueType.
+     *
+     * @param valueType A class representing the type of value that this provider to be located should supply
+     * @return {@code true} if a matching argument provider is found, else {@code false}
+     */
     boolean isProviderPresent(Class<?> valueType);
 }

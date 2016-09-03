@@ -19,8 +19,19 @@
 package pw.stamina.mandate.execution.argument;
 
 /**
+ * The strategy by which plain String objects are converted to {@link CommandArgument CommandArgument} instances for use
+ * in future processing.
+ *
  * @author Mark Johnson
  */
 public interface CommandArgumentCreationStrategy {
+
+    /**
+     * Attempts to return a CommandArgument instance that is syntactically equivalent to the String passed as an argument
+     * to this method.
+     *
+     * @param argument the String argument from which a CommandArgument should be derived
+     * @return a new CommandArgument representing the String argument passed to this method
+     */
     CommandArgument newArgument(String argument);
 }

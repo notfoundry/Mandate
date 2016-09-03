@@ -25,8 +25,21 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ * The strategy by which the {@link CommandParameter CommandParameters} associated with a {@link pw.stamina.mandate.execution.executable.CommandExecutable CommandExecutable}
+ * will be generated from the method backing them.
+ *
  * @author Mark Johnson
  */
 public interface CommandParameterCreationStrategy {
+
+    /**
+     * Attempts to return a list of {@link CommandParameter CommandParameters} corresponding as best possible to the declared parameters
+     * of the backing method provided as an argument to this method.
+     *
+     * @param backingMethod the backing method that the produced list of CommandParameters will be based on
+     * @param commandContext the command context associated with this creation attempt
+     * @return a list of CommandParameters best matching the parameters of the backing method
+     * @throws UnsupportedParameterException if one of the parameters of the provided method does not have a suitable {@link pw.stamina.mandate.execution.argument.ArgumentHandler ArgumentHandler}
+     */
     List<CommandParameter> generateCommandParameters(Method backingMethod, CommandContext commandContext) throws UnsupportedParameterException;
 }

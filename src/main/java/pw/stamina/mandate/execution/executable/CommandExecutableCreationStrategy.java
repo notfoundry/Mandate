@@ -23,8 +23,21 @@ import pw.stamina.mandate.execution.CommandContext;
 import java.lang.reflect.Method;
 
 /**
+ * The strategy by which a reflected command-executable {@link Method method} is converted to a {@link CommandExecutable CommandExecutable} instance
+ * for future invocation. The produced CommandExecutable will eventually invoke underlying method representing by the provided Method object when it is
+ * invoked.
+ *
  * @author Mark Johnson
  */
 public interface CommandExecutableCreationStrategy {
+
+    /**
+     * Attempts to create a new CommandExecutable instance from the provided arguments.
+     *
+     * @param backingMethod the backing method that the produced CommandExecutable will invoke as a command
+     * @param methodParent the parent instance associated with the provided method
+     * @param commandContext the command context associated with this creation attempt
+     * @return a new CommandExecutable instance integrating the provided method in its execution
+     */
     CommandExecutable newExecutable(Method backingMethod, Object methodParent, CommandContext commandContext);
 }

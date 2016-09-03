@@ -21,10 +21,29 @@ package pw.stamina.mandate.execution.argument;
 import java.util.function.Supplier;
 
 /**
+ * A builder object for an {@link ArgumentProvider ArgumentProvider}. Similar to what ArgumentProvider guarantees, this builder
+ * will prevent any potentially ambiguous argument providers from being added to the registry that is being built.
+ *
  * @author Mark Johnson
  */
 public interface ArgumentProviderBuilder {
+
+    /**
+     * Attempts to register a new implicit value provider to the provider registry being built. The registration will
+     * fail if it will result in a potentially ambiguous choice of value suppliers, such as when a provider of values
+     * of type V has already been registered to the registry being built.
+     *
+     * @param valueType A class representing the type of value that this provider will be supplying
+     * @param valueProvider the provider supplying values of type V
+     * @param <T> the type of value that this provider will be supplying
+     * @return this ArgumentProviderBuilder instance
+     */
     <T> ArgumentProviderBuilder addProvider(Class<T> valueType, Supplier<? extends T> valueProvider);
 
+    /**
+     * Returns a newly constructed {@link ArgumentProvider ArgumentProvider} with all argument providers
+     * that had been provided during the construction process automatically registered to it.
+     * @return a newly constructed {@link ArgumentProvider ArgumentProvider}
+     */
     ArgumentProvider build();
 }

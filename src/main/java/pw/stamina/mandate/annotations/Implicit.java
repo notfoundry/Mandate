@@ -23,6 +23,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation used to mark a command parameter as having arguments provided to it by the executing {@link pw.stamina.mandate.execution.CommandContext CommandContext}
+ * instead of relying on user input to determine the reified Object passed to it.
+ * <p>
+ * This can be thought of as a form of dependency injection for commands, preventing state from having to be stored and
+ * updated in the container objects in which command-executable methods are stored.
+ *
+ * @author Mark Johnson
+ */
 @Target(value=ElementType.PARAMETER)
 @Retention(value=RetentionPolicy.RUNTIME)
 public @interface Implicit {}
