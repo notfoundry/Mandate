@@ -20,6 +20,7 @@ package pw.stamina.mandate.internal.execution.argument.implicit;
 
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 public final class ArgumentProviderFactory {
     private ArgumentProviderFactory() {}
 
-    public static ArgumentProvider fromMapping(final Map<Class<?>, Supplier<?>> valueProviders) {
+    public static ArgumentProvider fromMapping(final Map<Type, Supplier<?>> valueProviders) {
         return new SimpleArgumentProvider(valueProviders);
     }
 }

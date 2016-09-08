@@ -18,6 +18,7 @@
 
 package pw.stamina.mandate.execution.argument;
 
+import java.lang.reflect.Type;
 import java.util.function.Supplier;
 
 /**
@@ -39,6 +40,19 @@ public interface ArgumentProviderBuilder {
      * @return this ArgumentProviderBuilder instance
      */
     <T> ArgumentProviderBuilder addProvider(Class<T> valueType, Supplier<? extends T> valueProvider);
+
+    /**
+     * Attempts to register a new implicit value provider to the provider registry being built. The registration will
+     * fail if it will result in a potentially ambiguous choice of value suppliers.
+     * <p>
+     * This method differs from {@link ArgumentProviderBuilder#addProvider(Class, Supplier)} in that it support using
+     * parameterized types as value types, allowing value providers to provide very specfic object instances for parameters.
+     *
+     * @param valueType A class representing the type of value that this provider will be supplying
+     * @param valueProvider the provider supplying values of type V
+     * @return this ArgumentProviderBuilder instance
+     */
+    ArgumentProviderBuilder addProvider(Type valueType, Supplier<?> valueProvider);
 
     /**
      * Returns a newly constructed {@link ArgumentProvider ArgumentProvider} with all argument providers

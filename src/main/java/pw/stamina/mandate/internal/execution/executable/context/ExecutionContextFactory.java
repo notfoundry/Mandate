@@ -21,6 +21,7 @@ package pw.stamina.mandate.internal.execution.executable.context;
 import pw.stamina.mandate.execution.ExecutionContext;
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Map;
 public final class ExecutionContextFactory {
     private ExecutionContextFactory() {}
 
-    public static ExecutionContext makeContext(final Map<Class<?>, ?> localValues, final ArgumentProvider providerRepository) {
+    public static ExecutionContext makeContext(final Map<Type, Object> localValues, final ArgumentProvider providerRepository) {
         return new SimpleExecutionContext(localValues, providerRepository);
     }
 }

@@ -18,6 +18,7 @@
 
 package pw.stamina.mandate.execution.argument;
 
+import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -40,18 +41,16 @@ public interface ArgumentProvider {
      *
      * @param valueType A class representing the type of value that this provider will be supplying
      * @param valueProvider the provider supplying values of type V
-     * @param <V> the type of value that this provider will be supplying
      */
-    <V> void registerProvider(Class<V> valueType, Supplier<? extends V> valueProvider);
+    void registerProvider(Type valueType, Supplier<?> valueProvider);
 
     /**
      * Attempts to locate a provider of values of type V, if one is present.
      *
      * @param valueType A class representing the type of value that this provider to be located should supply
-     * @param <V> the type of value that this provider to be located should supply
      * @return A present {@link Optional Optional} value wrapping the located provider if it is present, else an {@link Optional#empty() empty Optional}
      */
-    <V> Optional<Supplier<? extends V>> findProvider(Class<V> valueType);
+    Optional<Supplier<?>> findProvider(Type valueType);
 
     /**
      * Determines if there is a argument provider present that is capable of returning values of the type
@@ -60,5 +59,5 @@ public interface ArgumentProvider {
      * @param valueType A class representing the type of value that this provider to be located should supply
      * @return {@code true} if a matching argument provider is found, else {@code false}
      */
-    boolean isProviderPresent(Class<?> valueType);
+    boolean isProviderPresent(Type valueType);
 }

@@ -24,7 +24,7 @@ import pw.stamina.mandate.annotations.flag.AutoFlag;
 import pw.stamina.mandate.annotations.flag.UserFlag;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.execution.parameter.CommandParameterCreationStrategy;
-import pw.stamina.mandate.internal.utils.GenericResolver;
+import pw.stamina.mandate.internal.utils.reflect.GenericResolver;
 import pw.stamina.mandate.internal.utils.PrimitiveArrays;
 
 import java.lang.reflect.Method;

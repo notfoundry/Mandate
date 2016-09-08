@@ -21,6 +21,7 @@ package pw.stamina.mandate.internal.execution.argument.implicit;
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 import pw.stamina.mandate.execution.argument.ArgumentProviderBuilder;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -30,7 +31,7 @@ import java.util.function.Supplier;
  */
 public class SimpleArgumentProviderBuilder implements ArgumentProviderBuilder {
 
-    private final Map<Class<?>, Supplier<?>> valueProviders;
+    private final Map<Type, Supplier<?>> valueProviders;
 
     public SimpleArgumentProviderBuilder() {
         this.valueProviders = new HashMap<>();
@@ -38,8 +39,14 @@ public class SimpleArgumentProviderBuilder implements ArgumentProviderBuilder {
 
     @Override
     public <T> ArgumentProviderBuilder addProvider(final Class<T> valueType, final Supplier<? extends T> valueProvider) {
+        addProvider((Type) valueType, valueProvider);
+        return this;
+    }
+
+    @Override
+    public ArgumentProviderBuilder addProvider(Type valueType, Supplier<?> valueProvider) {
         if (valueProviders.put(valueType, valueProvider) != null) {
-            throw new IllegalStateException(String.format("Top-level argument provider already mapped for arguments of type %s", valueType.getCanonicalName()));
+            throw new IllegalStateException(String.format("Top-level argument provider already mapped for arguments of type %s", valueType.getTypeName()));
         }
         return this;
     }

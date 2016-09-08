@@ -20,6 +20,7 @@ package pw.stamina.mandate.internal.execution.argument.implicit;
 
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -29,25 +30,25 @@ import java.util.function.Supplier;
  */
 public class SimpleArgumentProvider implements ArgumentProvider {
 
-    private final Map<Class<?>, Supplier<?>> valueProviders;
+    private final Map<Type, Supplier<?>> valueProviders;
 
-    public SimpleArgumentProvider(final Map<Class<?>, Supplier<?>> valueProviders) {
+    public SimpleArgumentProvider(final Map<Type, Supplier<?>> valueProviders) {
         this.valueProviders = valueProviders;
     }
 
     @Override
-    public <V> void registerProvider(final Class<V> valueType, final Supplier<? extends V> valueProvider) {
+    public void registerProvider(final Type valueType, final Supplier<?> valueProvider) {
         valueProviders.put(valueType, valueProvider);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <V> Optional<Supplier<? extends V>> findProvider(final Class<V> valueType) {
-        return Optional.ofNullable(valueProviders.get(valueType)).map(provider -> (Supplier<? extends V>) provider);
+    public Optional<Supplier<?>> findProvider(final Type valueType) {
+        return Optional.ofNullable(valueProviders.get(valueType));
     }
 
     @Override
-    public boolean isProviderPresent(final Class<?> valueType) {
+    public boolean isProviderPresent(final Type valueType) {
         return valueProviders.containsKey(valueType);
     }
 }

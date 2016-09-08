@@ -31,10 +31,14 @@ import pw.stamina.mandate.annotations.Syntax;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.execution.result.ExitCode;
+import pw.stamina.mandate.internal.utils.reflect.TypeBuilder;
 import pw.stamina.mandate.io.IODescriptor;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * @author Mark Johnson
@@ -82,6 +86,30 @@ public class ImplicitArgumentsTestSuite {
     }
 
     @Test
+    public void testPassingParameterizedImplicitArgument() {
+        commandContext.getValueProviders().registerProvider(
+                TypeBuilder.from(Map.class, String.class, String.class),
+                () -> Collections.singletonMap("foo", "bar"));
+
+        final Execution result = commandContext.execute("implicit stringstringmap");
+
+        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+
+        Assert.assertTrue(commandOutput.peek() instanceof Map);
+
+        Assert.assertEquals(((Map<String, String>) commandOutput.poll()).get("foo"), "bar");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDifferentiatingBetweenGenericTypeParameters() {
+        commandContext.getValueProviders().registerProvider(
+                TypeBuilder.from(Map.class, String.class, String.class),
+                () -> Collections.singletonMap("foo", "bar"));
+
+        final Execution result = commandContext.execute("implicit intintmap");
+    }
+
+    @Test
     public void testExecutingCommandWithNoIODescriptor() {
         final Execution result = commandContext.execute("implicit none");
 
@@ -91,6 +119,17 @@ public class ImplicitArgumentsTestSuite {
     @Executes(tree = "time")
     public ExitCode runImplicitTime(@Implicit final IODescriptor io, @Implicit final ZonedDateTime time) {
         io.out().write(time);
+        return ExitCode.SUCCESS;
+    }
+
+    @Executes(tree = "stringstringmap")
+    public ExitCode runImplicitStringToStringMap(@Implicit IODescriptor io, @Implicit Map<String, String> stringStringMap) {
+        io.out().write(stringStringMap);
+        return ExitCode.SUCCESS;
+    }
+
+    @Executes(tree = "intintmap")
+    public ExitCode runImplicitIntegerToIntegerMap(@Implicit Map<Integer, Integer> integerIntegerMap) {
         return ExitCode.SUCCESS;
     }
 

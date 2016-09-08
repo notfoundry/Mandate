@@ -22,21 +22,23 @@ import pw.stamina.mandate.annotations.Executes;
 import pw.stamina.mandate.execution.CommandConfiguration;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.ExecutionContext;
+import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 import pw.stamina.mandate.execution.argument.CommandArgument;
-import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.execution.result.ExitCode;
+import pw.stamina.mandate.internal.execution.executable.context.ExecutionContextFactory;
 import pw.stamina.mandate.io.IODescriptor;
 import pw.stamina.mandate.io.IOEnvironment;
 import pw.stamina.mandate.parsing.InputTokenizationException;
 import pw.stamina.mandate.syntax.CommandRegistry;
 import pw.stamina.mandate.syntax.ExecutableLookup;
-import pw.stamina.mandate.internal.execution.executable.context.ExecutionContextFactory;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.lang.reflect.Type;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Mark Johnson
@@ -91,7 +93,11 @@ public class DefaultCommandContext implements CommandContext {
             return Execution.complete(ExitCode.INVALID);
         }
 
-        final ExecutionContext executionContext = ExecutionContextFactory.makeContext(Collections.singletonMap(IODescriptor.class, descriptor), providerRepository);
+        final Map<Type, Object> typesForContext = new HashMap<>();
+        typesForContext.put(IODescriptor.class, descriptor);
+        typesForContext.put(CommandContext.class, this);
+        final ExecutionContext executionContext = ExecutionContextFactory.makeContext(typesForContext, providerRepository);
+
         final ExecutableLookup executableLookup = commandRegistry.findExecutable(arguments, executionContext);
         if (executableLookup.wasSuccessful()) {
             return executableLookup.getExecutable().execute(arguments, executionContext);

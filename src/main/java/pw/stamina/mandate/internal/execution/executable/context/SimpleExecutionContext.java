@@ -22,6 +22,7 @@ import pw.stamina.mandate.execution.ExecutionContext;
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 import pw.stamina.mandate.io.IODescriptor;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,11 +31,11 @@ import java.util.Optional;
  */
 public class SimpleExecutionContext implements ExecutionContext {
 
-    private final Map<Class<?>, ?> localValues;
+    private final Map<Type, Object> localValues;
 
     private final ArgumentProvider providerRepository;
 
-    public SimpleExecutionContext(final Map<Class<?>, ?> localValues, final ArgumentProvider providerRepository) {
+    public SimpleExecutionContext(final Map<Type, Object> localValues, final ArgumentProvider providerRepository) {
         this.localValues = localValues;
         this.providerRepository = providerRepository;
     }
@@ -45,10 +46,10 @@ public class SimpleExecutionContext implements ExecutionContext {
     }
 
     @Override
-    public <T> T getProvidedValue(final Class<T> type) {
-        return Optional.ofNullable((T) localValues.get(type))
-                .orElseGet(() -> providerRepository.findProvider(type)
-                        .orElseThrow(() -> new IllegalArgumentException(""))
+    public Object getProvidedValue(final Type type) {
+        return Optional.ofNullable(localValues.get(type))
+                .orElseGet(() ->  providerRepository.findProvider(type)
+                        .orElseThrow(() -> new IllegalArgumentException("Unable to resolve a suitable value for type " + type.getTypeName()))
                         .get()
                 );
     }

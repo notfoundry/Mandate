@@ -21,7 +21,7 @@ package pw.stamina.mandate.internal.execution.parameter;
 import pw.stamina.mandate.annotations.Implicit;
 import pw.stamina.mandate.annotations.meta.Usage;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
-import pw.stamina.mandate.internal.utils.GenericResolver;
+import pw.stamina.mandate.internal.utils.reflect.GenericResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;

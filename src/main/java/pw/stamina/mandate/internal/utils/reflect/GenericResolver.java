@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2016 Foundry
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.stamina.mandate.internal.utils;
+package pw.stamina.mandate.internal.utils.reflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -31,7 +31,7 @@ public final class GenericResolver {
         if (parameterizedType instanceof ParameterizedType) {
             return ((ParameterizedType) parameterizedType).getActualTypeArguments();
         } else {
-            throw new UnsupportedOperationException("Failed to resolve type parameters for type " + parameterizedType.getTypeName());
+            return new Type[0];
         }
     }
 }

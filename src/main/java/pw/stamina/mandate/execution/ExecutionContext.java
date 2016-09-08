@@ -20,11 +20,13 @@ package pw.stamina.mandate.execution;
 
 import pw.stamina.mandate.io.IODescriptor;
 
+import java.lang.reflect.Type;
+
 /**
  * @author Mark Johnson
  */
 public interface ExecutionContext {
     IODescriptor getIODescriptor();
 
-    <T> T getProvidedValue(Class<T> type);
+    Object getProvidedValue(Type type);
 }

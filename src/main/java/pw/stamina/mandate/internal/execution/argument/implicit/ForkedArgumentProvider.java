@@ -20,6 +20,7 @@ package pw.stamina.mandate.internal.execution.argument.implicit;
 
 import pw.stamina.mandate.execution.argument.ArgumentProvider;
 
+import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -38,22 +39,22 @@ public class ForkedArgumentProvider implements ArgumentProvider {
     }
 
     @Override
-    public <V> void registerProvider(final Class<V> valueType, final Supplier<? extends V> valueProvider) {
+    public void registerProvider(final Type valueType, final Supplier<?> valueProvider) {
         if (thisProvider.isProviderPresent(valueType)) {
-            throw new IllegalStateException(String.format("Top-level argument provider already mapped for arguments of type %s", valueType.getCanonicalName()));
+            throw new IllegalStateException(String.format("Top-level argument provider already mapped for arguments of type %s", valueType.getTypeName()));
         } else {
             thisProvider.registerProvider(valueType, valueProvider);
         }
     }
 
     @Override
-    public <V> Optional<Supplier<? extends V>> findProvider(final Class<V> valueType) {
-        final Optional<Supplier<? extends V>> lookup = thisProvider.findProvider(valueType);
+    public Optional<Supplier<?>> findProvider(final Type valueType) {
+        final Optional<Supplier<?>> lookup = thisProvider.findProvider(valueType);
         return lookup.isPresent() ? lookup : forkedProvider.findProvider(valueType);
     }
 
     @Override
-    public boolean isProviderPresent(final Class<?> valueType) {
+    public boolean isProviderPresent(final Type valueType) {
         return thisProvider.isProviderPresent(valueType) || forkedProvider.isProviderPresent(valueType);
     }
 }

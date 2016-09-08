@@ -18,14 +18,15 @@
 
 package pw.stamina.mandate.internal.parsing;
 
-import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.annotations.Implicit;
 import pw.stamina.mandate.annotations.flag.AutoFlag;
 import pw.stamina.mandate.annotations.flag.UserFlag;
+import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.execution.parameter.CommandParameter;
+import pw.stamina.mandate.internal.utils.reflect.TypeBuilder;
 import pw.stamina.mandate.parsing.ArgumentReificationException;
 import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
 
@@ -88,7 +89,7 @@ public enum DefaultArgumentReifier implements ArgumentReificationStrategy {
                     }
                 }
             } else {
-                final Object implicitLookup = executionContext.getProvidedValue(parameter.getType());
+                final Object implicitLookup = executionContext.getProvidedValue(TypeBuilder.from(parameter.getType(), parameter.getTypeParameters()));
                 if (implicitLookup != null) {
                     parsedArgs.add(implicitLookup);
                 } else {
