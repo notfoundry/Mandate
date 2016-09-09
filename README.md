@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/foundry27/Mandate.svg?branch=master)](https://travis-ci.org/foundry27/Mandate)
 [![codecov](https://codecov.io/gh/foundry27/Mandate/branch/master/graph/badge.svg)](https://codecov.io/gh/foundry27/Mandate)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pw.stamina/mandate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pw.stamina/mandate)
 
 ###What is it?
 Mandate provides an API for using annotated method definitions to parse user input as *commands* in a similar fashion to POSIX's getopt, except with integrated functionality for defining, searching for, executing, and linking the commands to which that input is presented.
