@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +36,8 @@ import pw.stamina.mandate.io.IODescriptor;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -70,27 +71,39 @@ public class CommandFlagTestSuite {
     public void testFlagSet() {
         final Execution result = commandContext.execute("greet --caps --recipient you hello");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("to you: HELLO", commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals("to you: HELLO", commandOutput.poll());
     }
 
     @Test
     public void testFlagUnset() {
         final Execution result = commandContext.execute("greet foo");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("to someone: foo", commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals("to someone: foo", commandOutput.poll());
     }
 
     @Test
     public void testNonDeclarationOrderFlagSet() {
         final Execution result = commandContext.execute("greet hello --recipient me --caps");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("to me: HELLO", commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals("to me: HELLO", commandOutput.poll());
     }
 
     @Executes

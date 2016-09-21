@@ -23,6 +23,7 @@ import pw.stamina.mandate.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.execution.argument.CommandArgument;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
+import pw.stamina.mandate.internal.annotations.numeric.PreciseClamp;
 import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
 import pw.stamina.mandate.internal.utils.Primitives;
 import pw.stamina.mandate.parsing.InputParsingException;
@@ -47,59 +48,39 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
 
     private static final Map<Class<? extends Number>, Function<String, ? extends Number>> NUMBER_DECODERS;
 
+    private static final Map<Class<? extends Number>, Function<Number, Function<CommandParameter, Number>>> POST_PROCESSORS;
+
     @Override
     public final Number parse(final CommandArgument input, final CommandParameter parameter, final CommandContext commandContext) throws InputParsingException {
         @SuppressWarnings("unchecked")
         final Class<? extends Number> numberClass = (Class<? extends Number>) Primitives.wrap(parameter.getType());
-        Number resultNumber = parseNumber(input.getRaw(), numberClass);
-
-        if (numberClass == Float.class || numberClass == Double.class) {
-            final RealClamp realClamp = parameter.getAnnotation(RealClamp.class);
-            if (realClamp != null) {
-                final double min, max;
-                if (!Double.isNaN((min = Math.min(realClamp.min(), realClamp.max()))) && resultNumber.doubleValue() < min) {
-                    resultNumber = (numberClass == Float.class ? (float) min : min);
-                } else if (!Double.isNaN((max = Math.max(realClamp.min(), realClamp.max()))) && resultNumber.doubleValue() > max) {
-                    resultNumber = (numberClass == Float.class ? (float) max : max);
-                }
-            }
-        } else {
-            final IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
-            if (intClamp != null) {
-                final Long min, max;
-                if (resultNumber.longValue() < (min = Math.min(intClamp.min(), intClamp.max()))) {
-                    resultNumber = parseNumber(min.toString(), numberClass);
-                } else if (resultNumber.longValue() > (max = (Math.max(intClamp.min(), intClamp.max())))) {
-                    resultNumber = parseNumber(max.toString(), numberClass);
-                }
-            }
-        }
-        return resultNumber;
+        final Number resultNumber = parseNumber(input.getRaw(), numberClass);
+        return POST_PROCESSORS.get(numberClass).apply(resultNumber).apply(parameter);
     }
 
     @Override
     public final String getSyntax(final CommandParameter parameter) {
-        final Class<? extends Number> numberClass; final String suffix;
         @SuppressWarnings("unchecked")
-        final String prefix = (numberClass = Primitives.wrap((Class<? extends Number>) parameter.getType())).getSimpleName();
+        final Class<? extends Number> numberClass = Primitives.wrap((Class<? extends Number>) parameter.getType());
+        final String prefix = numberClass.getSimpleName();
+        final String suffix;
 
-        if (numberClass == Float.class || numberClass == Double.class) {
+        final IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
+        if (intClamp == null) {
             final RealClamp realClamp = parameter.getAnnotation(RealClamp.class);
             if (realClamp == null) {
                 return parameter.getLabel() + " - " + prefix;
+            } else {
+                final double min = Math.min(realClamp.min(), realClamp.max());
+                final double max = Math.max(realClamp.min(), realClamp.max());
+                suffix = !Double.isNaN(min) && !Double.isNaN(max) ? String.format("%s-%s", min, max) : (!Double.isNaN(min) ? ">" + min : (!Double.isNaN(max) ? "<" + max : "?"));
             }
-            final double min = Math.min(realClamp.min(), realClamp.max());
-            final double max = Math.max(realClamp.min(), realClamp.max());
-            suffix = !Double.isNaN(min) && !Double.isNaN(max) ? String.format("%s-%s", min, max) : (!Double.isNaN(min) ? ">" + min : (!Double.isNaN(max) ? "<" + max : "?"));
         } else {
-            final IntClamp intClamp = parameter.getAnnotation(IntClamp.class);
-            if (intClamp == null) {
-                return parameter.getLabel() + " - " + prefix;
-            }
             final long min = Math.min(intClamp.min(), intClamp.max());
             final long max = Math.max(intClamp.min(), intClamp.max());
             suffix = Long.MIN_VALUE != min && Long.MAX_VALUE != max ? String.format("%s-%s", min, max) : (Long.MIN_VALUE != min ? ">" + min : (Long.MAX_VALUE != max ? "<" + max : "?"));
         }
+
         return parameter.getLabel() + " - " + String.format("%s[%s]", prefix, suffix);
     }
 
@@ -143,6 +124,64 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
                 : new BigDecimal(input));
     }
 
+    private static Number clampInteger(final IntClamp intClamp, final Number num, final Function<Number, Number> castingFunction) {
+        final long min, max;
+        if (num.longValue() < (min = Math.min(intClamp.min(), intClamp.max()))) {
+            return castingFunction.apply(min);
+        } else if (num.longValue() > (max = (Math.max(intClamp.min(), intClamp.max())))) {
+            return castingFunction.apply(max);
+        } else {
+            return num;
+        }
+    }
+
+    private static Number clampReal(final RealClamp realClamp, final Number num, final Function<Number, Number> castingFunction) {
+        final double min, max;
+        if (!Double.isNaN((min = Math.min(realClamp.min(), realClamp.max()))) && num.doubleValue() < min) {
+            return castingFunction.apply(min);
+        } else if (!Double.isNaN((max = Math.max(realClamp.min(), realClamp.max()))) && num.doubleValue() > max) {
+            return castingFunction.apply(max);
+        } else {
+            return num;
+        }
+    }
+
+    private static BigInteger clampBigInteger(final PreciseClamp preciseClamp, final BigInteger num) {
+        final BigInteger min = !preciseClamp.min().isEmpty() ? decodeBigInteger(preciseClamp.min()) : null;
+        final BigInteger max = !preciseClamp.max().isEmpty() ? decodeBigInteger(preciseClamp.max()) : null;
+        if (min != null) {
+            final BigInteger absMin = (max != null) ? min.min(max) : min;
+            if (num.compareTo(absMin) < 0) {
+                return absMin;
+            }
+        }
+        if (max != null) {
+            final BigInteger absMax = (min != null) ? max.max(min) : max;
+            if (num.compareTo(absMax) > 0) {
+                return absMax;
+            }
+        }
+        return num;
+    }
+
+    private static BigDecimal clampBigDecimal(final PreciseClamp preciseClamp, final BigDecimal num) {
+        final BigDecimal min = !preciseClamp.min().isEmpty() ? decodeBigDecimal(preciseClamp.min()) : null;
+        final BigDecimal max = !preciseClamp.max().isEmpty() ? decodeBigDecimal(preciseClamp.max()) : null;
+        if (min != null) {
+            final BigDecimal absMin = (max != null) ? min.min(max) : min;
+            if (num.compareTo(absMin) < 0) {
+                return absMin;
+            }
+        }
+        if (max != null) {
+            final BigDecimal absMax = (min != null) ? max.max(min) : max;
+            if (num.compareTo(absMax) > 0) {
+                return absMax;
+            }
+        }
+        return num;
+    }
+
     static {
         final Map<Class<? extends Number>, Function<String, ? extends Number>> decoders = new HashMap<>();
         decoders.put(Byte.class, Byte::decode);
@@ -154,5 +193,58 @@ public final class NumberArgumentHandler implements ArgumentHandler<Number> {
         decoders.put(BigInteger.class, NumberArgumentHandler::decodeBigInteger);
         decoders.put(BigDecimal.class, NumberArgumentHandler::decodeBigDecimal);
         NUMBER_DECODERS = Collections.unmodifiableMap(decoders);
+
+        final Function<Function<Number, Number>, Function<Number, Function<CommandParameter, Number>>> intProcessor = cast -> num -> param -> {
+            final IntClamp intClamp = param.getAnnotation(IntClamp.class);
+            if (intClamp != null) {
+                return clampInteger(intClamp, num, cast);
+            } else {
+                final RealClamp realClamp = param.getAnnotation(RealClamp.class);
+                if (realClamp != null) {
+                    return clampReal(realClamp, num, cast);
+                } else {
+                    return num;
+                }
+            }
+        };
+
+        final Function<Function<Number, Number>, Function<Number, Function<CommandParameter, Number>>> realProcessor = cast -> num -> param -> {
+            final RealClamp realClamp = param.getAnnotation(RealClamp.class);
+            if (realClamp != null) {
+                return clampReal(realClamp, num, cast);
+            } else {
+                final IntClamp intClamp = param.getAnnotation(IntClamp.class);
+                if (intClamp != null) {
+                    return clampInteger(intClamp, num, cast);
+                } else {
+                    return num;
+                }
+            }
+        };
+
+        final Map<Class<? extends Number>, Function<Number, Function<CommandParameter, Number>>> processingStages = new HashMap<>();
+        processingStages.put(Byte.class, intProcessor.apply(Number::byteValue));
+        processingStages.put(Short.class, intProcessor.apply(Number::shortValue));
+        processingStages.put(Integer.class, intProcessor.apply(Number::intValue));
+        processingStages.put(Long.class, intProcessor.apply(Number::longValue));
+        processingStages.put(Double.class, realProcessor.apply(Number::doubleValue));
+        processingStages.put(Float.class, realProcessor.apply(Number::floatValue));
+        processingStages.put(BigInteger.class, num -> param -> {
+            final PreciseClamp preciseClamp = param.getAnnotation(PreciseClamp.class);
+            if (preciseClamp != null) {
+                return clampBigInteger(preciseClamp, (BigInteger) num);
+            } else {
+                return intProcessor.apply(Function.identity()).apply(num).apply(param);
+            }
+        });
+        processingStages.put(BigDecimal.class, num -> param -> {
+            final PreciseClamp preciseClamp = param.getAnnotation(PreciseClamp.class);
+            if (preciseClamp != null) {
+                return clampBigDecimal(preciseClamp, (BigDecimal) num);
+            } else {
+                return realProcessor.apply(Function.identity()).apply(num).apply(param);
+            }
+        });
+        POST_PROCESSORS = Collections.unmodifiableMap(processingStages);
     }
 }

@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +35,8 @@ import pw.stamina.mandate.io.IODescriptor;
 import java.util.ArrayDeque;
 import java.util.Optional;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -69,9 +70,13 @@ public class OptionalCommandArgumentTestSuite {
     public void testUsingFullCommandSignature() {
         final Execution result = commandContext.execute("execute first \"second argument\" 100");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("first second argument 100",
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals("first second argument 100",
                 commandOutput.poll());
     }
 
@@ -79,9 +84,13 @@ public class OptionalCommandArgumentTestSuite {
     public void testUsingPartialCommandSignature() {
         final Execution result = commandContext.execute("execute first second");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("first second 0",
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals("first second 0",
                 commandOutput.poll());
     }
 
@@ -89,9 +98,13 @@ public class OptionalCommandArgumentTestSuite {
     public void testUsingOnlyMandatoryArguments() {
         final Execution result = commandContext.execute("execute first");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals("first DEFAULT 0",
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals("first DEFAULT 0",
                 commandOutput.poll());
     }
 

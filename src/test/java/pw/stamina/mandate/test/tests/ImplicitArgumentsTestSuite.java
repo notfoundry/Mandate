@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +38,9 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mark Johnson
@@ -78,11 +80,15 @@ public class ImplicitArgumentsTestSuite {
 
         final Execution result = commandContext.execute("implicit time");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof ZonedDateTime);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(commandOutput.poll(), currentTime);
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof ZonedDateTime);
+
+        assertEquals(commandOutput.poll(), currentTime);
     }
 
     @Test
@@ -93,11 +99,15 @@ public class ImplicitArgumentsTestSuite {
 
         final Execution result = commandContext.execute("implicit stringstringmap");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Map);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(((Map<String, String>) commandOutput.poll()).get("foo"), "bar");
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Map);
+
+        assertEquals(((Map<String, String>) commandOutput.poll()).get("foo"), "bar");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -107,13 +117,23 @@ public class ImplicitArgumentsTestSuite {
                 () -> Collections.singletonMap("foo", "bar"));
 
         final Execution result = commandContext.execute("implicit intintmap");
+
+        assertTrue(result.result() == ExitCode.FAILURE);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(1, commandErrors.size());
     }
 
     @Test
     public void testExecutingCommandWithNoIODescriptor() {
         final Execution result = commandContext.execute("implicit none");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
     }
 
     @Executes(tree = "time")

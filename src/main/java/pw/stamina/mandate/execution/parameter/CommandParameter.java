@@ -92,6 +92,15 @@ public interface CommandParameter extends AnnotatedElement {
     boolean isImplicit();
 
     /**
+     * Returns whether or not this parameter accepts a variable number of arguments
+     *
+     * @return {@code true} if this parameter accepts a variable number of arguments, else {@code false}
+     */
+    default boolean isVarargs() {
+        return false;
+    }
+
+    /**
      * Returns a friendly description of this parameter. See {@link pw.stamina.mandate.annotations.meta.Usage Usage}
      *
      * @return a friendly description of this parameter

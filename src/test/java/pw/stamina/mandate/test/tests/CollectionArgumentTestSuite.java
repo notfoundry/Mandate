@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +34,8 @@ import pw.stamina.mandate.io.IODescriptor;
 import pw.stamina.mandate.internal.annotations.Length;
 
 import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -70,51 +71,63 @@ public class CollectionArgumentTestSuite {
     public void testPassingToStringCollection() {
         final Execution result = commandContext.execute("run strings [foo, bar]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Collection);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(Arrays.asList("foo", "bar"), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Collection);
+
+        assertEquals(Arrays.asList("foo", "bar"), commandOutput.poll());
     }
 
     @Test
     public void testPassingZeroLengthCollectionAsArgument() {
         final Execution result = commandContext.execute("run strings []");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Collection);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(Collections.emptyList(), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Collection);
+
+        assertEquals(Collections.emptyList(), commandOutput.poll());
     }
 
     @Test
     public void testPassingToClampedLengthIntCollection() {
         final Execution result = commandContext.execute("run clampedints [1, 2, 3, 4, 5]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Collection);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(Arrays.asList(1, 2, 3, 4, 5), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Collection);
+
+        assertEquals(Arrays.asList(1, 2, 3, 4, 5), commandOutput.poll());
     }
 
     @Test
     public void testFailingClampedLengthCollectionCheck() {
         final Execution result = commandContext.execute("run clampedints [1, 2, 3]");
 
-        Assert.assertTrue(result.result() == ExitCode.INVALID);
+        assertTrue(result.result() == ExitCode.INVALID);
     }
 
     @Test
     public void testPassingTo2DStringCollection() {
         final Execution result = commandContext.execute("run 2dstrings [[foo, bar], [baz, quz]]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Collection);
+        assertTrue(commandOutput.peek() instanceof Collection);
 
-        Assert.assertEquals(Arrays.asList(Arrays.asList("foo", "bar"), Arrays.asList("baz", "quz")), commandOutput.poll());
+        assertEquals(Arrays.asList(Arrays.asList("foo", "bar"), Arrays.asList("baz", "quz")), commandOutput.poll());
     }
 
     @Executes(tree = "strings")

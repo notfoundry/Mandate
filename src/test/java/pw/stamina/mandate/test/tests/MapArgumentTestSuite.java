@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +36,8 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -70,24 +71,32 @@ public class MapArgumentTestSuite {
     public void testPassingStringIntegerMap() {
         final Execution result = commandContext.execute("stringintmap [foo->256, bar -> 512]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Map);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(256, ((Map) commandOutput.peek()).get("foo"));
+        assertEquals(0, commandErrors.size());
 
-        Assert.assertEquals(512, ((Map) commandOutput.peek()).get("bar"));
+        assertTrue(commandOutput.peek() instanceof Map);
+
+        assertEquals(256, ((Map) commandOutput.peek()).get("foo"));
+
+        assertEquals(512, ((Map) commandOutput.peek()).get("bar"));
     }
 
     @Test
     public void testPassing2DStringIntegerMap() {
         final Execution result = commandContext.execute("2dstringintmap [foo ->[bar-> 512]]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Map);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(Collections.singletonMap("bar", 512), ((Map) commandOutput.poll()).get("foo"));
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Map);
+
+        assertEquals(Collections.singletonMap("bar", 512), ((Map) commandOutput.poll()).get("foo"));
     }
 
     @Executes

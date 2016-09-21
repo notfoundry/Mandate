@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +33,8 @@ import pw.stamina.mandate.execution.result.ExitCode;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -68,21 +69,33 @@ public class ExclusiveCommandFlagTestSuite {
     public void testExclusiveFlagSet() {
         final Execution result = commandContext.execute("run --flag1 --flag2");
 
-        Assert.assertTrue(result.result() == ExitCode.INVALID);
+        assertTrue(result.result() == ExitCode.INVALID);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(1, commandErrors.size());
     }
 
     @Test
     public void testIdenticalFlagSet() {
         final Execution result = commandContext.execute("run --flag2 --flag2");
 
-        Assert.assertTrue(result.result() == ExitCode.INVALID);
+        assertTrue(result.result() == ExitCode.INVALID);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(1, commandErrors.size());
     }
 
     @Test
     public void testSuccessfulFlagSet() {
         final Execution result = commandContext.execute("run -f1");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
     }
 
     @Executes

@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +34,8 @@ import pw.stamina.mandate.io.IODescriptor;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -69,18 +70,26 @@ public class ClassSyntaxInheritanceTestSuite {
     public void testSyntaxInheritance() {
         final Execution result = commandContext.execute("execute sum 500 250");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals(750, commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals(750, commandOutput.poll());
     }
 
     @Test
     public void testAliasUsage() {
         final Execution result = commandContext.execute("do add 1000 500");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertEquals(1500, commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertEquals(1500, commandOutput.poll());
     }
 
     @Executes(tree = "sum|add")

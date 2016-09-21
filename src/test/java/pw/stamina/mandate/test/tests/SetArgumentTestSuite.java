@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +33,8 @@ import pw.stamina.mandate.execution.result.ExitCode;
 import pw.stamina.mandate.io.IODescriptor;
 
 import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -69,33 +70,45 @@ public class SetArgumentTestSuite {
     public void testPassingToStringSet() {
         final Execution result = commandContext.execute("run strings [foo, foo, bar, bar]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Set);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(new HashSet<>(Arrays.asList("foo", "bar")), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Set);
+
+        assertEquals(new HashSet<>(Arrays.asList("foo", "bar")), commandOutput.poll());
     }
 
     @Test
     public void testPassingZeroLengthSetAsArgument() {
         final Execution result = commandContext.execute("run strings []");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Set);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(Collections.emptySet(), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Set);
+
+        assertEquals(Collections.emptySet(), commandOutput.poll());
     }
 
     @Test
     public void testPassingTo2DStringSet() {
         final Execution result = commandContext.execute("run 2dstrings [[foo, bar, bar], [baz, baz, quz]]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof Set);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(new HashSet<>(Arrays.asList(new HashSet<>(Arrays.asList("foo", "bar")), new HashSet<>(Arrays.asList("baz", "quz")))), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof Set);
+
+        assertEquals(new HashSet<>(Arrays.asList(new HashSet<>(Arrays.asList("foo", "bar")), new HashSet<>(Arrays.asList("baz", "quz")))), commandOutput.poll());
     }
 
     @Executes(tree = "strings")

@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +33,8 @@ import pw.stamina.mandate.execution.result.ExitCode;
 import pw.stamina.mandate.io.IODescriptor;
 
 import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -67,11 +68,15 @@ public class OptionalTypeParameterTestSuite {
     public void testPassingOptionalIntegerList() {
         final Execution result = commandContext.execute("optionalparameters [2, 4, 6, 8, 10]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(commandOutput.peek() instanceof List);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(Arrays.asList(Optional.of(2), Optional.of(4), Optional.of(6), Optional.of(8), Optional.of(10)), commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertTrue(commandOutput.peek() instanceof List);
+
+        assertEquals(Arrays.asList(Optional.of(2), Optional.of(4), Optional.of(6), Optional.of(8), Optional.of(10)), commandOutput.poll());
     }
 
     @Executes

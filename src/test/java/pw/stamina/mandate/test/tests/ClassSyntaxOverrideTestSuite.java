@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +34,8 @@ import pw.stamina.mandate.io.IODescriptor;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -69,18 +70,24 @@ public class ClassSyntaxOverrideTestSuite {
     public void testSyntaxOverride() {
         final Execution result = commandContext.execute("sum 125 125");
 
-        commandErrors.forEach(System.out::println);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertEquals(1, commandOutput.size());
 
-        Assert.assertEquals(250, commandOutput.poll());
+        assertEquals(0, commandErrors.size());
+
+        assertEquals(250, commandOutput.poll());
     }
 
     @Test
     public void testFailedClassSyntaxUse() {
         final Execution result = commandContext.execute("foo 200 175");
 
-        Assert.assertTrue(result.result() == ExitCode.INVALID);
+        assertTrue(result.result() == ExitCode.INVALID);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(1, commandErrors.size());
     }
 
     @Executes

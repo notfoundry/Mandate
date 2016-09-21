@@ -18,7 +18,6 @@
 
 package pw.stamina.mandate.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +35,8 @@ import pw.stamina.mandate.internal.annotations.Length;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Mark Johnson
@@ -71,52 +72,76 @@ public class ArrayArgumentTestSuite {
     public void testPassingToStringArray() {
         final Execution result = commandContext.execute("run strings [foo, \"Hello World!\", baz]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertArrayEquals(new String[] {"foo", "Hello World!", "baz"}, (String[]) commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertArrayEquals(new String[] {"foo", "Hello World!", "baz"}, (String[]) commandOutput.poll());
     }
 
     @Test
     public void testPassingTo2DStringArray() {
         final Execution result = commandContext.execute("run 2dstrings [[foo, bar], [baz, quz, \"tricky, ]]]\"]]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertArrayEquals(new String[][] {{"foo", "bar"}, {"baz", "quz", "tricky", "]]]"}}, (String[][]) commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertArrayEquals(new String[][] {{"foo", "bar"}, {"baz", "quz", "tricky", "]]]"}}, (String[][]) commandOutput.poll());
     }
 
     @Test
     public void testPassingZeroLengthArrayAsArgument() {
         final Execution result = commandContext.execute("run strings []");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertArrayEquals(new String[0], (String[]) commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertArrayEquals(new String[0], (String[]) commandOutput.poll());
     }
 
     @Test
     public void testPassingToPrimitiveIntArray() {
         final Execution result = commandContext.execute("run ints [100, 5000, 15000]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertArrayEquals(new int[] {100, 5000, 15000}, (int[]) commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertArrayEquals(new int[] {100, 5000, 15000}, (int[]) commandOutput.poll());
     }
 
     @Test
     public void testPassingToClampedLengthIntArray() {
         final Execution result = commandContext.execute("run clampedints [1, 2, 3, 4, 5]");
 
-        Assert.assertTrue(result.result() == ExitCode.SUCCESS);
+        assertTrue(result.result() == ExitCode.SUCCESS);
 
-        Assert.assertArrayEquals(new int[] {1, 2, 3, 4, 5}, (int[]) commandOutput.poll());
+        assertEquals(1, commandOutput.size());
+
+        assertEquals(0, commandErrors.size());
+
+        assertArrayEquals(new int[] {1, 2, 3, 4, 5}, (int[]) commandOutput.poll());
     }
 
     @Test
     public void testFailingClampedLengthArrayCheck() {
         final Execution result = commandContext.execute("run clampedints [1, 2, 3]");
 
-        Assert.assertTrue(result.result() == ExitCode.INVALID);
+        assertTrue(result.result() == ExitCode.INVALID);
+
+        assertEquals(0, commandOutput.size());
+
+        assertEquals(1, commandErrors.size());
     }
 
     @Executes(tree = "strings")
