@@ -22,9 +22,9 @@ import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.execution.argument.CommandArgument;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
-import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
-import pw.stamina.mandate.internal.annotations.numeric.PreciseClamp;
-import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
+import pw.stamina.mandate.annotations.numeric.IntClamp;
+import pw.stamina.mandate.annotations.numeric.PreciseClamp;
+import pw.stamina.mandate.annotations.numeric.RealClamp;
 import pw.stamina.mandate.internal.utils.Primitives;
 import pw.stamina.mandate.parsing.InputParsingException;
 

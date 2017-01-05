@@ -68,7 +68,7 @@ public class SimpleContextBuilder implements ContextBuilder {
     @Override
     public ContextBuilder withHandlerRegistry(final ArgumentHandlerRegistry argumentHandlerRegistry) {
         if (this.argumentHandlerRegistry == null) {
-            this.argumentHandlerRegistry = new DefaultArgumentHandlerRegistry();
+            this.argumentHandlerRegistry = DefaultArgumentHandlerRegistry.makeDefaultRegistry();
         }
         this.argumentHandlerRegistry = new ForkedArgumentHandlerRegistry(this.argumentHandlerRegistry, argumentHandlerRegistry);
         return this;
@@ -99,7 +99,7 @@ public class SimpleContextBuilder implements ContextBuilder {
         return new DefaultCommandContext(
                 Optional.ofNullable(ioEnvironment).orElseGet(DefaultIOEnvironment::getInstance),
                 Optional.ofNullable(commandConfiguration).orElseGet(DefaultCommandConfiguration::getInstance),
-                Optional.ofNullable(argumentHandlerRegistry).orElseGet(DefaultArgumentHandlerRegistry::new),
+                Optional.ofNullable(argumentHandlerRegistry).orElseGet(DefaultArgumentHandlerRegistry::makeDefaultRegistry),
                 Optional.ofNullable(commandRegistry).orElseGet(SimpleCommandRegistry::new),
                 Optional.ofNullable(argumentProvider).orElseGet(() -> ArgumentProviderFactory.fromMapping(new HashMap<>()))
         );

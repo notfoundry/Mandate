@@ -65,22 +65,14 @@ public class SimpleCommandRegistry implements CommandRegistry {
                 if (currentComponent.findExecutables().isPresent()) {
 
                     int lowestConsumed = Integer.MAX_VALUE;
-                    InputParsingException lastException = null;
                     for (final CommandExecutable executable : currentComponent.findExecutables().get()) {
                         if (arguments.size() >= executable.minimumArguments() && arguments.size() <= executable.maximumArguments()) {
-                            try {
-                                executable.validate(arguments, executionContext);
-                                return new SimpleExecutableLookup(executable, null);
-                            } catch (final InputParsingException e) {
-                                lastException = e;
-                            }
+                            return new SimpleExecutableLookup(executable);
                         } else {
                             lowestConsumed = lowestConsumed > executable.minimumArguments() ? executable.minimumArguments() : lowestConsumed;
                         }
                     }
-                    if (lastException != null) {
-                        return new SimpleExecutableLookup(null, lastException);
-                    } else if (lowestConsumed != Integer.MAX_VALUE) {
+                    if (lowestConsumed != Integer.MAX_VALUE) {
                         depth += lowestConsumed;
                     }
                 }

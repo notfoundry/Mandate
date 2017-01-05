@@ -30,9 +30,9 @@ import pw.stamina.mandate.annotations.Syntax;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.execution.result.ExitCode;
-import pw.stamina.mandate.internal.annotations.numeric.IntClamp;
-import pw.stamina.mandate.internal.annotations.numeric.PreciseClamp;
-import pw.stamina.mandate.internal.annotations.numeric.RealClamp;
+import pw.stamina.mandate.annotations.numeric.IntClamp;
+import pw.stamina.mandate.annotations.numeric.PreciseClamp;
+import pw.stamina.mandate.annotations.numeric.RealClamp;
 import pw.stamina.mandate.io.IODescriptor;
 
 import java.math.BigDecimal;

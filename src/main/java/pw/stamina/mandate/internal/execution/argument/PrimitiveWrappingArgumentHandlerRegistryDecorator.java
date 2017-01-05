@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Foundry
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,31 +20,36 @@ package pw.stamina.mandate.internal.execution.argument;
 
 import pw.stamina.mandate.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
-import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistryBuilder;
+import pw.stamina.mandate.internal.utils.PrimitiveArrays;
+import pw.stamina.mandate.internal.utils.Primitives;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author Mark Johnson
  */
-public class SimpleArgumentHandlerRegistryBuilder implements ArgumentHandlerRegistryBuilder {
+public class PrimitiveWrappingArgumentHandlerRegistryDecorator implements ArgumentHandlerRegistry {
 
     private final ArgumentHandlerRegistry argumentHandlerRegistry;
 
-    public SimpleArgumentHandlerRegistryBuilder() {
-        this.argumentHandlerRegistry = new PrimitiveWrappingArgumentHandlerRegistryDecorator(new SimpleArgumentHandlerRegistry());
+    public PrimitiveWrappingArgumentHandlerRegistryDecorator(final ArgumentHandlerRegistry backingArgumentHandlerRegistry) {
+        this.argumentHandlerRegistry = backingArgumentHandlerRegistry;
     }
 
     @Override
-    public ArgumentHandlerRegistryBuilder addHandler(final ArgumentHandler<?> argumentHandler) {
-        if (!argumentHandlerRegistry.addArgumentHandler(argumentHandler)) {
-            throw new IllegalStateException(String.format("A top-level handler for arguments of type %s already exists in the registry", Arrays.asList(argumentHandler.getHandledTypes())));
+    public <T> Optional<ArgumentHandler<T>> findArgumentHandler(Class<T> type) {
+        if (type.isPrimitive()) {
+            type = Primitives.wrap(type);
+        } else if (type.isArray()) {
+            @SuppressWarnings("unchecked")
+            final Class<T> wrappedArray = (Class<T>) PrimitiveArrays.wrap(type);
+            type = wrappedArray;
         }
-        return this;
+        return argumentHandlerRegistry.findArgumentHandler(type);
     }
 
     @Override
-    public ArgumentHandlerRegistry build() {
-        return argumentHandlerRegistry;
+    public boolean addArgumentHandler(final ArgumentHandler<?> argumentHandler) {
+        return argumentHandlerRegistry.addArgumentHandler(argumentHandler);
     }
 }

@@ -29,6 +29,7 @@ import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.internal.utils.reflect.TypeBuilder;
 import pw.stamina.mandate.parsing.ArgumentReificationException;
 import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
+import pw.stamina.mandate.parsing.InputParsingException;
 
 import java.util.*;
 
@@ -38,7 +39,7 @@ import java.util.*;
 public enum DefaultArgumentReifier implements ArgumentReificationStrategy {
     INSTANCE;
 
-    public Object[] parse(final Deque<CommandArgument> arguments, final List<CommandParameter> parameters, final ExecutionContext executionContext, final CommandContext commandContext) throws ArgumentReificationException {
+    public Object[] parse(final Deque<CommandArgument> arguments, final List<CommandParameter> parameters, final ExecutionContext executionContext, final CommandContext commandContext) throws InputParsingException {
         final List<Object> parsedArgs = new ArrayList<>(parameters.size());
         final Set<String> excludedFlags = new HashSet<>();
 

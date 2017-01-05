@@ -18,6 +18,7 @@
 
 package pw.stamina.mandate.internal.execution.argument;
 
+import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
 import pw.stamina.mandate.internal.execution.argument.handlers.*;
 
 import java.util.Arrays;
@@ -26,7 +27,8 @@ import java.util.Arrays;
  * @author Mark Johnson
  */
 public final class DefaultArgumentHandlerRegistry extends SimpleArgumentHandlerRegistry {
-    public DefaultArgumentHandlerRegistry() {
+
+    private DefaultArgumentHandlerRegistry() {
         Arrays.asList(
                 new ArrayArgumentHandler(),
                 new BooleanArgumentHandler(),
@@ -40,5 +42,9 @@ public final class DefaultArgumentHandlerRegistry extends SimpleArgumentHandlerR
                 new OptionalArgumentTypeParameterHandler(),
                 new SetArgumentHandler()
         ).forEach(this::addArgumentHandler);
+    }
+
+    public static ArgumentHandlerRegistry makeDefaultRegistry() {
+        return new PrimitiveWrappingArgumentHandlerRegistryDecorator(new DefaultArgumentHandlerRegistry());
     }
 }

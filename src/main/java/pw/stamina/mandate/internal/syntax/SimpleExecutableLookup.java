@@ -35,6 +35,10 @@ public class SimpleExecutableLookup implements ExecutableLookup {
         this.exception = exception;
     }
 
+    public SimpleExecutableLookup(final CommandExecutable executable) {
+        this(executable, null);
+    }
+
     @Override
     public Exception getException() {
         return exception;

@@ -23,8 +23,8 @@ import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.execution.argument.CommandArgument;
 import pw.stamina.mandate.parsing.InputParsingException;
-import pw.stamina.mandate.internal.annotations.Length;
-import pw.stamina.mandate.internal.annotations.strings.Equals;
+import pw.stamina.mandate.annotations.Length;
+import pw.stamina.mandate.annotations.strings.Equals;
 
 import javax.swing.text.Segment;
 import java.nio.CharBuffer;

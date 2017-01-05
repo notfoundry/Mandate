@@ -31,7 +31,7 @@ import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.execution.result.ExitCode;
 import pw.stamina.mandate.io.IODescriptor;
-import pw.stamina.mandate.internal.annotations.Length;
+import pw.stamina.mandate.annotations.Length;
 
 import java.util.*;
 

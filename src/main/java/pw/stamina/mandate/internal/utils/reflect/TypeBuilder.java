@@ -20,6 +20,8 @@ package pw.stamina.mandate.internal.utils.reflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -34,18 +36,66 @@ public final class TypeBuilder {
         Objects.requireNonNull(rawType, "Raw type cannot be null");
         Objects.requireNonNull(typeParameters, "Type parameters cannot be null");
 
-        if (rawType.getTypeParameters().length != typeParameters.length) {
+        final TypeVariable<?>[] typeVariablesForType = rawType.getTypeParameters();
+        if (typeVariablesForType.length != typeParameters.length) {
             throw new IllegalArgumentException(String.format("Tried to pass %d type parameters to type %s (%d type parameters)",
                     typeParameters.length, rawType.getCanonicalName(), rawType.getTypeParameters().length));
         }
 
         if (typeParameters.length > 0) {
-            for (final Type type : typeParameters) {
-                Objects.requireNonNull(type, "Type parameters cannot be null");
+            for (int i = 0; i < typeParameters.length; i++) {
+                Objects.requireNonNull(typeParameters[i], "Type parameters cannot be null");
+                final Type[] typeBounds = typeVariablesForType[i].getBounds();
+                for (final Type bound : typeBounds) {
+                    checkTypeBounds(bound, typeParameters[i]);
+                }
             }
             return new ConstructedParameterizedType(rawType, typeParameters);
         } else {
             return rawType;
+        }
+    }
+
+    private static void checkTypeBounds(Type boundary, Type attempt) {
+        if (boundary instanceof Class) {
+            if (attempt instanceof Class) {
+                if (!((Class<?>) boundary).isAssignableFrom((Class<?>) attempt)) {
+                    throw new IllegalArgumentException("");
+                }
+            } else if (attempt instanceof ParameterizedType) {
+                if (!((Class<?>) boundary).isAssignableFrom((Class<?>) ((ParameterizedType) attempt).getRawType())) {
+                    throw new IllegalArgumentException("");
+                }
+            } else if (attempt instanceof WildcardType) {
+                for (final Type type : ((WildcardType) attempt).getUpperBounds()) {
+                    if (type instanceof Class) {
+                        if (!((Class<?>) boundary).isAssignableFrom((Class<?>) type)) {
+                            throw new IllegalArgumentException("");
+                        }
+                    } else if (type instanceof ParameterizedType) {
+                        if (!((Class<?>) boundary).isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
+                            throw new IllegalArgumentException("");
+                        }
+                    }
+                }
+                for (final Type type : ((WildcardType) attempt).getLowerBounds()) {
+                    if (type instanceof Class) {
+                        if (!((Class<?>) type).isAssignableFrom((Class<?>) boundary)) {
+                            throw new IllegalArgumentException("");
+                        }
+                    } else if (type instanceof ParameterizedType) {
+                        if (!((Class<?>) ((ParameterizedType) type).getRawType()).isAssignableFrom((Class<?>) boundary)) {
+                            throw new IllegalArgumentException("");
+                        }
+                    }
+                }
+            }
+        } else if (boundary instanceof ParameterizedType) {
+            if (attempt instanceof Class) {
+                if (!((Class<?>) ((ParameterizedType) boundary).getRawType()).isAssignableFrom((Class<?>) attempt)) {
+                    throw new IllegalArgumentException("");
+                }
+            }
         }
     }
 

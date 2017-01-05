@@ -20,8 +20,6 @@ package pw.stamina.mandate.internal.execution.argument;
 
 import pw.stamina.mandate.execution.argument.ArgumentHandler;
 import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
-import pw.stamina.mandate.internal.utils.PrimitiveArrays;
-import pw.stamina.mandate.internal.utils.Primitives;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,14 +38,6 @@ public class SimpleArgumentHandlerRegistry implements ArgumentHandlerRegistry {
 
     @Override
     public <T> Optional<ArgumentHandler<T>> findArgumentHandler(Class<T> type) {
-        if (type.isPrimitive()) {
-            type = Primitives.wrap(type);
-        } else if (type.isArray()) {
-            @SuppressWarnings("unchecked")
-            final Class<T> wrappedArray = (Class<T>) PrimitiveArrays.wrap(type);
-            type = wrappedArray;
-        }
-
         @SuppressWarnings("unchecked")
         final ArgumentHandler<T> handlerLookup = (ArgumentHandler<T>) argumentHandlers.get(type);
         if (handlerLookup != null) {

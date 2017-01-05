@@ -24,7 +24,7 @@
 
     <groupId>pw.stamina</groupId>
     <artifactId>mandate</artifactId>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
     <packaging>jar</packaging>
 
     <name>Mandate</name>
@@ -97,6 +97,7 @@
                         <include>pw.stamina.mandate.test.tests.ClassSyntaxOverrideTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.CollectionArgumentTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.CommandFlagTestSuite</include>
+                        <include>pw.stamina.mandate.test.tests.ConstructedCommandContextTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.ExclusiveCommandFlagTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.ImplicitArgumentsTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.ListArgumentTestSuite</include>

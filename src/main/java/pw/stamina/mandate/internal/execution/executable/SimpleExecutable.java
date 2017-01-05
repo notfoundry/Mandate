@@ -36,7 +36,6 @@ import pw.stamina.mandate.parsing.ArgumentReificationException;
 import pw.stamina.mandate.parsing.InputParsingException;
 
 import java.lang.reflect.Method;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
@@ -71,8 +70,13 @@ class SimpleExecutable implements CommandExecutable {
 
     @Override
     public Execution execute(final Deque<CommandArgument> arguments, final ExecutionContext executionContext) throws ArgumentReificationException {
-        final Object[] parsedArgs = commandContext.getCommandConfiguration().getArgumentReificationStrategy().parse(arguments, parameters, executionContext, commandContext);
-        return ExecutionFactory.makeExecution(commandInvoker, executionContext, parsedArgs, parallel);
+        try {
+            final Object[] parsedArgs = commandContext.getCommandConfiguration().getArgumentReificationStrategy().parse(arguments, parameters, executionContext, commandContext);
+            return ExecutionFactory.makeExecution(commandInvoker, executionContext, parsedArgs, parallel);
+        } catch (InputParsingException e) {
+            executionContext.getIODescriptor().err().write(e.getMessage());
+            return Execution.complete(ExitCode.INVALID);
+        }
     }
 
     @Override
@@ -95,15 +99,12 @@ class SimpleExecutable implements CommandExecutable {
 
     @Override
     public int maximumArguments() {
-        final int baseParameterCount = (int) parameters.stream().filter(param -> !param.isImplicit()).count();
+        final int baseParameterCount = (int) parameters.stream()
+                .filter(param -> !param.isImplicit())
+                .count();
         return baseParameterCount + (int) parameters.stream()
                 .filter(param -> param.getAnnotation(UserFlag.class) != null)
                 .count();
-    }
-
-    @Override
-    public void validate(final Deque<CommandArgument> arguments, final ExecutionContext executionContext) throws InputParsingException {
-        commandContext.getCommandConfiguration().getArgumentReificationStrategy().parse(new ArrayDeque<>(arguments), parameters, executionContext, commandContext);
     }
 
     @Override
@@ -111,7 +112,8 @@ class SimpleExecutable implements CommandExecutable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final SimpleExecutable that = (SimpleExecutable) o;
-        return this.minimumArguments() == that.minimumArguments() && this.maximumArguments() == that.maximumArguments();
+        return this.minimumArguments() == that.minimumArguments() &&
+                this.maximumArguments() == that.maximumArguments();
     }
 
     @Override
