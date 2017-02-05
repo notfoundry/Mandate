@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,18 +20,18 @@ package pw.stamina.mandate.internal.execution;
 
 import pw.stamina.mandate.execution.CommandConfiguration;
 import pw.stamina.mandate.execution.ConfigurationBuilder;
-import pw.stamina.mandate.execution.argument.CommandArgumentCreationStrategy;
+import pw.stamina.mandate.parsing.argument.CommandArgumentCreationStrategy;
 import pw.stamina.mandate.execution.executable.CommandExecutableCreationStrategy;
 import pw.stamina.mandate.execution.parameter.CommandParameterCreationStrategy;
-import pw.stamina.mandate.internal.execution.argument.DefaultCommandArgumentFactory;
+import pw.stamina.mandate.internal.parsing.argument.DefaultCommandArgumentFactory;
 import pw.stamina.mandate.internal.execution.executable.DefaultCommandExecutableFactory;
 import pw.stamina.mandate.internal.execution.parameter.DefaultCommandParameterFactory;
 import pw.stamina.mandate.internal.parsing.DefaultArgumentReifier;
 import pw.stamina.mandate.internal.parsing.DefaultInputTokenizer;
-import pw.stamina.mandate.internal.syntax.component.DefaultSyntaxComponentFactory;
+import pw.stamina.mandate.internal.syntax.component.DefaultSyntaxTreeFactory;
 import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
 import pw.stamina.mandate.parsing.InputTokenizationStrategy;
-import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
+import pw.stamina.mandate.syntax.SyntaxTreeCreationStrategy;
 
 import java.util.Optional;
 
@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 public class SimpleConfigurationBuilder implements ConfigurationBuilder {
 
-    private SyntaxComponentCreationStrategy syntaxComponentCreationStrategy;
+    private SyntaxTreeCreationStrategy syntaxTreeCreationStrategy;
 
     private CommandArgumentCreationStrategy commandArgumentCreationStrategy;
 
@@ -53,9 +53,9 @@ public class SimpleConfigurationBuilder implements ConfigurationBuilder {
     private ArgumentReificationStrategy argumentReificationStrategy;
 
     @Override
-    public ConfigurationBuilder usingSyntaxCreationStrategy(final SyntaxComponentCreationStrategy syntaxComponentCreationStrategy) {
-        checkPrecondition(this.syntaxComponentCreationStrategy == null, "SyntaxComponent creation strategy has already been provided");
-        this.syntaxComponentCreationStrategy = syntaxComponentCreationStrategy;
+    public ConfigurationBuilder usingSyntaxCreationStrategy(final SyntaxTreeCreationStrategy syntaxTreeCreationStrategy) {
+        checkPrecondition(this.syntaxTreeCreationStrategy == null, "SyntaxTree creation strategy has already been provided");
+        this.syntaxTreeCreationStrategy = syntaxTreeCreationStrategy;
         return this;
     }
 
@@ -97,7 +97,7 @@ public class SimpleConfigurationBuilder implements ConfigurationBuilder {
     @Override
     public CommandConfiguration build() {
         return new SimpleCommandConfiguration(
-                Optional.ofNullable(syntaxComponentCreationStrategy).orElseGet(DefaultSyntaxComponentFactory::getInstance),
+                Optional.ofNullable(syntaxTreeCreationStrategy).orElseGet(DefaultSyntaxTreeFactory::getInstance),
                 Optional.ofNullable(commandArgumentCreationStrategy).orElseGet(DefaultCommandArgumentFactory::getInstance),
                 Optional.ofNullable(inputTokenizationStrategy).orElseGet(DefaultInputTokenizer::getInstance),
                 Optional.ofNullable(executableCreationStrategy).orElseGet(DefaultCommandExecutableFactory::getInstance),

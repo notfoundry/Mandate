@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@ package pw.stamina.mandate.internal.syntax;
 
 import pw.stamina.mandate.execution.ExecutionContext;
 import pw.stamina.mandate.execution.executable.CommandExecutable;
-import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.internal.syntax.component.ImmutableSyntaxTreeDecorator;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
 import pw.stamina.mandate.parsing.InputParsingException;
 import pw.stamina.mandate.syntax.CommandRegistry;
 import pw.stamina.mandate.syntax.ExecutableLookup;
-import pw.stamina.mandate.syntax.SyntaxComponent;
-import pw.stamina.mandate.internal.syntax.component.ImmutableSyntaxComponentDecorator;
+import pw.stamina.mandate.syntax.SyntaxTree;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,16 +35,16 @@ import java.util.stream.Collectors;
  */
 public class SimpleCommandRegistry implements CommandRegistry {
 
-    private final Map<String, SyntaxComponent> registeredCommands = new HashMap<>();
+    private final Map<String, SyntaxTree> registeredCommands = new HashMap<>();
 
     @Override
-    public Set<SyntaxComponent> getCommands() {
-        return Collections.unmodifiableSet(registeredCommands.values().stream().map(ImmutableSyntaxComponentDecorator::new).collect(Collectors.toSet()));
+    public Set<SyntaxTree> getCommands() {
+        return Collections.unmodifiableSet(registeredCommands.values().stream().map(ImmutableSyntaxTreeDecorator::new).collect(Collectors.toSet()));
     }
 
     @Override
-    public void addCommand(final SyntaxComponent component) {
-        final SyntaxComponent old;
+    public void addCommand(final SyntaxTree component) {
+        final SyntaxTree old;
         if ((old = registeredCommands.get(component.getSyntax())) == null) {
             registeredCommands.put(component.getSyntax(), component);
         } else {
@@ -56,7 +56,7 @@ public class SimpleCommandRegistry implements CommandRegistry {
     public ExecutableLookup findExecutable(final Deque<CommandArgument> arguments, final ExecutionContext executionContext) {
         int depth = 0;
         final List<CommandArgument> consumedArgs = new ArrayList<>();
-        SyntaxComponent currentComponent;
+        SyntaxTree currentComponent;
         CommandArgument currentArgument;
         if ((currentComponent = registeredCommands.get((currentArgument = arguments.getFirst()).getRaw())) != null) {
 
@@ -76,7 +76,7 @@ public class SimpleCommandRegistry implements CommandRegistry {
                         depth += lowestConsumed;
                     }
                 }
-                final Optional<SyntaxComponent> tokenLookup;
+                final Optional<SyntaxTree> tokenLookup;
                 if (!arguments.isEmpty() && (tokenLookup = currentComponent.findChild(arguments.getFirst().getRaw())).isPresent()) {
                     depth++;
                     currentComponent = tokenLookup.get();
@@ -100,11 +100,11 @@ public class SimpleCommandRegistry implements CommandRegistry {
         return registeredCommands.containsKey(command);
     }
 
-    private static void mergeSyntaxComponent(final SyntaxComponent newComponent, final SyntaxComponent oldComponent) {
-        Optional<SyntaxComponent> lookup;
+    private static void mergeSyntaxComponent(final SyntaxTree newComponent, final SyntaxTree oldComponent) {
+        Optional<SyntaxTree> lookup;
         newComponent.findExecutables().ifPresent(set -> set.forEach(oldComponent::addExecutable));
         if (newComponent.findChildren().isPresent()) {
-            for (final SyntaxComponent component : newComponent.findChildren().get()) {
+            for (final SyntaxTree component : newComponent.findChildren().get()) {
                 if ((lookup = oldComponent.findChild(component.getSyntax())).isPresent()) {
                     mergeSyntaxComponent(component, lookup.get());
                 } else {

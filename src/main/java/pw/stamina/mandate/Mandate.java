@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@ package pw.stamina.mandate;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.ConfigurationBuilder;
 import pw.stamina.mandate.execution.ContextBuilder;
-import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistryBuilder;
-import pw.stamina.mandate.execution.argument.ArgumentProviderBuilder;
+import pw.stamina.mandate.parsing.argument.ArgumentHandlerRegistryBuilder;
+import pw.stamina.mandate.parsing.argument.ArgumentProviderBuilder;
 import pw.stamina.mandate.internal.execution.SimpleConfigurationBuilder;
-import pw.stamina.mandate.internal.execution.argument.SimpleArgumentHandlerRegistryBuilder;
-import pw.stamina.mandate.internal.execution.argument.implicit.SimpleArgumentProviderBuilder;
+import pw.stamina.mandate.internal.parsing.argument.SimpleArgumentHandlerRegistryBuilder;
+import pw.stamina.mandate.internal.parsing.argument.implicit.SimpleArgumentProviderBuilder;
 import pw.stamina.mandate.io.IOBuilder;
 import pw.stamina.mandate.internal.execution.SimpleContextBuilder;
 import pw.stamina.mandate.internal.io.SimpleIOBuilder;
@@ -100,7 +100,7 @@ public final class Mandate {
      * @return the semantic version number of this copy of Mandate
      */
     public static String getVersion() {
-        return "2.3.0";
+        return "3.0.0";
     }
 
     /**

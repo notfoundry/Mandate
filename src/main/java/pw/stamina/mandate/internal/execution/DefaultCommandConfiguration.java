@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 package pw.stamina.mandate.internal.execution;
 
 import pw.stamina.mandate.execution.CommandConfiguration;
-import pw.stamina.mandate.execution.argument.CommandArgumentCreationStrategy;
-import pw.stamina.mandate.internal.execution.argument.DefaultCommandArgumentFactory;
+import pw.stamina.mandate.parsing.argument.CommandArgumentCreationStrategy;
+import pw.stamina.mandate.internal.parsing.argument.DefaultCommandArgumentFactory;
 import pw.stamina.mandate.execution.executable.CommandExecutableCreationStrategy;
 import pw.stamina.mandate.internal.execution.executable.DefaultCommandExecutableFactory;
 import pw.stamina.mandate.execution.parameter.CommandParameterCreationStrategy;
@@ -29,8 +29,8 @@ import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
 import pw.stamina.mandate.internal.parsing.DefaultArgumentReifier;
 import pw.stamina.mandate.internal.parsing.DefaultInputTokenizer;
 import pw.stamina.mandate.parsing.InputTokenizationStrategy;
-import pw.stamina.mandate.internal.syntax.component.DefaultSyntaxComponentFactory;
-import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
+import pw.stamina.mandate.internal.syntax.component.DefaultSyntaxTreeFactory;
+import pw.stamina.mandate.syntax.SyntaxTreeCreationStrategy;
 
 /**
  * @author Mark Johnson
@@ -39,8 +39,8 @@ public enum DefaultCommandConfiguration implements CommandConfiguration {
     INSTANCE;
 
     @Override
-    public SyntaxComponentCreationStrategy getSyntaxCreationStrategy() {
-        return DefaultSyntaxComponentFactory.getInstance();
+    public SyntaxTreeCreationStrategy getSyntaxCreationStrategy() {
+        return DefaultSyntaxTreeFactory.getInstance();
     }
 
     @Override

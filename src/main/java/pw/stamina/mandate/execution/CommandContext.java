@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@
 package pw.stamina.mandate.execution;
 
 import pw.stamina.mandate.annotations.Syntax;
-import pw.stamina.mandate.execution.argument.ArgumentProvider;
-import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
 import pw.stamina.mandate.execution.result.Execution;
-import pw.stamina.mandate.io.IODescriptor;
 import pw.stamina.mandate.io.IOEnvironment;
+import pw.stamina.mandate.parsing.argument.ArgumentHandlerRegistry;
+import pw.stamina.mandate.parsing.argument.ArgumentProvider;
+import pw.stamina.mandate.security.CommandSender;
 import pw.stamina.mandate.syntax.CommandRegistry;
 
 /**
@@ -66,18 +66,7 @@ public interface CommandContext {
      */
     Execution execute(String input);
 
-    /**
-     * Tries to execute a command based on the provided input, using the provided IODescriptor for the execution
-     * <p>
-     * If the execution fails as a result of invalid or malformed user input, the result of this
-     * will immediately have a present exit code of {@link pw.stamina.mandate.execution.result.ExitCode#INVALID INVALID}. Otherwise,
-     * this will return an {@link Execution execution} corresponding to the evaluated command running possibly asynchronously
-     *
-     * @param input the input to be tokenized and parsed as a command and its arguments
-     * @param descriptor the IODescriptor to use for the terminating command in this execution
-     * @return a running execution if the invocation completed without errors, else a completed execution with an exit code of INVALID
-     */
-    Execution execute(String input, IODescriptor descriptor);
+    Execution execute(String input, CommandSender commandSender);
 
     IOEnvironment getIOEnvironment();
 

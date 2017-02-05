@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@ package pw.stamina.mandate.internal.execution;
 import pw.stamina.mandate.execution.CommandConfiguration;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.ContextBuilder;
-import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
-import pw.stamina.mandate.execution.argument.ArgumentProvider;
-import pw.stamina.mandate.internal.execution.argument.ForkedArgumentHandlerRegistry;
-import pw.stamina.mandate.internal.execution.argument.implicit.ForkedArgumentProvider;
+import pw.stamina.mandate.parsing.argument.ArgumentHandlerRegistry;
+import pw.stamina.mandate.parsing.argument.ArgumentProvider;
+import pw.stamina.mandate.internal.parsing.argument.ForkedArgumentHandlerRegistry;
+import pw.stamina.mandate.internal.parsing.argument.implicit.ForkedArgumentProvider;
 import pw.stamina.mandate.internal.syntax.ForkedCommandRegistry;
 import pw.stamina.mandate.io.IOEnvironment;
 import pw.stamina.mandate.syntax.CommandRegistry;
-import pw.stamina.mandate.internal.execution.argument.DefaultArgumentHandlerRegistry;
-import pw.stamina.mandate.internal.execution.argument.implicit.ArgumentProviderFactory;
+import pw.stamina.mandate.internal.parsing.argument.DefaultArgumentHandlerRegistry;
+import pw.stamina.mandate.internal.parsing.argument.implicit.ArgumentProviderFactory;
 import pw.stamina.mandate.internal.io.DefaultIOEnvironment;
 import pw.stamina.mandate.internal.syntax.SimpleCommandRegistry;
 

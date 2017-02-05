@@ -1,0 +1,54 @@
+/*
+ * Mandate - A flexible annotation-based command parsing and execution system
+ * Copyright (C) 2017 Mark Johnson
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package pw.stamina.mandate.internal.parsing.argument.implicit;
+
+import pw.stamina.mandate.parsing.argument.ArgumentProvider;
+
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+/**
+ * @author Mark Johnson
+ */
+public class SimpleArgumentProvider implements ArgumentProvider {
+
+    private final Map<Type, Supplier<?>> valueProviders;
+
+    public SimpleArgumentProvider(final Map<Type, Supplier<?>> valueProviders) {
+        this.valueProviders = valueProviders;
+    }
+
+    @Override
+    public void registerProvider(final Type valueType, final Supplier<?> valueProvider) {
+        valueProviders.put(valueType, valueProvider);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Optional<Supplier<?>> findProvider(final Type valueType) {
+        return Optional.ofNullable(valueProviders.get(valueType));
+    }
+
+    @Override
+    public boolean isProviderPresent(final Type valueType) {
+        return valueProviders.containsKey(valueType);
+    }
+}

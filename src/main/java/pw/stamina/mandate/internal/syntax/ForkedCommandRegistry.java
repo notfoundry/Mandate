@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 package pw.stamina.mandate.internal.syntax;
 
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
 import pw.stamina.mandate.syntax.CommandRegistry;
 import pw.stamina.mandate.syntax.ExecutableLookup;
-import pw.stamina.mandate.syntax.SyntaxComponent;
+import pw.stamina.mandate.syntax.SyntaxTree;
 
 import java.util.Deque;
 import java.util.HashSet;
@@ -43,22 +43,22 @@ public class ForkedCommandRegistry implements CommandRegistry {
     }
 
     @Override
-    public Set<SyntaxComponent> getCommands() {
-        final Set<SyntaxComponent> componentSet = new HashSet<>();
+    public Set<SyntaxTree> getCommands() {
+        final Set<SyntaxTree> componentSet = new HashSet<>();
         componentSet.addAll(thisRegistry.getCommands());
         componentSet.addAll(forkedRegistry.getCommands());
         return componentSet;
     }
 
     @Override
-    public void addCommand(final SyntaxComponent component) {
+    public void addCommand(final SyntaxTree component) {
         thisRegistry.addCommand(component);
     }
 
     @Override
-    public ExecutableLookup findExecutable(final Deque<CommandArgument> syntaxComponents, final ExecutionContext executionContext) {
-        final ExecutableLookup lookup = thisRegistry.findExecutable(syntaxComponents, executionContext);
-        return lookup.wasSuccessful() ? lookup : forkedRegistry.findExecutable(syntaxComponents, executionContext);
+    public ExecutableLookup findExecutable(final Deque<CommandArgument> commandArguments, final ExecutionContext executionContext) {
+        final ExecutableLookup lookup = thisRegistry.findExecutable(commandArguments, executionContext);
+        return lookup.wasSuccessful() ? lookup : forkedRegistry.findExecutable(commandArguments, executionContext);
     }
 
     @Override

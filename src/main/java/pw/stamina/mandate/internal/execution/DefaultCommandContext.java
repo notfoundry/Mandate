@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,17 @@ import pw.stamina.mandate.annotations.Executes;
 import pw.stamina.mandate.execution.CommandConfiguration;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.execution.argument.ArgumentHandlerRegistry;
-import pw.stamina.mandate.execution.argument.ArgumentProvider;
-import pw.stamina.mandate.execution.argument.CommandArgument;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.execution.result.ExitCode;
 import pw.stamina.mandate.internal.execution.executable.context.ExecutionContextFactory;
+import pw.stamina.mandate.internal.security.UnprivilegedCommandSender;
 import pw.stamina.mandate.io.IODescriptor;
 import pw.stamina.mandate.io.IOEnvironment;
 import pw.stamina.mandate.parsing.InputTokenizationException;
+import pw.stamina.mandate.parsing.argument.ArgumentHandlerRegistry;
+import pw.stamina.mandate.parsing.argument.ArgumentProvider;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
+import pw.stamina.mandate.security.CommandSender;
 import pw.stamina.mandate.syntax.CommandRegistry;
 import pw.stamina.mandate.syntax.ExecutableLookup;
 
@@ -68,7 +70,7 @@ public class DefaultCommandContext implements CommandContext {
         boolean registered = false;
         for (final Method method : container.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Executes.class)) {
-                commandConfiguration.getSyntaxCreationStrategy().getComponents(method, container, this).forEach(commandRegistry::addCommand);
+                commandConfiguration.getSyntaxCreationStrategy().createSyntaxTree(method, container, this).forEach(commandRegistry::addCommand);
                 registered = true;
             }
         }
@@ -76,12 +78,14 @@ public class DefaultCommandContext implements CommandContext {
     }
 
     @Override
-    public Execution execute(final String input, final IODescriptor descriptor) {
-        if (input == null) {
-            descriptor.err().write("Invalid input: input cannot be empty");
-            return Execution.complete(ExitCode.INVALID);
-        } else if (input.isEmpty()) {
-            descriptor.err().write("Invalid input: input cannot be empty");
+    public Execution execute(final String input) {
+        return execute(input, UnprivilegedCommandSender.INSTANCE);
+    }
+
+    @Override
+    public Execution execute(final String input, final CommandSender commandSender) {
+        final IODescriptor ioDescriptor = ioEnvironment.descriptorFactory().get();
+        if (!isInputNonnullAndPresent(input, ioDescriptor)) {
             return Execution.complete(ExitCode.INVALID);
         }
 
@@ -89,27 +93,34 @@ public class DefaultCommandContext implements CommandContext {
         try {
             arguments = commandConfiguration.getInputTokenizationStrategy().parse(input, commandConfiguration.getArgumentCreationStrategy());
         } catch (final InputTokenizationException e) {
-            descriptor.err().write("Exception tokenizing input: " + e.getLocalizedMessage());
+            ioDescriptor.err().write("Exception tokenizing input: " + e.getLocalizedMessage());
             return Execution.complete(ExitCode.INVALID);
         }
 
         final Map<Type, Object> typesForContext = new HashMap<>();
-        typesForContext.put(IODescriptor.class, descriptor);
+        typesForContext.put(IODescriptor.class, ioDescriptor);
         typesForContext.put(CommandContext.class, this);
-        final ExecutionContext executionContext = ExecutionContextFactory.makeContext(typesForContext, providerRepository);
+        final ExecutionContext executionContext = ExecutionContextFactory.makeContext(typesForContext, providerRepository, commandSender);
 
         final ExecutableLookup executableLookup = commandRegistry.findExecutable(arguments, executionContext);
         if (executableLookup.wasSuccessful()) {
             return executableLookup.getExecutable().execute(arguments, executionContext);
         } else {
-            descriptor.err().write(executableLookup.getException().getMessage());
+            ioDescriptor.err().write(executableLookup.getException().getMessage());
             return Execution.complete(ExitCode.INVALID);
         }
     }
 
-    @Override
-    public Execution execute(final String input) {
-        return execute(input, ioEnvironment.descriptorFactory().get());
+    private static boolean isInputNonnullAndPresent(final String input, final IODescriptor ioDescriptor) {
+        if (input == null) {
+            ioDescriptor.err().write("Invalid input: input cannot be empty");
+            return false;
+        } else if (input.isEmpty()) {
+            ioDescriptor.err().write("Invalid input: input cannot be empty");
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override

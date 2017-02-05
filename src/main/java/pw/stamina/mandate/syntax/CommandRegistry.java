@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package pw.stamina.mandate.syntax;
 
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
 
 import java.util.Deque;
 import java.util.Set;
@@ -31,11 +31,11 @@ public interface CommandRegistry {
     /**
      * @return a collection of all the base syntax components from which valid commands exist
      */
-    Set<SyntaxComponent> getCommands();
+    Set<SyntaxTree> getCommands();
 
-    void addCommand(SyntaxComponent component);
+    void addCommand(SyntaxTree component);
 
-    ExecutableLookup findExecutable(Deque<CommandArgument> syntaxComponents, ExecutionContext executionContext);
+    ExecutableLookup findExecutable(Deque<CommandArgument> commandArguments, ExecutionContext executionContext);
 
     boolean commandPresent(String command);
 }

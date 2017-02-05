@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,19 @@
 package pw.stamina.mandate.internal.execution;
 
 import pw.stamina.mandate.execution.CommandConfiguration;
-import pw.stamina.mandate.execution.argument.CommandArgumentCreationStrategy;
+import pw.stamina.mandate.parsing.argument.CommandArgumentCreationStrategy;
 import pw.stamina.mandate.execution.executable.CommandExecutableCreationStrategy;
 import pw.stamina.mandate.execution.parameter.CommandParameterCreationStrategy;
 import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
 import pw.stamina.mandate.parsing.InputTokenizationStrategy;
-import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
+import pw.stamina.mandate.syntax.SyntaxTreeCreationStrategy;
 
 /**
  * @author Mark Johnson
  */
 public class SimpleCommandConfiguration implements CommandConfiguration {
 
-    private final SyntaxComponentCreationStrategy syntaxComponentCreationStrategy;
+    private final SyntaxTreeCreationStrategy syntaxTreeCreationStrategy;
 
     private final CommandArgumentCreationStrategy commandArgumentCreationStrategy;
 
@@ -43,13 +43,13 @@ public class SimpleCommandConfiguration implements CommandConfiguration {
 
     private final ArgumentReificationStrategy argumentReificationStrategy;
 
-    public SimpleCommandConfiguration(final SyntaxComponentCreationStrategy syntaxComponentCreationStrategy,
+    public SimpleCommandConfiguration(final SyntaxTreeCreationStrategy syntaxTreeCreationStrategy,
                                       final CommandArgumentCreationStrategy commandArgumentCreationStrategy,
                                       final InputTokenizationStrategy inputTokenizationStrategy,
                                       final CommandExecutableCreationStrategy executableCreationStrategy,
                                       final CommandParameterCreationStrategy parameterCreationStrategy,
                                       final ArgumentReificationStrategy argumentReificationStrategy) {
-        this.syntaxComponentCreationStrategy = syntaxComponentCreationStrategy;
+        this.syntaxTreeCreationStrategy = syntaxTreeCreationStrategy;
         this.commandArgumentCreationStrategy = commandArgumentCreationStrategy;
         this.inputTokenizationStrategy = inputTokenizationStrategy;
         this.executableCreationStrategy = executableCreationStrategy;
@@ -58,8 +58,8 @@ public class SimpleCommandConfiguration implements CommandConfiguration {
     }
 
     @Override
-    public SyntaxComponentCreationStrategy getSyntaxCreationStrategy() {
-        return syntaxComponentCreationStrategy;
+    public SyntaxTreeCreationStrategy getSyntaxCreationStrategy() {
+        return syntaxTreeCreationStrategy;
     }
 
     @Override

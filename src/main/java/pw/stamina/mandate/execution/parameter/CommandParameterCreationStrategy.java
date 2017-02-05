@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ public interface CommandParameterCreationStrategy {
      * @param backingMethod the backing method that the produced list of CommandParameters will be based on
      * @param commandContext the command context associated with this creation attempt
      * @return a list of CommandParameters best matching the parameters of the backing method
-     * @throws UnsupportedParameterException if one of the parameters of the provided method does not have a suitable {@link pw.stamina.mandate.execution.argument.ArgumentHandler ArgumentHandler}
+     * @throws UnsupportedParameterException if one of the parameters of the provided method does not have a suitable {@link pw.stamina.mandate.parsing.argument.ArgumentHandler ArgumentHandler}
      */
     List<CommandParameter> generateCommandParameters(Method backingMethod, CommandContext commandContext) throws UnsupportedParameterException;
 }

@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,6 @@ public final class ExecutionFactory {
     private ExecutionFactory() {}
 
     public static Execution makeExecution(CommandInvoker invoker, ExecutionContext executionContext, Object[] parsedArguments, boolean parallel) {
-        return (parallel) ? new AsynchronousInvokerExecution(invoker, executionContext, parsedArguments) : new SynchronousTransformerExecution(invoker, executionContext, parsedArguments);
+        return (parallel) ? new AsynchronousInvokerExecution(invoker, executionContext, parsedArguments) : new SynchronousInvokerExecution(invoker, executionContext, parsedArguments);
     }
 }

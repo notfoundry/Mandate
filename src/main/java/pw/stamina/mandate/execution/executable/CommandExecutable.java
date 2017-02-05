@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,11 @@
 package pw.stamina.mandate.execution.executable;
 
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.io.IODescriptor;
+import pw.stamina.mandate.security.CommandSender;
 
 import java.util.Deque;
 import java.util.List;
@@ -43,6 +44,10 @@ public interface CommandExecutable {
      * @return a possibly asynchronous execution representing a running invocation of this executable
      */
     Execution execute(Deque<CommandArgument> arguments, ExecutionContext executionContext);
+
+    default boolean canExecute(CommandSender commandSender) {
+        return true;
+    }
 
     /**
      * @return a list of the parameters that this executable is defined as having

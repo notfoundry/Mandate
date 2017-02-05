@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Foundry
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ import pw.stamina.mandate.annotations.Executes;
 import pw.stamina.mandate.annotations.Implicit;
 import pw.stamina.mandate.annotations.Syntax;
 import pw.stamina.mandate.execution.CommandContext;
-import pw.stamina.mandate.execution.argument.ArgumentHandler;
-import pw.stamina.mandate.execution.argument.CommandArgument;
+import pw.stamina.mandate.parsing.argument.ArgumentHandler;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
 import pw.stamina.mandate.execution.result.Execution;
 import pw.stamina.mandate.execution.result.ExitCode;

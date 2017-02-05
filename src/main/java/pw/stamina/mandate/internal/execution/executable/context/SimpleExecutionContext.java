@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@
 package pw.stamina.mandate.internal.execution.executable.context;
 
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.execution.argument.ArgumentProvider;
+import pw.stamina.mandate.parsing.argument.ArgumentProvider;
 import pw.stamina.mandate.io.IODescriptor;
+import pw.stamina.mandate.security.CommandSender;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -35,9 +36,12 @@ public class SimpleExecutionContext implements ExecutionContext {
 
     private final ArgumentProvider providerRepository;
 
-    public SimpleExecutionContext(final Map<Type, Object> localValues, final ArgumentProvider providerRepository) {
+    private final CommandSender commandSender;
+
+    public SimpleExecutionContext(final Map<Type, Object> localValues, final ArgumentProvider providerRepository, final CommandSender commandSender) {
         this.localValues = localValues;
         this.providerRepository = providerRepository;
+        this.commandSender = commandSender;
     }
 
     @Override
@@ -52,5 +56,10 @@ public class SimpleExecutionContext implements ExecutionContext {
                         .orElseThrow(() -> new IllegalArgumentException("Unable to resolve a suitable value for type " + type.getTypeName()))
                         .get()
                 );
+    }
+
+    @Override
+    public CommandSender getCommandSender() {
+        return commandSender;
     }
 }

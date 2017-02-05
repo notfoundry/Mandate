@@ -1,6 +1,6 @@
 /*
  * Mandate - A flexible annotation-based command parsing and execution system
- * Copyright (C) 2016 Mark Johnson
+ * Copyright (C) 2017 Mark Johnson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 package pw.stamina.mandate.execution;
 
-import pw.stamina.mandate.execution.argument.CommandArgumentCreationStrategy;
+import pw.stamina.mandate.parsing.argument.CommandArgumentCreationStrategy;
 import pw.stamina.mandate.execution.executable.CommandExecutableCreationStrategy;
 import pw.stamina.mandate.execution.parameter.CommandParameterCreationStrategy;
 import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
 import pw.stamina.mandate.parsing.InputTokenizationStrategy;
-import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
+import pw.stamina.mandate.syntax.SyntaxTreeCreationStrategy;
 
 /**
  * A configuration object that a {@link CommandContext CommandContext} may use to determine how various parts of the
@@ -32,7 +32,7 @@ import pw.stamina.mandate.syntax.SyntaxComponentCreationStrategy;
  * @author Mark Johnson
  */
 public interface CommandConfiguration {
-    SyntaxComponentCreationStrategy getSyntaxCreationStrategy();
+    SyntaxTreeCreationStrategy getSyntaxCreationStrategy();
 
     CommandArgumentCreationStrategy getArgumentCreationStrategy();
 
