@@ -24,7 +24,7 @@
 
     <groupId>pw.stamina</groupId>
     <artifactId>mandate</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
 
     <name>Mandate</name>
@@ -92,6 +92,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <includes>
+                        <include>pw.stamina.mandate.test.tests.ArgumentPassingStylesTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.ArrayArgumentTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.ClassSyntaxInheritanceTestSuite</include>
                         <include>pw.stamina.mandate.test.tests.ClassSyntaxOverrideTestSuite</include>

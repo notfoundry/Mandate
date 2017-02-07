@@ -100,7 +100,6 @@ public enum DefaultArgumentReifier implements ArgumentReificationStrategy {
             }
         }
 
-
         if (!arguments.isEmpty()) {
             throw new ArgumentReificationException(String.format("Passed %d invalid or previously present argument(s): %s", arguments.size(), arguments.toString()));
         } else {
