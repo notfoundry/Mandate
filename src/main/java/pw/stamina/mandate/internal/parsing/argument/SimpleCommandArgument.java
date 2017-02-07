@@ -23,10 +23,10 @@ import pw.stamina.mandate.parsing.argument.CommandArgument;
 /**
  * @author Mark Johnson
  */
-class SimpleCommandArgument implements CommandArgument {
+public class SimpleCommandArgument implements CommandArgument {
     private final String argument;
 
-    SimpleCommandArgument(final String argument) {
+    public SimpleCommandArgument(final String argument) {
         this.argument = argument;
     }
 

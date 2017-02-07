@@ -23,13 +23,14 @@ import pw.stamina.mandate.annotations.flag.AutoFlag;
 import pw.stamina.mandate.annotations.flag.UserFlag;
 import pw.stamina.mandate.execution.CommandContext;
 import pw.stamina.mandate.execution.ExecutionContext;
-import pw.stamina.mandate.parsing.argument.ArgumentHandler;
-import pw.stamina.mandate.parsing.argument.CommandArgument;
 import pw.stamina.mandate.execution.parameter.CommandParameter;
+import pw.stamina.mandate.internal.parsing.argument.SimpleCommandArgument;
 import pw.stamina.mandate.internal.utils.reflect.TypeBuilder;
 import pw.stamina.mandate.parsing.ArgumentReificationException;
 import pw.stamina.mandate.parsing.ArgumentReificationStrategy;
 import pw.stamina.mandate.parsing.InputParsingException;
+import pw.stamina.mandate.parsing.argument.ArgumentHandler;
+import pw.stamina.mandate.parsing.argument.CommandArgument;
 
 import java.util.*;
 
@@ -59,8 +60,8 @@ public enum DefaultArgumentReifier implements ArgumentReificationStrategy {
                     }
 
                     final String def = (parameter.getType() == Boolean.class || parameter.getType() == Boolean.TYPE)
-                            ? present != null ? "true" : "false" : present != null ? autoFlag.ifdef()
-                            : autoFlag.elsedef();
+                            ? present != null ? "true" : "false"
+                            : present != null ? autoFlag.ifdef() : autoFlag.elsedef();
                     if (!parameter.isOptional()) {
                         parsedArgs.add((!def.isEmpty()) ? argumentHandler.parse(commandContext.getCommandConfiguration().getArgumentCreationStrategy().newArgument(def), parameter, commandContext) : null);
                     } else {
@@ -121,14 +122,25 @@ public enum DefaultArgumentReifier implements ArgumentReificationStrategy {
     }
 
     private static CommandArgument popFlagAndOperandIfPresent(final Deque<CommandArgument> arguments, final String[] possibilities) {
-        for (final Iterator<CommandArgument> it = arguments.iterator(); it.hasNext();) {
+        for (final Iterator<CommandArgument> it = arguments.iterator(); it.hasNext(); ) {
             final CommandArgument arg = it.next();
-            for (final String option : possibilities) {
-                if (arg.getRaw().equals("-" + option) && it.hasNext()) {
-                    it.remove();
-                    final CommandArgument operand = it.next();
-                    it.remove();
-                    return operand;
+            final int inlineEqualsSignLookup = arg.getRaw().indexOf("=");
+            if (inlineEqualsSignLookup >= 0) {
+                final String contentsBeforeEqualsSign = arg.getRaw().substring(0, inlineEqualsSignLookup);
+                for (final String option : possibilities) {
+                    if (contentsBeforeEqualsSign.equals("-" + option)) {
+                        it.remove();
+                        return new SimpleCommandArgument(arg.getRaw().substring(inlineEqualsSignLookup+1));
+                    }
+                }
+            } else {
+                for (final String option : possibilities) {
+                    if (arg.getRaw().equals("-" + option) && it.hasNext()) {
+                        it.remove();
+                        final CommandArgument operand = it.next();
+                        it.remove();
+                        return operand;
+                    }
                 }
             }
         }
