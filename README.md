@@ -1,17 +1,17 @@
-##A fluent command processing system, in the spirit of POSIX
+## A fluent command processing system, in the spirit of POSIX
 
 [![Build Status](https://travis-ci.org/foundry27/Mandate.svg?branch=master)](https://travis-ci.org/foundry27/Mandate)
 [![codecov](https://codecov.io/gh/foundry27/Mandate/branch/master/graph/badge.svg)](https://codecov.io/gh/foundry27/Mandate)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/pw.stamina/mandate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pw.stamina/mandate)
 
-###What is it?
+### What is it?
 Mandate provides an API for using annotated method definitions to parse user input as *commands* in a similar fashion to POSIX's getopt, except with integrated functionality for defining, searching for, executing, and linking the commands to which that input is presented.
 This is perfectly suited for an environment in which user input has to be gathered from outside the CLI, possibly many numbers of times, and interpreted from within an already running program.
 
 Using Mandate can eliminate boilerplate code and speed up development with integrated platforms, messaging services, games, and more!
 
 
-###How does it work?
+### How does it work?
 
 The first thing you'll need to start using Mandate is a **CommandContext** to use as your combined classpath and executor. The preferred method of getting this is
 
@@ -64,7 +64,7 @@ This method will return a result of type **Execution**, representing a possibly 
 You may notice there is no reference to the string "Greetings!" anywhere here. That's because the outputs of the *greet* command were left to the output stream assigned to the execution through the *IODescriptor* argument. By default, any *CommandContext* will have a **CommandInput** reading from *System.in* for input, and **CommandOutput**s printing to *System.out* for output and error messages. This, however, is totally configurable.
 
 
-###Argument Types
+### Argument Types
 Mandate commands can define four types of arguments, those being **Flags**, **Enforced**, **Optional**, and **Implicit** arguments.
 
 ```java
@@ -107,7 +107,7 @@ context.execute("greet --repetitions 6 yo! Robert -c");
 As you can see, *Flags* can be present anywhere in the input provided by the user. *Enforced* and *Optional* arguments, however, must be provided through the input in declaration order. Because the *IODescriptor* is implicit, we don't have to have a matching argument for it.
 
 
-###Argument Values
+### Argument Values
 Mandate has built-in support for:
   * All primitive types and their wrapper classes
   * All built-in CharSequence types
