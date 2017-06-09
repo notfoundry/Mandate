@@ -5,7 +5,7 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/pw.stamina/mandate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pw.stamina/mandate)
 
 ### What is it?
-Mandate provides an API for using annotated method definitions to parse user input as *commands* in a similar fashion to POSIX's getopt, except with integrated functionality for defining, searching for, executing, and linking the commands to which that input is presented.
+Mandate provides an API for using annotated method definitions to parse user input as *commands* and *command arguments* in a similar fashion to POSIX's getopt, except with integrated functionality for defining, searching for, executing, and linking the commands to which that input is presented.
 This is perfectly suited for an environment in which user input has to be gathered from outside the CLI, possibly many numbers of times, and interpreted from within an already running program.
 
 Using Mandate can eliminate boilerplate code and speed up development with integrated platforms, messaging services, games, and more!
